@@ -5,10 +5,13 @@ export function initDatabase(dbPath?: string): Database.Database {
   const resolvedPath = dbPath || path.resolve(process.cwd(), 'data', 'exonus.db');
   const db = new Database(resolvedPath);
 
-  // Enable WAL (Write-Ahead Logging) mode for microsecond concurrent reads/writes
+  // Enable WAL (Write-Ahead Logging) mode and performance pragmas
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
   db.pragma('synchronous = NORMAL');
+  db.pragma('temp_store = MEMORY');
+  db.pragma('mmap_size = 268435456'); // 256MB zero-copy memory mapped reads
+  db.pragma('cache_size = -64000');   // 64MB memory page cache
 
   db.exec(`
     -- 1. Company & Financial Year Setup
@@ -272,7 +275,30 @@ export function initDatabase(dbPath?: string): Database.Database {
       synced_at DATETIME
     );
 
-    -- Indexes for sub-millisecond query performance
+    -- Performance Indexes & Covering Scans (Audited by Systems Debugger)
+    CREATE INDEX IF NOT EXISTS idx_accounts_company ON accounts(company_id);
+    CREATE INDEX IF NOT EXISTS idx_account_groups_company ON account_groups(company_id);
+    CREATE INDEX IF NOT EXISTS idx_items_company ON items(company_id);
+    CREATE INDEX IF NOT EXISTS idx_mc_company ON material_centres(company_id);
+
+    -- Covering Indexes for Financial & Stock Aggregations (Index-only scans)
+    CREATE INDEX IF NOT EXISTS idx_ledger_acc_covering ON ledger_entries(account_id, debit, credit);
+    CREATE INDEX IF NOT EXISTS idx_stock_covering ON stock_entries(item_id, material_centre_id, inward_qty, outward_qty);
+
+    -- Compound Indexes for Voucher Point & Range Retrievals
+    CREATE INDEX IF NOT EXISTS idx_vouchers_comp_date ON vouchers(company_id, date DESC, created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_vouchers_comp_party_date ON vouchers(company_id, party_account_id, date DESC, created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_outbox_comp_created ON sync_outbox(company_id, created_at DESC);
+
+    -- Foreign Key Cascade Protection Indexes (Eliminates table scans on voucher edit/delete)
+    CREATE INDEX IF NOT EXISTS idx_voucher_items_vch ON voucher_items(voucher_id);
+    CREATE INDEX IF NOT EXISTS idx_voucher_bs_vch ON voucher_bill_sundry_lines(voucher_id);
+    CREATE INDEX IF NOT EXISTS idx_ledger_vch ON ledger_entries(voucher_id);
+    CREATE INDEX IF NOT EXISTS idx_stock_vch ON stock_entries(voucher_id);
+    CREATE INDEX IF NOT EXISTS idx_bill_refs_vch ON bill_references(ref_voucher_id);
+    CREATE INDEX IF NOT EXISTS idx_bill_adj_vch ON bill_adjustments(payment_voucher_id);
+
+    -- Backward compatibility legacy indexes
     CREATE INDEX IF NOT EXISTS idx_ledger_account_date ON ledger_entries(account_id, entry_date);
     CREATE INDEX IF NOT EXISTS idx_stock_item_mc ON stock_entries(item_id, material_centre_id);
     CREATE INDEX IF NOT EXISTS idx_outbox_pending ON sync_outbox(status);

@@ -32,9 +32,9 @@ export function executeProductionRun(db: Database.Database, input: ProductionVou
       db.prepare(`
         INSERT INTO stock_entries (
           id, company_id, voucher_id, item_id, material_centre_id, outward_qty, rate, entry_date
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, NULL, ?, ?, ?, ?, ?)
       `).run(
-        randomUUID(), input.company_id, productionId, rm.raw_item_id,
+        randomUUID(), input.company_id, rm.raw_item_id,
         rm.source_godown_id, consumedQty, item.standard_purchase_rate || 100, input.date
       );
     }
@@ -49,9 +49,9 @@ export function executeProductionRun(db: Database.Database, input: ProductionVou
     db.prepare(`
       INSERT INTO stock_entries (
         id, company_id, voucher_id, item_id, material_centre_id, inward_qty, rate, entry_date
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, NULL, ?, ?, ?, ?, ?)
     `).run(
-      randomUUID(), input.company_id, productionId, bom.finished_item_id,
+      randomUUID(), input.company_id, bom.finished_item_id,
       bom.target_godown_id, totalFinishedUnits, unitCost, input.date
     );
 

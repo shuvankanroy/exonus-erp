@@ -244,5 +244,15 @@ export function extendCommercialSchema(db: Database.Database) {
       status TEXT DEFAULT 'ACT' CHECK(status IN ('ACT', 'CNL')),
       FOREIGN KEY (voucher_id) REFERENCES vouchers(id) ON DELETE CASCADE
     );
+
+    -- Foreign Key Indexes for Commercial Tables
+    CREATE INDEX IF NOT EXISTS idx_brs_vch ON bank_reconciliations(voucher_id);
+    CREATE INDEX IF NOT EXISTS idx_payroll_runs_vch ON payroll_runs(gl_voucher_id);
+    CREATE INDEX IF NOT EXISTS idx_einvoice_vch ON gst_e_invoices(voucher_id);
+    CREATE INDEX IF NOT EXISTS idx_eway_vch ON gst_e_way_bills(voucher_id);
+    CREATE INDEX IF NOT EXISTS idx_so_items_order ON sales_order_items(order_id);
+    CREATE INDEX IF NOT EXISTS idx_po_items_po ON purchase_order_items(po_id);
+    CREATE INDEX IF NOT EXISTS idx_challan_items_challan ON delivery_challan_items(challan_id);
+    CREATE INDEX IF NOT EXISTS idx_bom_raw_bom ON bom_raw_materials(bom_id);
   `);
 }
