@@ -20,6 +20,7 @@ import { createContraVoucher } from './services/contraService.js';
 import { getCompanyFeatures, updateCompanyFeatures, getVoucherSeriesList, updateVoucherSeries, freezeDataUpToDate, getActiveFreezeDate } from './services/configurationService.js';
 import { StockLedgerEngine } from './services/stockLedgerService.js';
 import { SerialBatchService } from './services/serialBatchService.js';
+import { StockOperationsService } from './services/stockOperationsService.js';
 import { randomUUID } from 'crypto';
 import path from 'path';
 import fs from 'fs';
@@ -1182,6 +1183,34 @@ app.post('/api/brands', (req, res) => {
       VALUES (?, ?, ?, ?)
     `).run(id, activeCompanyId, name, description || '');
     res.json({ success: true, id, name });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// --- Phase 4: Stock Entry (4 types) & Physical Reconciliation ---
+
+app.post('/api/stock/entry', (req, res) => {
+  try {
+    const service = new StockOperationsService(db);
+    const result = service.executeStockEntry({
+      ...req.body,
+      company_id: activeCompanyId
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/stock/reconciliation', (req, res) => {
+  try {
+    const service = new StockOperationsService(db);
+    const result = service.executeStockReconciliation({
+      ...req.body,
+      company_id: activeCompanyId
+    });
+    res.json({ success: true, ...result });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
