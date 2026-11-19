@@ -21,6 +21,7 @@ import { getCompanyFeatures, updateCompanyFeatures, getVoucherSeriesList, update
 import { StockLedgerEngine } from './services/stockLedgerService.js';
 import { SerialBatchService } from './services/serialBatchService.js';
 import { StockOperationsService } from './services/stockOperationsService.js';
+import { LandedCostService } from './services/landedCostService.js';
 import { randomUUID } from 'crypto';
 import path from 'path';
 import fs from 'fs';
@@ -1211,6 +1212,71 @@ app.post('/api/stock/reconciliation', (req, res) => {
       company_id: activeCompanyId
     });
     res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// --- Phase 5: Landed Cost Voucher (LCV) & Stock Analytics ---
+
+app.post('/api/stock/landed-cost', (req, res) => {
+  try {
+    const service = new LandedCostService(db);
+    const result = service.executeLandedCostVoucher({
+      ...req.body,
+      company_id: activeCompanyId
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/stock/ageing', (req, res) => {
+  try {
+    // Computes FIFO-based aging buckets (0-30, 31-60, 61-90, 90+ days)
+    const sles = db.prepare(`
+      SELECT sle.*, i.name as item_name, i.sku, mc.name as warehouse_name
+      FROM stock_ledger_entries sle
+      JOIN items i ON sle.item_id = i.id
+      JOIN material_centres mc ON sle.material_centre_id = mc.id
+      WHERE sle.company_id = ? AND sle.is_cancelled = 0
+      ORDER BY sle.posting_date ASC
+    `).all(activeCompanyId) as any[];
+
+    const today = new Date().toISOString().split('T')[0];
+    const itemMap = new Map<string, any>();
+
+    for (const sle of sles) {
+      if (!itemMap.has(sle.item_id)) {
+        itemMap.set(sle.item_id, {
+          item_id: sle.item_id,
+          item_name: sle.item_name,
+          sku: sle.sku,
+          warehouse_name: sle.warehouse_name,
+          current_stock: 0,
+          current_value: 0,
+          age_0_30: 0,
+          age_31_60: 0,
+          age_61_90: 0,
+          age_above_90: 0
+        });
+      }
+
+      const row = itemMap.get(sle.item_id);
+      row.current_stock = Number(sle.qty_after_transaction);
+      row.current_value = Number(sle.stock_value);
+
+      const daysOld = Math.floor((new Date(today).getTime() - new Date(sle.posting_date).getTime()) / (1000 * 3600 * 24));
+      const val = Number(sle.stock_value_difference);
+
+      if (daysOld <= 30) row.age_0_30 = Math.max(0, row.age_0_30 + val);
+      else if (daysOld <= 60) row.age_31_60 = Math.max(0, row.age_31_60 + val);
+      else if (daysOld <= 90) row.age_61_90 = Math.max(0, row.age_61_90 + val);
+      else row.age_above_90 = Math.max(0, row.age_above_90 + val);
+    }
+
+    res.json(Array.from(itemMap.values()));
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
