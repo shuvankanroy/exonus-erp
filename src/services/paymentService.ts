@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import { randomUUID } from 'crypto';
+import { registerBankInstrument } from './brsService.js';
 
 export interface PaymentReceiptInput {
   company_id: string;
@@ -9,6 +10,8 @@ export interface PaymentReceiptInput {
   bank_cash_account_id: string; // Bank or Cash ledger
   amount: number;
   narration?: string;
+  cheque_instrument_number?: string;
+  cheque_date?: string;
   adjust_bills?: Array<{
     bill_reference_id: string;
     amount_to_adjust: number;
@@ -100,7 +103,25 @@ export function createPaymentReceiptVoucher(db: Database.Database, input: Paymen
       }
     }
 
-    // 4. Outbox Sync
+    // 4. Register Bank Instrument for BRS tracking (if payment/receipt involves a Bank Account)
+    const isBankAccount = db.prepare(`
+      SELECT a.id FROM accounts a 
+      JOIN account_groups ag ON a.group_id = ag.id 
+      WHERE a.id = ? AND ag.name = 'Bank Accounts'
+    `).get(input.bank_cash_account_id);
+
+    if (isBankAccount) {
+      registerBankInstrument(db, {
+        company_id: input.company_id,
+        bank_account_id: input.bank_cash_account_id,
+        voucher_id: voucherId,
+        cheque_instrument_number: input.cheque_instrument_number,
+        cheque_date: input.cheque_date || input.date,
+        amount: input.amount
+      });
+    }
+
+    // 5. Outbox Sync
     db.prepare(`
       INSERT INTO sync_outbox (id, company_id, entity_type, entity_id, action, payload)
       VALUES (?, ?, 'VOUCHER', ?, 'CREATE', ?)

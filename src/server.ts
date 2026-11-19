@@ -9,6 +9,7 @@ import { createPaymentReceiptVoucher } from './services/paymentService.js';
 import { createSalesOrder, createDeliveryChallan, getSalesOrders, createSalesQuotation, getSalesQuotations, convertQuotationToOrder } from './services/orderService.js';
 import { createPurchaseOrder, createGoodsReceiptNote, getPurchaseOrders, getGoodsReceiptNotes } from './services/procurementService.js';
 import { getBillSundries, saveBillSundry, seedDefaultBillSundries } from './services/billSundryService.js';
+import { getBankAccounts, getBankReconciliationStatement, updateBankClearance, ensureDefaultBankAccount } from './services/brsService.js';
 import { executeProductionRun } from './services/manufacturingService.js';
 import { processMonthlyPayroll } from './services/payrollService.js';
 import { generateEWayBill, generateEInvoice } from './services/gstComplianceService.js';
@@ -529,6 +530,38 @@ app.post('/api/gst/eway-bill', (req, res) => {
   try {
     const result = generateEWayBill(db, req.body);
     res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 9.1 Bank Reconciliation Statement (BRS Module)
+app.get('/api/brs/banks', (req, res) => {
+  try {
+    const banks = getBankAccounts(db, activeCompanyId);
+    res.json(banks);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/brs/statement', (req, res) => {
+  try {
+    const bankAccountId = req.query.bank_account_id as string;
+    const asOfDate = req.query.as_of_date as string;
+    if (!bankAccountId) throw new Error('bank_account_id is required');
+
+    const statement = getBankReconciliationStatement(db, activeCompanyId, bankAccountId, asOfDate);
+    res.json(statement);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/brs/clearance', (req, res) => {
+  try {
+    const result = updateBankClearance(db, req.body);
+    res.json(result);
   } catch (err: any) {
     res.status(400).json({ success: false, error: err.message });
   }

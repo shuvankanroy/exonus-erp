@@ -120,6 +120,11 @@
           <span class="ml-auto text-[9px] font-mono font-bold bg-slate-100 text-slate-500 px-1 py-0.5 rounded">F6</span>
         </a>
 
+        <a @click="currentView = 'brs_view'; loadBRS();" :class="{ active: currentView === 'brs_view' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
+          <i class="fa-solid fa-building-columns w-4 text-center text-blue-600"></i>
+          <span>Bank Reconciliation (BRS)</span>
+        </a>
+
         <a @click="currentView = 'stock_status'; loadStock();" :class="{ active: currentView === 'stock_status' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
           <i class="fa-solid fa-boxes-stacked w-4 text-center text-indigo-500"></i>
           <span>Stock Status & Godowns</span>
@@ -1103,14 +1108,20 @@
               </div>
             </div>
 
-            <div>
-              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Amount (₹)</label>
-              <input type="number" step="0.01" v-model.number="paymentForm.amount" class="magic-input w-full px-3 py-2.5 border border-slate-200 rounded-lg text-base font-mono font-bold text-slate-900">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Amount (₹)</label>
+                <input type="number" step="0.01" v-model.number="paymentForm.amount" class="magic-input w-full px-3 py-2.5 border border-slate-200 rounded-lg text-base font-mono font-bold text-slate-900">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Cheque / Instrument #</label>
+                <input type="text" v-model="paymentForm.cheque_instrument_number" placeholder="e.g. CHQ-449102" class="magic-input w-full px-3 py-2.5 border border-slate-200 rounded-lg text-xs font-mono font-bold">
+              </div>
             </div>
 
             <div>
-              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Narration / Cheque / UTR #</label>
-              <input type="text" v-model="paymentForm.narration" placeholder="UTR Number or Cheque details..." class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs">
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Narration / Remarks</label>
+              <input type="text" v-model="paymentForm.narration" placeholder="UTR Number, Bank transfer notes, or remarks..." class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs">
             </div>
 
             <div class="pt-4 flex justify-end">
@@ -1374,6 +1385,114 @@
           </div>
         </div>
 
+        <!-- I. BANK RECONCILIATION STATEMENT (BRS) -->
+        <div v-if="currentView === 'brs_view'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-building-columns text-blue-600"></i> Bank Reconciliation Statement (BRS)
+              </h2>
+              <p class="text-xs text-slate-400">Reconcile General Ledger bank accounts with physical bank statements & uncleared cheques</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <select v-model="selectedBankAccountId" @change="loadBRS" class="magic-input px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold text-slate-800">
+                <option v-for="b in bankAccountsList" :key="b.id" :value="b.id">{{ b.name }} (GL: ₹{{ b.book_balance.toFixed(2) }})</option>
+              </select>
+              <button @click="loadBRS" class="px-3 py-1.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1.5">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh
+              </button>
+            </div>
+          </div>
+
+          <!-- BRS Summary Metric Cards (BUSY Architecture) -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 font-mono">
+            <div class="p-4 rounded-xl border border-blue-200 bg-blue-50/50">
+              <span class="text-[10px] font-bold uppercase text-blue-600 tracking-wider">Balance per Books (GL)</span>
+              <p class="text-lg font-black text-blue-900 mt-1">₹{{ (brsStatement.book_balance || 0).toFixed(2) }}</p>
+              <span class="text-[10px] text-blue-500 font-sans">Company Ledger Balance</span>
+            </div>
+
+            <div class="p-4 rounded-xl border border-amber-200 bg-amber-50/50">
+              <span class="text-[10px] font-bold uppercase text-amber-700 tracking-wider">Unpresented Cheques (+)</span>
+              <p class="text-lg font-black text-amber-900 mt-1">₹{{ (brsStatement.unpresented_cheques_total || 0).toFixed(2) }}</p>
+              <span class="text-[10px] text-amber-600 font-sans">Issued Payments Uncleared</span>
+            </div>
+
+            <div class="p-4 rounded-xl border border-rose-200 bg-rose-50/50">
+              <span class="text-[10px] font-bold uppercase text-rose-700 tracking-wider">Uncleared Deposits (-)</span>
+              <p class="text-lg font-black text-rose-900 mt-1">₹{{ (brsStatement.uncleared_deposits_total || 0).toFixed(2) }}</p>
+              <span class="text-[10px] text-rose-600 font-sans">Received Cheques Uncleared</span>
+            </div>
+
+            <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50">
+              <span class="text-[10px] font-bold uppercase text-emerald-700 tracking-wider">Passbook Balance</span>
+              <p class="text-lg font-black text-emerald-900 mt-1">₹{{ (brsStatement.statement_balance || 0).toFixed(2) }}</p>
+              <span class="text-[10px] text-emerald-600 font-sans">Estimated Bank Balance</span>
+            </div>
+          </div>
+
+          <!-- Cheque & Instrument Reconciliation Register -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden">
+            <table class="w-full magic-grid text-left">
+              <thead>
+                <tr>
+                  <th>Voucher #</th>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Party</th>
+                  <th>Instrument / Cheque #</th>
+                  <th class="text-right">Amount (₹)</th>
+                  <th>Clearance Date</th>
+                  <th>Reconciliation Status</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in (brsStatement.items || [])" :key="item.reconciliation_id" class="hover:bg-slate-50/50">
+                  <td class="font-mono text-xs font-bold text-blue-600">{{ item.voucher_number }}</td>
+                  <td class="font-mono text-xs text-slate-500">{{ item.voucher_date }}</td>
+                  <td>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded"
+                      :class="item.transaction_type === 'DEPOSIT' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-purple-50 text-purple-700 border border-purple-200'">
+                      {{ item.transaction_type }}
+                    </span>
+                  </td>
+                  <td class="font-bold text-slate-800">{{ item.party_name }}</td>
+                  <td class="font-mono text-xs text-slate-600 font-bold">{{ item.cheque_instrument_number || 'Direct/NEFT' }}</td>
+                  <td class="text-right font-mono font-black" :class="item.transaction_type === 'DEPOSIT' ? 'text-emerald-600' : 'text-slate-900'">
+                    {{ item.transaction_type === 'DEPOSIT' ? '+' : '-' }}₹{{ item.amount.toFixed(2) }}
+                  </td>
+                  <td class="font-mono text-xs text-slate-600">
+                    <span v-if="item.status === 'CLEARED'" class="text-emerald-700 font-bold">{{ item.bank_clearance_date }}</span>
+                    <span v-else class="text-slate-400 italic">Pending Bank</span>
+                  </td>
+                  <td>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase"
+                      :class="{
+                        'bg-amber-50 text-amber-700 border border-amber-200': item.status === 'UNCLEARED',
+                        'bg-emerald-50 text-emerald-700 border border-emerald-200': item.status === 'CLEARED',
+                        'bg-rose-50 text-rose-700 border border-rose-200': item.status === 'BOUNCED'
+                      }">
+                      {{ item.status }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <button v-if="item.status === 'UNCLEARED'" @click="markChequeCleared(item)" class="text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-1 rounded-md transition">
+                      Clear Cheque ➔
+                    </button>
+                    <button v-else-if="item.status === 'CLEARED'" @click="markChequeUncleared(item)" class="text-[11px] text-slate-500 hover:text-slate-700 underline">
+                      Reset
+                    </button>
+                  </td>
+                </tr>
+                <tr v-if="!brsStatement.items || brsStatement.items.length === 0">
+                  <td colspan="9" class="text-center py-6 text-slate-400 text-xs">No bank transactions found for this account.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- J. CLOUD SYNC -->
         <div v-if="currentView === 'cloud_sync'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
@@ -1466,6 +1585,9 @@
         const boms = ref([]);
         const employees = ref([]);
         const billSundries = ref([]);
+        const bankAccountsList = ref([]);
+        const selectedBankAccountId = ref('');
+        const brsStatement = ref({ book_balance: 0, unpresented_cheques_total: 0, uncleared_deposits_total: 0, statement_balance: 0, items: [] });
 
         // New Party Form
         const newPartyForm = ref({
@@ -1520,6 +1642,7 @@
           party_account_id: '',
           bank_cash_account_id: '',
           amount: 0,
+          cheque_instrument_number: '',
           narration: ''
         });
 
@@ -1962,6 +2085,65 @@
           }
         };
 
+        const loadBRS = async () => {
+          try {
+            const banksRes = await fetch('/api/brs/banks');
+            bankAccountsList.value = await banksRes.json();
+            if (bankAccountsList.value.length > 0 && !selectedBankAccountId.value) {
+              selectedBankAccountId.value = bankAccountsList.value[0].id;
+            }
+            if (selectedBankAccountId.value) {
+              const stmtRes = await fetch(`/api/brs/statement?bank_account_id=${selectedBankAccountId.value}`);
+              brsStatement.value = await stmtRes.json();
+            }
+          } catch (e) {
+            console.error('Failed to load BRS:', e);
+          }
+        };
+
+        const markChequeCleared = async (item) => {
+          const clearDate = prompt('Enter Bank Clearance Date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+          if (!clearDate) return;
+          try {
+            const res = await fetch('/api/brs/clearance', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                reconciliation_id: item.reconciliation_id,
+                bank_clearance_date: clearDate,
+                status: 'CLEARED'
+              })
+            });
+            const data = await res.json();
+            if (data.success) {
+              loadBRS();
+            } else {
+              alert('Error: ' + data.error);
+            }
+          } catch (e) {
+            alert('Failed to clear cheque: ' + e.message);
+          }
+        };
+
+        const markChequeUncleared = async (item) => {
+          try {
+            const res = await fetch('/api/brs/clearance', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                reconciliation_id: item.reconciliation_id,
+                status: 'UNCLEARED'
+              })
+            });
+            const data = await res.json();
+            if (data.success) {
+              loadBRS();
+            }
+          } catch (e) {
+            alert('Failed: ' + e.message);
+          }
+        };
+
         const loadTrialBalance = async () => {
           const res = await fetch('/api/reports/trial-balance');
           trialBalance.value = await res.json();
@@ -2068,7 +2250,13 @@
           loadOrderIntoInvoice,
           loadSync,
           loadEmployees,
-          processPayroll
+          processPayroll,
+          bankAccountsList,
+          selectedBankAccountId,
+          brsStatement,
+          loadBRS,
+          markChequeCleared,
+          markChequeUncleared
         };
       }
     }).mount('#app');
