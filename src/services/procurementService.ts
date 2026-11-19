@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import { randomUUID } from 'crypto';
+import { StockLedgerEngine } from './stockLedgerService.js';
 
 export interface PurchaseOrderInput {
   company_id: string;
@@ -186,6 +187,25 @@ export function createGoodsReceiptNote(db: Database.Database, input: GoodsReceip
         randomUUID(), input.company_id, it.item_id, batchId,
         input.material_centre_id, it.received_qty, it.rate, input.date
       );
+
+      // ERPNext Immutable Stock Ledger Entry (SLE) & Bin Update
+      try {
+        const sleEngine = new StockLedgerEngine(db);
+        sleEngine.postEntry({
+          company_id: input.company_id,
+          voucher_id: grnId,
+          voucher_type: 'PURCHASE_RECEIPT',
+          voucher_number: grnNumber,
+          posting_date: input.date,
+          item_id: it.item_id,
+          material_centre_id: input.material_centre_id,
+          batch_id: batchId || undefined,
+          actual_qty: it.received_qty,
+          incoming_rate: it.rate
+        });
+      } catch (e) {
+        console.warn('GRN SLE posting notice:', e);
+      }
 
       // If linked to PO, update backlog
       if (input.purchase_order_id) {

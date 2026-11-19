@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import { randomUUID } from 'crypto';
+import { StockLedgerEngine } from './stockLedgerService.js';
 
 export interface SalesQuotationInput {
   company_id: string;
@@ -327,6 +328,25 @@ export function createDeliveryChallan(db: Database.Database, input: DeliveryChal
         randomUUID(), input.company_id, it.item_id, it.batch_id || null,
         input.material_centre_id, it.dispatched_qty, it.rate, input.date
       );
+
+      // ERPNext Immutable Stock Ledger Entry (SLE) & Bin Update
+      try {
+        const sleEngine = new StockLedgerEngine(db);
+        sleEngine.postEntry({
+          company_id: input.company_id,
+          voucher_id: challanId,
+          voucher_type: 'DELIVERY_NOTE',
+          voucher_number: challanNumber,
+          posting_date: input.date,
+          item_id: it.item_id,
+          material_centre_id: input.material_centre_id,
+          batch_id: it.batch_id || undefined,
+          actual_qty: -it.dispatched_qty,
+          outgoing_rate: it.rate
+        });
+      } catch (e) {
+        console.warn('Delivery Note SLE posting notice:', e);
+      }
 
       // If linked to Sales Order, update fulfillment backlog
       if (input.sales_order_id) {
