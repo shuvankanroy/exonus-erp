@@ -6,6 +6,7 @@ import { seedCompanyAndStandardMasters } from './db/seed.js';
 import { createSalesVoucher } from './services/salesService.js';
 import { createPurchaseVoucher } from './services/purchaseService.js';
 import { createPaymentReceiptVoucher } from './services/paymentService.js';
+import { createSalesOrder, createDeliveryChallan, getSalesOrders } from './services/orderService.js';
 import { executeProductionRun } from './services/manufacturingService.js';
 import { processMonthlyPayroll } from './services/payrollService.js';
 import { generateEWayBill, generateEInvoice } from './services/gstComplianceService.js';
@@ -245,6 +246,43 @@ app.get('/api/vouchers', (req, res) => {
     LIMIT 200
   `).all(activeCompanyId);
   res.json(vouchers);
+});
+
+// =========================================================================
+// PHASE 2: ORDER-TO-CASH (SALES ORDERS & DELIVERY CHALLANS)
+// =========================================================================
+
+app.get('/api/orders/sales', (req, res) => {
+  try {
+    const orders = getSalesOrders(db, activeCompanyId);
+    res.json(orders);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/orders/sales', (req, res) => {
+  try {
+    const result = createSalesOrder(db, {
+      ...req.body,
+      company_id: activeCompanyId,
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/challans/delivery', (req, res) => {
+  try {
+    const result = createDeliveryChallan(db, {
+      ...req.body,
+      company_id: activeCompanyId,
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
 });
 
 // 4. Create Sales Voucher
