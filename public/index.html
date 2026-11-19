@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exonus ERP - Modern Hybrid Accounting</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Keyboard-focused styling like BUSY/Tally */
+    .busy-grid th { background-color: #1e293b; color: #f8fafc; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 10px; }
+    .busy-grid td { padding: 6px 10px; border-bottom: 1px solid #e2e8f0; font-size: 0.875rem; }
+    .busy-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased">
+  <div id="app" class="flex flex-col h-screen overflow-hidden">
+
+    <!-- Top Ribbon / Navigation -->
+    <header class="bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md">
+      <div class="flex items-center space-x-3">
+        <div class="bg-blue-600 text-white font-black text-lg px-2.5 py-0.5 rounded shadow">E</div>
+        <div>
+          <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
+            Exonus ERP
+            <span class="text-xs font-medium px-2 py-0.5 rounded bg-blue-900 text-blue-200 border border-blue-700">Silver / Gold Desktop</span>
+          </h1>
+          <p class="text-xs text-slate-400">{{ company?.name || 'Loading Company...' }} | FY: 2026-27 | GSTIN: {{ company?.gstin }}</p>
+        </div>
+      </div>
+
+      <!-- Quick Shortcuts Guide (BUSY Style) -->
+      <div class="hidden md:flex items-center space-x-2 text-xs">
+        <button @click="currentTab = 'sales'" :class="currentTab === 'sales' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'" class="px-3 py-1.5 rounded font-mono font-medium border border-slate-700 flex items-center gap-1.5 transition">
+          <span class="bg-slate-950 px-1.5 py-0.5 rounded text-[10px] text-blue-400 font-bold">F8</span> Sales (POS)
+        </button>
+        <button @click="currentTab = 'purchase'" :class="currentTab === 'purchase' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'" class="px-3 py-1.5 rounded font-mono font-medium border border-slate-700 flex items-center gap-1.5 transition">
+          <span class="bg-slate-950 px-1.5 py-0.5 rounded text-[10px] text-blue-400 font-bold">F9</span> Purchase
+        </button>
+        <button @click="currentTab = 'payment'" :class="currentTab === 'payment' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'" class="px-3 py-1.5 rounded font-mono font-medium border border-slate-700 flex items-center gap-1.5 transition">
+          <span class="bg-slate-950 px-1.5 py-0.5 rounded text-[10px] text-blue-400 font-bold">F5</span> Payment/Receipt
+        </button>
+        <button @click="currentTab = 'trial_balance'; loadTrialBalance();" :class="currentTab === 'trial_balance' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'" class="px-3 py-1.5 rounded font-mono font-medium border border-slate-700 flex items-center gap-1.5 transition">
+          <span class="bg-slate-950 px-1.5 py-0.5 rounded text-[10px] text-blue-400 font-bold">F6</span> Trial Balance
+        </button>
+        <button @click="currentTab = 'stock'; loadStock();" :class="currentTab === 'stock' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'" class="px-3 py-1.5 rounded font-mono font-medium border border-slate-700 flex items-center gap-1.5 transition">
+          <span class="bg-slate-950 px-1.5 py-0.5 rounded text-[10px] text-blue-400 font-bold">F7</span> Stock Status
+        </button>
+        <button @click="currentTab = 'sync'; loadSync();" :class="currentTab === 'sync' ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'" class="px-3 py-1.5 rounded font-mono font-medium border border-slate-700 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-cloud-arrow-up text-xs"></i> Cloud Sync
+        </button>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          WAL Engine Online
+        </span>
+      </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-100">
+      
+      <!-- 1. SALES INVOICE (BUSY & POS STYLE) -->
+      <div v-if="currentTab === 'sales'" class="max-w-6xl mx-auto bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+        <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-200">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-file-invoice-dollar text-blue-600"></i> Sales Invoice Entry
+            </h2>
+            <p class="text-xs text-slate-500">Keyboard navigation: Type fields and press <kbd class="px-1 py-0.5 bg-slate-100 border border-slate-300 rounded font-mono">Enter</kbd> or <kbd class="px-1 py-0.5 bg-slate-100 border border-slate-300 rounded font-mono">F2</kbd> to save voucher</p>
+          </div>
+          <span class="text-xs bg-blue-50 text-blue-700 px-3 py-1 rounded border border-blue-200 font-semibold">Series: Main | Type: Tax Invoice</span>
+        </div>
+
+        <!-- Voucher Header Form -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Voucher Date</label>
+            <input type="date" v-model="salesForm.date" class="busy-input w-full px-3 py-1.5 border border-slate-300 rounded text-sm font-medium">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Customer (Debtor / Cash)</label>
+            <select v-model="salesForm.party_account_id" class="busy-input w-full px-3 py-1.5 border border-slate-300 rounded text-sm font-medium">
+              <option v-for="a in accounts" :key="a.id" :value="a.id">{{ a.name }} ({{ a.group_name }})</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Material Centre (Godown)</label>
+            <select v-model="salesForm.material_centre_id" class="busy-input w-full px-3 py-1.5 border border-slate-300 rounded text-sm font-medium">
+              <option v-for="g in godowns" :key="g.id" :value="g.id">{{ g.name }}</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Payment Mode</label>
+            <select v-model="salesForm.pos_settlement_type" class="busy-input w-full px-3 py-1.5 border border-slate-300 rounded text-sm font-medium">
+              <option value="CREDIT">Ledger Credit (Bill-by-Bill)</option>
+              <option value="CASH">Cash Settlement</option>
+              <option value="UPI">UPI / QR Payment</option>
+              <option value="CARD">Debit / Credit Card</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Line Item Grid (BUSY Style) -->
+        <div class="border border-slate-200 rounded-lg overflow-hidden mb-5">
+          <table class="w-full busy-grid text-left">
+            <thead>
+              <tr>
+                <th class="w-12">#</th>
+                <th>Item Description</th>
+                <th class="w-24">Unit</th>
+                <th class="w-24 text-right">Qty</th>
+                <th class="w-32 text-right">Price (₹)</th>
+                <th class="w-24 text-right">Disc %</th>
+                <th class="w-28 text-right">GST Rate</th>
+                <th class="w-36 text-right">Total Amount (₹)</th>
+                <th class="w-16 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(row, idx) in salesForm.items" :key="idx" class="hover:bg-slate-50 transition">
+                <td class="font-mono text-slate-500 text-xs">{{ idx + 1 }}</td>
+                <td>
+                  <select v-model="row.item_id" @change="onItemChange(row)" class="busy-input w-full px-2 py-1 border border-slate-300 rounded text-sm">
+                    <option v-for="item in items" :key="item.id" :value="item.id">{{ item.name }} (HSN: {{ item.hsn_code }})</option>
+                  </select>
+                </td>
+                <td class="text-xs font-medium text-slate-600">{{ row.unit_symbol || 'Pcs' }}</td>
+                <td>
+                  <input type="number" min="1" v-model.number="row.qty" class="busy-input w-full px-2 py-1 border border-slate-300 rounded text-sm text-right font-medium">
+                </td>
+                <td>
+                  <input type="number" step="0.01" v-model.number="row.rate" class="busy-input w-full px-2 py-1 border border-slate-300 rounded text-sm text-right font-medium">
+                </td>
+                <td>
+                  <input type="number" min="0" max="100" v-model.number="row.discount_pct" class="busy-input w-full px-2 py-1 border border-slate-300 rounded text-sm text-right">
+                </td>
+                <td class="text-right text-xs font-semibold text-slate-600">{{ row.gst_rate }}%</td>
+                <td class="text-right font-bold text-slate-900">₹{{ calculateLineTotal(row).toFixed(2) }}</td>
+                <td class="text-center">
+                  <button @click="removeLine(idx)" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-1 rounded hover:bg-rose-50 transition">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="bg-slate-50 px-4 py-2 border-t border-slate-200">
+            <button @click="addLine" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+              <i class="fa-solid fa-plus-circle"></i> + Add Item Row (Alt+A)
+            </button>
+          </div>
+        </div>
+
+        <!-- Voucher Summary & Totals -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end bg-slate-50 p-4 rounded-lg border border-slate-200">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Narration / Remarks</label>
+            <input type="text" v-model="salesForm.narration" placeholder="Enter remarks or transport details..." class="busy-input w-full px-3 py-1.5 border border-slate-300 rounded text-sm">
+          </div>
+          <div class="space-y-1.5 text-right font-mono">
+            <div class="flex justify-between text-xs text-slate-600">
+              <span>Taxable Value:</span>
+              <span class="font-bold">₹{{ salesTotals.taxable.toFixed(2) }}</span>
+            </div>
+            <div class="flex justify-between text-xs text-slate-600">
+              <span>Total GST (CGST+SGST / IGST):</span>
+              <span class="font-bold">₹{{ salesTotals.tax.toFixed(2) }}</span>
+            </div>
+            <div class="flex justify-between text-base font-black text-slate-900 border-t border-slate-300 pt-1.5">
+              <span>Grand Total:</span>
+              <span class="text-blue-600 text-lg">₹{{ salesTotals.gross.toFixed(2) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="mt-5 flex justify-end gap-3">
+          <button @click="submitSalesVoucher" :disabled="loading" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2 rounded shadow flex items-center gap-2 transition disabled:opacity-50">
+            <i class="fa-solid fa-floppy-disk"></i> Save Voucher (F2)
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. TRIAL BALANCE REPORT (Strict Double-Entry View) -->
+      <div v-if="currentTab === 'trial_balance'" class="max-w-6xl mx-auto bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+        <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-scale-balanced text-emerald-600"></i> Trial Balance
+            </h2>
+            <p class="text-xs text-slate-500">Live Double-Entry General Ledger Verification</p>
+          </div>
+          <button @click="loadTrialBalance" class="px-3 py-1 text-xs bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded font-semibold text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh
+          </button>
+        </div>
+
+        <div class="border border-slate-200 rounded-lg overflow-hidden">
+          <table class="w-full busy-grid text-left">
+            <thead>
+              <tr>
+                <th>Account Name</th>
+                <th>Group</th>
+                <th>Nature</th>
+                <th class="text-right">Debit (₹)</th>
+                <th class="text-right">Credit (₹)</th>
+                <th class="text-right">Closing Balance (₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="r in trialBalance.rows" :key="r.id" class="hover:bg-slate-50">
+                <td class="font-semibold text-slate-900">{{ r.name }}</td>
+                <td class="text-xs text-slate-500">{{ r.group_name }}</td>
+                <td>
+                  <span class="text-[10px] px-2 py-0.5 rounded font-bold" 
+                    :class="{
+                      'bg-emerald-100 text-emerald-700': r.nature === 'ASSET',
+                      'bg-amber-100 text-amber-700': r.nature === 'LIABILITY',
+                      'bg-blue-100 text-blue-700': r.nature === 'INCOME',
+                      'bg-rose-100 text-rose-700': r.nature === 'EXPENSE'
+                    }">
+                    {{ r.nature }}
+                  </span>
+                </td>
+                <td class="text-right font-mono font-medium text-slate-800">{{ r.total_debit ? '₹' + r.total_debit.toFixed(2) : '-' }}</td>
+                <td class="text-right font-mono font-medium text-slate-800">{{ r.total_credit ? '₹' + r.total_credit.toFixed(2) : '-' }}</td>
+                <td class="text-right font-mono font-bold" :class="r.balance >= 0 ? 'text-slate-900' : 'text-blue-700'">
+                  ₹{{ Math.abs(r.balance).toFixed(2) }} {{ r.balance >= 0 ? 'Dr' : 'Cr' }}
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="bg-slate-900 text-white font-mono font-bold">
+                <td colspan="3" class="text-right uppercase text-xs tracking-wider">Total Verification:</td>
+                <td class="text-right">₹{{ trialBalance.totalDebits?.toFixed(2) }}</td>
+                <td class="text-right">₹{{ trialBalance.totalCredits?.toFixed(2) }}</td>
+                <td class="text-right">
+                  <span v-if="trialBalance.isBalanced" class="text-emerald-400 text-xs">
+                    <i class="fa-solid fa-circle-check"></i> Balanced
+                  </span>
+                  <span v-else class="text-rose-400 text-xs">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Discrepancy
+                  </span>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- 3. STOCK STATUS (Perpetual Inventory) -->
+      <div v-if="currentTab === 'stock'" class="max-w-6xl mx-auto bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+        <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-boxes-stacked text-amber-600"></i> Real-Time Stock Status
+            </h2>
+            <p class="text-xs text-slate-500">Perpetual Stock Ledger by Godown & Items</p>
+          </div>
+          <button @click="loadStock" class="px-3 py-1 text-xs bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded font-semibold text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh
+          </button>
+        </div>
+
+        <div class="border border-slate-200 rounded-lg overflow-hidden">
+          <table class="w-full busy-grid text-left">
+            <thead>
+              <tr>
+                <th>Item Name</th>
+                <th>HSN Code</th>
+                <th>Godown / Centre</th>
+                <th class="text-right">Total Inward</th>
+                <th class="text-right">Total Outward</th>
+                <th class="text-right">Closing Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="s in stockList" :key="s.item_id" class="hover:bg-slate-50">
+                <td class="font-bold text-slate-900">{{ s.item_name }}</td>
+                <td class="font-mono text-xs text-slate-500">{{ s.hsn_code }}</td>
+                <td class="text-xs text-slate-600">{{ s.godown_name }}</td>
+                <td class="text-right font-mono font-medium text-emerald-600">+{{ s.total_inward }} {{ s.unit }}</td>
+                <td class="text-right font-mono font-medium text-rose-600">-{{ s.total_outward }} {{ s.unit }}</td>
+                <td class="text-right font-mono font-black text-slate-900">{{ s.current_stock }} {{ s.unit }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 4. CLOUD SYNC STATUS (Silver Cloud / Gold Cloud) -->
+      <div v-if="currentTab === 'sync'" class="max-w-6xl mx-auto bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+        <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-cloud-arrow-up text-indigo-600"></i> Cloud Sync Engine (Outbox Queue)
+            </h2>
+            <p class="text-xs text-slate-500">Local-First Change Data Capture (CDC) streaming to Cloud Relay</p>
+          </div>
+          <button @click="loadSync" class="px-3 py-1 text-xs bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded font-semibold text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh
+          </button>
+        </div>
+
+        <div class="border border-slate-200 rounded-lg overflow-hidden">
+          <table class="w-full busy-grid text-left">
+            <thead>
+              <tr>
+                <th>Event ID</th>
+                <th>Entity Type</th>
+                <th>Action</th>
+                <th>Status</th>
+                <th>Event Payload</th>
+                <th>Created At</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="evt in outboxList" :key="evt.id" class="hover:bg-slate-50">
+                <td class="font-mono text-xs text-slate-500">{{ evt.id.slice(0, 8) }}...</td>
+                <td class="font-semibold text-xs text-slate-700">{{ evt.entity_type }}</td>
+                <td><span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded font-bold">{{ evt.action }}</span></td>
+                <td>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold"
+                    :class="evt.status === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'">
+                    <i class="fa-solid fa-clock"></i> {{ evt.status }}
+                  </span>
+                </td>
+                <td class="font-mono text-xs text-slate-600 max-w-xs truncate">{{ evt.payload }}</td>
+                <td class="text-xs text-slate-500">{{ evt.created_at }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Bottom Status Bar (BUSY / Tally Style) -->
+    <footer class="bg-slate-900 text-slate-400 px-4 py-1.5 text-xs flex justify-between items-center border-t border-slate-800 font-mono">
+      <div>Exonus Core v1.0.0 | Engine: SQLite WAL Mode | Currency: INR (₹)</div>
+      <div class="flex items-center space-x-4">
+        <span><kbd class="px-1 bg-slate-800 border border-slate-700 rounded text-slate-300">Esc</kbd> Back</span>
+        <span><kbd class="px-1 bg-slate-800 border border-slate-700 rounded text-slate-300">F2</kbd> Save</span>
+        <span><kbd class="px-1 bg-slate-800 border border-slate-700 rounded text-slate-300">Alt+A</kbd> Add Row</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    const { createApp, ref, computed, onMounted } = Vue;
+
+    createApp({
+      setup() {
+        const currentTab = ref('sales');
+        const company = ref(null);
+        const accounts = ref([]);
+        const items = ref([]);
+        const godowns = ref([]);
+        const trialBalance = ref({ rows: [], totalDebits: 0, totalCredits: 0, isBalanced: true });
+        const stockList = ref([]);
+        const outboxList = ref([]);
+        const loading = ref(false);
+
+        const salesForm = ref({
+          date: new Date().toISOString().split('T')[0],
+          party_account_id: '',
+          material_centre_id: '',
+          pos_settlement_type: 'CREDIT',
+          narration: '',
+          items: [
+            { item_id: '', qty: 1, rate: 0, discount_pct: 0, gst_rate: 18, unit_symbol: 'Pcs' }
+          ]
+        });
+
+        const loadInitialData = async () => {
+          try {
+            const compRes = await fetch('/api/company');
+            company.value = await compRes.json();
+
+            const mastRes = await fetch('/api/masters');
+            const data = await mastRes.json();
+            accounts.value = data.accounts;
+            items.value = data.items;
+            godowns.value = data.godowns;
+
+            if (accounts.value.length > 0) salesForm.value.party_account_id = accounts.value[0].id;
+            if (godowns.value.length > 0) salesForm.value.material_centre_id = godowns.value[0].id;
+            if (items.value.length > 0) {
+              salesForm.value.items[0].item_id = items.value[0].id;
+              onItemChange(salesForm.value.items[0]);
+            }
+          } catch (e) {
+            console.error('Error loading data:', e);
+          }
+        };
+
+        const onItemChange = (row) => {
+          const it = items.value.find(i => i.id === row.item_id);
+          if (it) {
+            row.rate = it.standard_sale_rate || 0;
+            row.gst_rate = it.gst_rate || 18;
+            row.unit_symbol = it.unit_symbol || 'Pcs';
+          }
+        };
+
+        const addLine = () => {
+          const firstItem = items.value[0];
+          salesForm.value.items.push({
+            item_id: firstItem ? firstItem.id : '',
+            qty: 1,
+            rate: firstItem ? firstItem.standard_sale_rate : 0,
+            discount_pct: 0,
+            gst_rate: firstItem ? firstItem.gst_rate : 18,
+            unit_symbol: firstItem ? firstItem.unit_symbol : 'Pcs'
+          });
+        };
+
+        const removeLine = (idx) => {
+          if (salesForm.value.items.length > 1) {
+            salesForm.value.items.splice(idx, 1);
+          }
+        };
+
+        const calculateLineTotal = (row) => {
+          const base = (row.qty || 0) * (row.rate || 0);
+          const disc = (base * (row.discount_pct || 0)) / 100;
+          const taxable = base - disc;
+          const tax = (taxable * (row.gst_rate || 0)) / 100;
+          return taxable + tax;
+        };
+
+        const salesTotals = computed(() => {
+          let taxable = 0;
+          let tax = 0;
+          for (const it of salesForm.value.items) {
+            const base = (it.qty || 0) * (it.rate || 0);
+            const disc = (base * (it.discount_pct || 0)) / 100;
+            const t = base - disc;
+            taxable += t;
+            tax += (t * (it.gst_rate || 0)) / 100;
+          }
+          return {
+            taxable,
+            tax,
+            gross: taxable + tax
+          };
+        });
+
+        const submitSalesVoucher = async () => {
+          loading.value = true;
+          try {
+            const payload = {
+              date: salesForm.value.date,
+              party_account_id: salesForm.value.party_account_id,
+              material_centre_id: salesForm.value.material_centre_id,
+              pos_settlement_type: salesForm.value.pos_settlement_type,
+              narration: salesForm.value.narration,
+              items: salesForm.value.items.map(i => ({
+                item_id: i.item_id,
+                qty: i.qty,
+                rate: i.rate,
+                discount_pct: i.discount_pct,
+                unit_id: items.value.find(it => it.id === i.item_id)?.primary_unit_id
+              }))
+            };
+
+            const res = await fetch('/api/vouchers/sales', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert(`🎉 Voucher ${data.voucherNumber} Created Successfully! Gross Total: ₹${data.grossTotal}`);
+              loadTrialBalance();
+              loadStock();
+            } else {
+              alert('Error: ' + data.error);
+            }
+          } catch (e) {
+            alert('Failed to save voucher: ' + e.message);
+          } finally {
+            loading.value = false;
+          }
+        };
+
+        const loadTrialBalance = async () => {
+          const res = await fetch('/api/reports/trial-balance');
+          trialBalance.value = await res.json();
+        };
+
+        const loadStock = async () => {
+          const res = await fetch('/api/reports/stock-status');
+          stockList.value = await res.json();
+        };
+
+        const loadSync = async () => {
+          const res = await fetch('/api/sync/outbox');
+          outboxList.value = await res.json();
+        };
+
+        // Keyboard Shortcuts handler (F2 save, F8 sales, F6 TB, F7 stock)
+        window.addEventListener('keydown', (e) => {
+          if (e.key === 'F2') {
+            e.preventDefault();
+            if (currentTab.value === 'sales') submitSalesVoucher();
+          } else if (e.key === 'F8') {
+            e.preventDefault();
+            currentTab.value = 'sales';
+          } else if (e.key === 'F6') {
+            e.preventDefault();
+            currentTab.value = 'trial_balance';
+            loadTrialBalance();
+          } else if (e.key === 'F7') {
+            e.preventDefault();
+            currentTab.value = 'stock';
+            loadStock();
+          }
+        });
+
+        onMounted(() => {
+          loadInitialData();
+          loadTrialBalance();
+          loadStock();
+          loadSync();
+        });
+
+        return {
+          currentTab,
+          company,
+          accounts,
+          items,
+          godowns,
+          salesForm,
+          salesTotals,
+          trialBalance,
+          stockList,
+          outboxList,
+          loading,
+          onItemChange,
+          addLine,
+          removeLine,
+          calculateLineTotal,
+          submitSalesVoucher,
+          loadTrialBalance,
+          loadStock,
+          loadSync
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
