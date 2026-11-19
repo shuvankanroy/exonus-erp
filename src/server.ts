@@ -22,6 +22,7 @@ import { StockLedgerEngine } from './services/stockLedgerService.js';
 import { SerialBatchService } from './services/serialBatchService.js';
 import { StockOperationsService } from './services/stockOperationsService.js';
 import { LandedCostService } from './services/landedCostService.js';
+import { rebuildWarehouseTree, ensureDefaultWarehouseHierarchy, validateWarehousePosting } from './services/warehouseTreeService.js';
 import { randomUUID } from 'crypto';
 import path from 'path';
 import fs from 'fs';
@@ -1015,15 +1016,46 @@ app.post('/api/stock/settings', (req, res) => {
 });
 
 // 4. Warehouse Hierarchy Master (Add / List)
+// ERPNext NestedSet Tree View for Warehouses
 app.get('/api/warehouses/tree', (req, res) => {
   try {
+    ensureDefaultWarehouseHierarchy(db, activeCompanyId, 'EX');
     const warehouses = db.prepare(`
-      SELECT mc.*, parent.name as parent_name, acc.name as account_name
+      SELECT 
+        mc.id,
+        mc.name,
+        mc.warehouse_type,
+        mc.parent_centre_id,
+        mc.is_group,
+        mc.account_id,
+        mc.address,
+        mc.is_default,
+        mc.disabled,
+        mc.lft,
+        mc.rgt,
+        parent.name as parent_name,
+        acc.name as account_name,
+        (
+          SELECT COALESCE(SUM(b.actual_qty), 0)
+          FROM bins b
+          WHERE b.material_centre_id IN (
+            SELECT child.id FROM material_centres child
+            WHERE child.company_id = mc.company_id AND child.lft >= mc.lft AND child.rgt <= mc.rgt
+          )
+        ) as total_qty,
+        (
+          SELECT COALESCE(SUM(b.stock_value), 0)
+          FROM bins b
+          WHERE b.material_centre_id IN (
+            SELECT child.id FROM material_centres child
+            WHERE child.company_id = mc.company_id AND child.lft >= mc.lft AND child.rgt <= mc.rgt
+          )
+        ) as total_stock_value
       FROM material_centres mc
       LEFT JOIN material_centres parent ON mc.parent_centre_id = parent.id
       LEFT JOIN accounts acc ON mc.account_id = acc.id
       WHERE mc.company_id = ?
-      ORDER BY mc.name ASC
+      ORDER BY mc.lft ASC
     `).all(activeCompanyId);
     res.json(warehouses);
   } catch (err: any) {
@@ -1033,13 +1065,27 @@ app.get('/api/warehouses/tree', (req, res) => {
 
 app.post('/api/warehouses', (req, res) => {
   try {
-    const { name, parent_centre_id, is_group, account_id, address, is_default } = req.body;
-    if (!name) throw new Error('Warehouse name is required');
+    const { name, warehouse_type, parent_centre_id, is_group, account_id, address, is_default } = req.body;
+    if (!name || !name.trim()) throw new Error('Warehouse name is required');
     const id = randomUUID();
     db.prepare(`
-      INSERT INTO material_centres (id, company_id, name, parent_centre_id, is_group, account_id, address, is_default)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(id, activeCompanyId, name, parent_centre_id || null, is_group ? 1 : 0, account_id || null, address || '', is_default ? 1 : 0);
+      INSERT INTO material_centres (id, company_id, name, warehouse_type, parent_centre_id, is_group, account_id, address, is_default)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      id, 
+      activeCompanyId, 
+      name.trim(), 
+      warehouse_type || 'Actual',
+      parent_centre_id || null, 
+      is_group ? 1 : 0, 
+      account_id || null, 
+      address || '', 
+      is_default ? 1 : 0
+    );
+    
+    // Auto rebuild NestedSet tree
+    rebuildWarehouseTree(db, activeCompanyId);
+
     res.json({ success: true, id, message: 'Warehouse created successfully' });
   } catch (err: any) {
     res.status(400).json({ error: err.message });

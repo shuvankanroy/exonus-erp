@@ -108,11 +108,15 @@ export function initDatabase(dbPath?: string): Database.Database {
       id TEXT PRIMARY KEY,
       company_id TEXT NOT NULL,
       name TEXT NOT NULL, -- e.g., 'Main Godown', 'Shop Floor'
+      warehouse_type TEXT DEFAULT 'Actual', -- Actual, Transit, WIP, Finished Goods
       parent_centre_id TEXT, -- Hierarchical parent godown (Tree structure)
       is_group BOOLEAN DEFAULT 0, -- Folder group vs leaf storage node
       account_id TEXT, -- Linked Stock-in-Hand GL Account
       address TEXT,
       is_default BOOLEAN DEFAULT 0,
+      disabled BOOLEAN DEFAULT 0,
+      lft INTEGER DEFAULT 0,
+      rgt INTEGER DEFAULT 0,
       FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
       FOREIGN KEY (parent_centre_id) REFERENCES material_centres(id),
       FOREIGN KEY (account_id) REFERENCES accounts(id)
@@ -484,9 +488,13 @@ export function initDatabase(dbPath?: string): Database.Database {
   const existingMcCols = db.prepare("PRAGMA table_info(material_centres)").all() as Array<{ name: string }>;
   const mcColNames = new Set(existingMcCols.map(c => c.name));
   const newMcCols: Array<{ name: string; type: string }> = [
+    { name: 'warehouse_type', type: 'TEXT DEFAULT "Actual"' },
     { name: 'parent_centre_id', type: 'TEXT' },
     { name: 'is_group', type: 'BOOLEAN DEFAULT 0' },
-    { name: 'account_id', type: 'TEXT' }
+    { name: 'account_id', type: 'TEXT' },
+    { name: 'disabled', type: 'BOOLEAN DEFAULT 0' },
+    { name: 'lft', type: 'INTEGER DEFAULT 0' },
+    { name: 'rgt', type: 'INTEGER DEFAULT 0' }
   ];
   for (const col of newMcCols) {
     if (!mcColNames.has(col.name)) {
