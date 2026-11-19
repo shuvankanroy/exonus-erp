@@ -174,8 +174,11 @@ app.get('/api/sync/outbox', (req, res) => {
 const publicDir = path.resolve(process.cwd(), 'public');
 if (fs.existsSync(publicDir)) {
   app.use(express.static(publicDir));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(publicDir, 'index.html'));
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+      return res.sendFile(path.join(publicDir, 'index.html'));
+    }
+    next();
   });
 }
 
