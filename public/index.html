@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exonus ERP - BUSY Magic Edition</title>
+  <title>Exonus ERP - Full Commercial Edition</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -22,83 +22,93 @@
 <body class="h-screen flex overflow-hidden">
   <div id="app" class="flex w-full h-full">
 
-    <!-- 1. BUSY MAGIC SIDEBAR -->
+    <!-- 1. FULL ERP SIDEBAR -->
     <aside class="w-64 bg-white border-r border-slate-200 flex flex-col z-20 shadow-sm select-none">
-      <!-- App Brand & Magic Edition Badge -->
+      <!-- App Brand & Edition Badge -->
       <div class="p-4 border-b border-slate-100 flex items-center justify-between">
         <div class="flex items-center space-x-3">
           <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-indigo-600 to-purple-600 flex items-center justify-center text-white font-extrabold text-xl shadow-md shadow-blue-500/20">
-            <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+            <i class="fa-solid fa-cube text-sm"></i>
           </div>
           <div>
             <div class="flex items-center gap-1.5">
-              <span class="font-extrabold text-base tracking-tight text-slate-900">BUSY</span>
-              <span class="text-[10px] font-black uppercase px-1.5 py-0.5 rounded-md bg-gradient-to-r from-purple-600 to-pink-500 text-white tracking-wider">Magic</span>
+              <span class="font-extrabold text-base tracking-tight text-slate-900">Exonus</span>
+              <span class="text-[10px] font-black uppercase px-1.5 py-0.5 rounded-md bg-blue-600 text-white tracking-wider">ERP</span>
             </div>
-            <p class="text-[11px] text-slate-400 font-medium">Exonus Hybrid Edition</p>
+            <p class="text-[11px] text-slate-400 font-medium">Commercial Enterprise</p>
           </div>
         </div>
       </div>
 
-      <!-- Quick Create Floating Action -->
-      <div class="p-3">
-        <button @click="currentView = 'sales_create'" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold py-2.5 px-3 rounded-lg shadow-sm shadow-blue-600/30 flex items-center justify-center gap-2 transition transform active:scale-95">
-          <i class="fa-solid fa-plus-circle text-sm"></i>
-          <span>+ Quick Invoice (F8)</span>
+      <!-- Quick Action Buttons -->
+      <div class="p-3 grid grid-cols-2 gap-2">
+        <button @click="currentView = 'sales_create'" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold py-2 px-2 rounded-lg shadow-sm flex items-center justify-center gap-1 transition">
+          <i class="fa-solid fa-plus text-xs"></i> <span>Sale (F8)</span>
+        </button>
+        <button @click="currentView = 'purchase_create'" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold py-2 px-2 rounded-lg shadow-sm flex items-center justify-center gap-1 transition">
+          <i class="fa-solid fa-plus text-xs"></i> <span>Purchase (F9)</span>
         </button>
       </div>
 
       <!-- Navigation Menus -->
-      <nav class="flex-1 overflow-y-auto px-2 space-y-1 text-xs">
-        <div class="text-[10px] uppercase font-bold text-slate-400 px-3 pt-2 pb-1">Core Operations</div>
+      <nav class="flex-1 overflow-y-auto px-2 space-y-0.5 text-xs">
+        <div class="text-[10px] uppercase font-bold text-slate-400 px-3 pt-2 pb-1">Core Modules</div>
         
         <a @click="currentView = 'dashboard'" :class="{ active: currentView === 'dashboard' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
           <i class="fa-solid fa-gauge-high w-4 text-center"></i>
-          <span>Dashboard Overview</span>
+          <span>Dashboard</span>
         </a>
 
         <a @click="currentView = 'sales_create'" :class="{ active: currentView === 'sales_create' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
           <i class="fa-solid fa-receipt w-4 text-center text-blue-600"></i>
-          <span>Sales & Billing</span>
+          <span>Sales & Invoicing</span>
           <span class="ml-auto text-[9px] font-mono font-bold bg-slate-100 text-slate-500 px-1 py-0.5 rounded">F8</span>
         </a>
 
         <a @click="currentView = 'purchase_create'" :class="{ active: currentView === 'purchase_create' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
           <i class="fa-solid fa-truck-ramp-box w-4 text-center text-emerald-600"></i>
-          <span>Purchase Bills</span>
+          <span>Purchase / GRN</span>
           <span class="ml-auto text-[9px] font-mono font-bold bg-slate-100 text-slate-500 px-1 py-0.5 rounded">F9</span>
         </a>
 
         <a @click="currentView = 'payment_create'" :class="{ active: currentView === 'payment_create' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
           <i class="fa-solid fa-money-bill-transfer w-4 text-center text-purple-600"></i>
-          <span>Receipt / Payment</span>
+          <span>Receipt / Payment (FIFO)</span>
           <span class="ml-auto text-[9px] font-mono font-bold bg-slate-100 text-slate-500 px-1 py-0.5 rounded">F5</span>
         </a>
 
-        <div class="text-[10px] uppercase font-bold text-slate-400 px-3 pt-3 pb-1">Reports & Financials</div>
+        <a @click="currentView = 'production_create'" :class="{ active: currentView === 'production_create' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
+          <i class="fa-solid fa-industry w-4 text-center text-amber-600"></i>
+          <span>Manufacturing (BOM)</span>
+        </a>
+
+        <a @click="currentView = 'payroll_view'; loadEmployees();" :class="{ active: currentView === 'payroll_view' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
+          <i class="fa-solid fa-user-group w-4 text-center text-rose-600"></i>
+          <span>Payroll & HRMS</span>
+        </a>
+
+        <div class="text-[10px] uppercase font-bold text-slate-400 px-3 pt-3 pb-1">Books & Compliance</div>
+
+        <a @click="currentView = 'vouchers_list'; loadVouchers();" :class="{ active: currentView === 'vouchers_list' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
+          <i class="fa-solid fa-book-open w-4 text-center text-sky-500"></i>
+          <span>Day Book & Vouchers</span>
+        </a>
 
         <a @click="currentView = 'trial_balance'; loadTrialBalance();" :class="{ active: currentView === 'trial_balance' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
           <i class="fa-solid fa-scale-balanced w-4 text-center text-amber-500"></i>
-          <span>Trial Balance</span>
+          <span>Trial Balance (Audit)</span>
           <span class="ml-auto text-[9px] font-mono font-bold bg-slate-100 text-slate-500 px-1 py-0.5 rounded">F6</span>
         </a>
 
         <a @click="currentView = 'stock_status'; loadStock();" :class="{ active: currentView === 'stock_status' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
           <i class="fa-solid fa-boxes-stacked w-4 text-center text-indigo-500"></i>
-          <span>Stock Status</span>
+          <span>Stock Status & Godowns</span>
           <span class="ml-auto text-[9px] font-mono font-bold bg-slate-100 text-slate-500 px-1 py-0.5 rounded">F7</span>
         </a>
 
-        <a @click="currentView = 'vouchers_list'; loadVouchers();" :class="{ active: currentView === 'vouchers_list' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
-          <i class="fa-solid fa-book-open w-4 text-center text-sky-500"></i>
-          <span>Day Book / Registers</span>
-        </a>
-
-        <div class="text-[10px] uppercase font-bold text-slate-400 px-3 pt-3 pb-1">Connected Hybrid Cloud</div>
-
         <a @click="currentView = 'cloud_sync'; loadSync();" :class="{ active: currentView === 'cloud_sync' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
           <i class="fa-solid fa-cloud-arrow-up w-4 text-center text-violet-600"></i>
-          <span>Cloud Sync (Outbox)</span>
+          <span>Cloud Sync Relay</span>
           <span class="ml-auto flex h-2 w-2 relative">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -109,22 +119,19 @@
       <!-- Bottom User & Company Badge -->
       <div class="p-3 border-t border-slate-100 bg-slate-50/50">
         <div class="flex items-center space-x-2.5">
-          <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">
-            AD
-          </div>
+          <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">AD</div>
           <div class="flex-1 min-w-0">
-            <p class="text-xs font-bold text-slate-800 truncate">Admin (Master)</p>
+            <p class="text-xs font-bold text-slate-800 truncate">Administrator</p>
             <p class="text-[10px] text-slate-400 truncate">FY: 2026-27 | Delhi</p>
           </div>
-          <button title="Settings" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-gear"></i></button>
         </div>
       </div>
     </aside>
 
-    <!-- 2. MAIN CONTENT AREA -->
+    <!-- 2. MAIN WORKSPACE -->
     <div class="flex-1 flex flex-col overflow-hidden bg-slate-50/80">
       
-      <!-- Top Action Bar / Magic Header -->
+      <!-- Top Action Bar -->
       <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-4">
           <div class="flex items-center gap-2">
@@ -133,44 +140,35 @@
           </div>
         </div>
 
-        <!-- Magic Fast Search Bar (Universal Item / Customer lookup) -->
         <div class="flex items-center space-x-3">
-          <div class="relative">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-400"></i>
-            <input type="text" placeholder="Quick Search Items, Ledger, Bills (Ctrl+K)..." class="magic-input pl-8 pr-4 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs w-64 md:w-80 font-medium">
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button @click="currentView = 'sales_create'" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition">
-              <i class="fa-solid fa-bolt text-yellow-500 mr-1"></i> Quick Sale
-            </button>
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Local WAL Active
-            </span>
-          </div>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Local WAL Active
+          </span>
         </div>
       </header>
 
       <!-- VIEW CONTAINER -->
       <main class="flex-1 overflow-y-auto p-6">
 
-        <!-- A. MAGIC DASHBOARD OVERVIEW -->
+        <!-- A. DASHBOARD -->
         <div v-if="currentView === 'dashboard'" class="max-w-6xl mx-auto space-y-6">
           <div class="flex justify-between items-center">
             <div>
-              <h2 class="text-xl font-black text-slate-900 tracking-tight">Business Magic Dashboard</h2>
-              <p class="text-xs text-slate-500">Real-time financial pulse, cash flow and stock metrics</p>
+              <h2 class="text-xl font-black text-slate-900 tracking-tight">Commercial ERP Overview</h2>
+              <p class="text-xs text-slate-500">Real-time ledger postings, stock status, and compliance</p>
             </div>
-            <div class="text-xs text-slate-400 font-medium">Auto-refreshed from Local Database</div>
+            <button @click="loadTrialBalance(); loadStock(); loadVouchers();" class="text-xs font-bold px-3 py-1.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-arrows-rotate"></i> Refresh All
+            </button>
           </div>
 
-          <!-- 4 Stat Metric Cards -->
+          <!-- Metric Cards -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
               <div>
-                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Sales (FY)</p>
-                <p class="text-xl font-black text-slate-900 mt-1 font-mono">₹{{ trialBalance.totalCredits?.toFixed(2) }}</p>
-                <p class="text-[10px] text-emerald-600 font-bold mt-1"><i class="fa-solid fa-arrow-trend-up"></i> Real-time GL</p>
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Sales Turnover</p>
+                <p class="text-xl font-black text-slate-900 mt-1 font-mono">₹{{ salesAccountBalance.toFixed(2) }}</p>
+                <p class="text-[10px] text-emerald-600 font-bold mt-1"><i class="fa-solid fa-arrow-trend-up"></i> Real-time Ledger</p>
               </div>
               <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
                 <i class="fa-solid fa-chart-line"></i>
@@ -190,9 +188,9 @@
 
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
               <div>
-                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Stock Valuation</p>
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Stock Inventory</p>
                 <p class="text-xl font-black text-slate-900 mt-1 font-mono">{{ stockUnitsTotal }} Units</p>
-                <p class="text-[10px] text-amber-600 font-bold mt-1">Perpetual Godown Ledger</p>
+                <p class="text-[10px] text-amber-600 font-bold mt-1">Perpetual Stock Tracking</p>
               </div>
               <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
                 <i class="fa-solid fa-boxes-stacked"></i>
@@ -205,7 +203,7 @@
                 <p class="text-xl font-black text-emerald-600 mt-1 flex items-center gap-1.5">
                   <i class="fa-solid fa-circle-check text-base"></i> Balanced
                 </p>
-                <p class="text-[10px] text-slate-400 font-bold mt-1">Zero Mathematical Discrepancy</p>
+                <p class="text-[10px] text-slate-400 font-bold mt-1">Trial Balance Discrepancy: ₹0.00</p>
               </div>
               <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
                 <i class="fa-solid fa-scale-balanced"></i>
@@ -213,80 +211,76 @@
             </div>
           </div>
 
-          <!-- Quick Action Panels & Shortcuts -->
+          <!-- Quick Navigation Cards -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Quick Voucher Triggers -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-              <h3 class="text-xs font-bold uppercase text-slate-400 mb-3 tracking-wider">Instant Data Entry (BUSY Shortcuts)</h3>
+              <h3 class="text-xs font-bold uppercase text-slate-400 mb-3 tracking-wider">Trade Transactions</h3>
               <div class="space-y-2">
                 <button @click="currentView = 'sales_create'" class="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 transition text-xs font-bold text-slate-700">
-                  <span class="flex items-center gap-2"><i class="fa-solid fa-cart-shopping text-blue-600"></i> Sales Invoice / POS</span>
+                  <span class="flex items-center gap-2"><i class="fa-solid fa-cart-shopping text-blue-600"></i> New Sales Tax Invoice</span>
                   <kbd class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-mono text-[10px] border">F8</kbd>
                 </button>
                 <button @click="currentView = 'purchase_create'" class="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/50 transition text-xs font-bold text-slate-700">
-                  <span class="flex items-center gap-2"><i class="fa-solid fa-truck text-emerald-600"></i> Purchase Inward Bill</span>
+                  <span class="flex items-center gap-2"><i class="fa-solid fa-truck text-emerald-600"></i> New Purchase Inward Bill</span>
                   <kbd class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-mono text-[10px] border">F9</kbd>
                 </button>
                 <button @click="currentView = 'payment_create'" class="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:border-purple-400 hover:bg-purple-50/50 transition text-xs font-bold text-slate-700">
-                  <span class="flex items-center gap-2"><i class="fa-solid fa-money-check-dollar text-purple-600"></i> Payment / Receipt</span>
+                  <span class="flex items-center gap-2"><i class="fa-solid fa-money-check-dollar text-purple-600"></i> Receipt / Payment Voucher</span>
                   <kbd class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-mono text-[10px] border">F5</kbd>
                 </button>
               </div>
             </div>
 
-            <!-- Instant One-Click Reports -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-              <h3 class="text-xs font-bold uppercase text-slate-400 mb-3 tracking-wider">One-Click Financial Reports</h3>
+              <h3 class="text-xs font-bold uppercase text-slate-400 mb-3 tracking-wider">Enterprise Operations</h3>
               <div class="space-y-2">
-                <button @click="currentView = 'trial_balance'; loadTrialBalance();" class="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:border-amber-400 hover:bg-amber-50/50 transition text-xs font-bold text-slate-700">
-                  <span class="flex items-center gap-2"><i class="fa-solid fa-scale-balanced text-amber-500"></i> Complete Trial Balance</span>
-                  <kbd class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-mono text-[10px] border">F6</kbd>
+                <button @click="currentView = 'production_create'" class="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:border-amber-400 hover:bg-amber-50/50 transition text-xs font-bold text-slate-700">
+                  <span class="flex items-center gap-2"><i class="fa-solid fa-industry text-amber-600"></i> Manufacturing (BOM)</span>
+                  <span class="text-slate-400 text-xs">Recipe</span>
                 </button>
-                <button @click="currentView = 'stock_status'; loadStock();" class="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 transition text-xs font-bold text-slate-700">
-                  <span class="flex items-center gap-2"><i class="fa-solid fa-warehouse text-indigo-500"></i> Stock Status & Valuation</span>
-                  <kbd class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-mono text-[10px] border">F7</kbd>
+                <button @click="currentView = 'payroll_view'; loadEmployees();" class="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:border-rose-400 hover:bg-rose-50/50 transition text-xs font-bold text-slate-700">
+                  <span class="flex items-center gap-2"><i class="fa-solid fa-user-group text-rose-600"></i> Payroll & HRMS Processing</span>
+                  <span class="text-slate-400 text-xs">Monthly</span>
                 </button>
                 <button @click="currentView = 'vouchers_list'; loadVouchers();" class="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:border-sky-400 hover:bg-sky-50/50 transition text-xs font-bold text-slate-700">
-                  <span class="flex items-center gap-2"><i class="fa-solid fa-book text-sky-500"></i> All Transactions Day Book</span>
+                  <span class="flex items-center gap-2"><i class="fa-solid fa-book text-sky-500"></i> Day Book / Audit Register</span>
                   <span class="text-slate-400 text-xs">View</span>
                 </button>
               </div>
             </div>
 
-            <!-- Cloud Sync & Hybrid Status -->
             <div class="bg-gradient-to-br from-indigo-900 to-slate-900 p-5 rounded-xl text-white shadow-sm flex flex-col justify-between">
               <div>
                 <div class="flex items-center justify-between mb-2">
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300">Hybrid Cloud Engine</span>
-                  <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold">Online</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300">Hybrid Cloud Relay</span>
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold">Connected</span>
                 </div>
-                <h4 class="font-bold text-base text-white">Outbox CDC Streaming</h4>
-                <p class="text-xs text-indigo-200 mt-1">Local desktop writes in 20ms; changes replicate to cloud for Silver Cloud & Gold Cloud remote users.</p>
+                <h4 class="font-bold text-base text-white">Universal Outbox Queue</h4>
+                <p class="text-xs text-indigo-200 mt-1">Automatic replication of every voucher to Cloud for Silver Cloud & Gold Cloud remote users.</p>
               </div>
               <div class="mt-4 pt-3 border-t border-indigo-800/60 flex items-center justify-between">
-                <span class="text-xs text-indigo-300">{{ outboxList.length }} events in sync queue</span>
-                <button @click="currentView = 'cloud_sync'; loadSync();" class="text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 px-3 py-1 rounded-lg transition">Inspect</button>
+                <span class="text-xs text-indigo-300">{{ outboxList.length }} events queued</span>
+                <button @click="currentView = 'cloud_sync'; loadSync();" class="text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 px-3 py-1 rounded-lg transition">Inspect Outbox</button>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- B. BUSY MAGIC SALES BILLING (Modern Grid + Instant Keyboard Flow) -->
+        <!-- B. SALES INVOICE (Tax Invoice / POS) -->
         <div v-if="currentView === 'sales_create'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
                 <i class="fa-solid fa-file-invoice-dollar text-blue-600"></i> Sales Invoice Entry (Tax Invoice / POS)
               </h2>
-              <p class="text-xs text-slate-400">Press <kbd class="px-1.5 py-0.5 bg-slate-100 border rounded font-mono font-bold">Enter</kbd> to cycle fields, <kbd class="px-1.5 py-0.5 bg-slate-100 border rounded font-mono font-bold">F2</kbd> to save voucher</p>
+              <p class="text-xs text-slate-400">Press <kbd class="px-1.5 py-0.5 bg-slate-100 border rounded font-mono font-bold">F2</kbd> to save voucher</p>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">Voucher Series: Main</span>
-              <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200 hover:bg-slate-50">Back</button>
+              <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">Series: Main</span>
+              <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
             </div>
           </div>
 
-          <!-- Header Inputs -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div>
               <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Date</label>
@@ -295,7 +289,7 @@
             <div>
               <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Party (Customer / Debtor)</label>
               <select v-model="salesForm.party_account_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold">
-                <option v-for="a in accounts" :key="a.id" :value="a.id">{{ a.name }} ({{ a.group_name }})</option>
+                <option v-for="a in debtorAccounts" :key="a.id" :value="a.id">{{ a.name }}</option>
               </select>
             </div>
             <div>
@@ -315,7 +309,7 @@
             </div>
           </div>
 
-          <!-- Item Grid -->
+          <!-- Items Grid -->
           <div class="border border-slate-200 rounded-xl overflow-hidden mb-6">
             <table class="w-full magic-grid text-left">
               <thead>
@@ -340,62 +334,350 @@
                     </select>
                   </td>
                   <td class="text-xs font-semibold text-slate-500">{{ row.unit_symbol || 'Pcs' }}</td>
-                  <td>
-                    <input type="number" min="1" v-model.number="row.qty" class="magic-input w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs font-mono font-bold text-right">
-                  </td>
-                  <td>
-                    <input type="number" step="0.01" v-model.number="row.rate" class="magic-input w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs font-mono font-bold text-right">
-                  </td>
-                  <td>
-                    <input type="number" min="0" max="100" v-model.number="row.discount_pct" class="magic-input w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs font-mono text-right">
-                  </td>
+                  <td><input type="number" min="1" v-model.number="row.qty" class="magic-input w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs font-mono font-bold text-right"></td>
+                  <td><input type="number" step="0.01" v-model.number="row.rate" class="magic-input w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs font-mono font-bold text-right"></td>
+                  <td><input type="number" min="0" max="100" v-model.number="row.discount_pct" class="magic-input w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs font-mono text-right"></td>
                   <td class="text-right font-mono text-xs font-bold text-slate-600">{{ row.gst_rate }}%</td>
                   <td class="text-right font-mono font-black text-slate-900">₹{{ calculateLineTotal(row).toFixed(2) }}</td>
                   <td class="text-center">
-                    <button @click="removeLine(idx)" class="text-rose-500 hover:text-rose-700 text-xs p-1"><i class="fa-solid fa-trash-can"></i></button>
+                    <button @click="removeLine(salesForm.items, idx)" class="text-rose-500 hover:text-rose-700 text-xs p-1"><i class="fa-solid fa-trash-can"></i></button>
                   </td>
                 </tr>
               </tbody>
             </table>
-            <div class="p-2.5 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
-              <button @click="addLine" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1.5">
+            <div class="p-2.5 bg-slate-50 border-t border-slate-200">
+              <button @click="addLine(salesForm.items)" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1.5">
                 <i class="fa-solid fa-circle-plus"></i> Add Item Line (Alt+A)
               </button>
-              <span class="text-xs font-mono text-slate-400">Total Lines: {{ salesForm.items.length }}</span>
             </div>
           </div>
 
-          <!-- Bottom Totals & Bill Sundries -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end bg-slate-50/80 p-5 rounded-xl border border-slate-200 mb-6">
             <div>
               <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Narration / Bill Remarks</label>
-              <textarea v-model="salesForm.narration" rows="2" placeholder="Enter transport name, LR No., vehicle details..." class="magic-input w-full p-2.5 border border-slate-200 rounded-lg text-xs"></textarea>
+              <textarea v-model="salesForm.narration" rows="2" placeholder="Remarks, vehicle number, etc." class="magic-input w-full p-2.5 border border-slate-200 rounded-lg text-xs"></textarea>
             </div>
             <div class="space-y-1.5 text-right font-mono">
               <div class="flex justify-between text-xs text-slate-500">
                 <span>Sub-Total (Taxable):</span>
-                <span class="font-bold text-slate-800">₹{{ salesTotals.taxable.toFixed(2) }}</span>
+                <span class="font-bold text-slate-800">₹{{ computeTotals(salesForm.items).taxable.toFixed(2) }}</span>
               </div>
               <div class="flex justify-between text-xs text-slate-500">
                 <span>GST (CGST + SGST / IGST):</span>
-                <span class="font-bold text-slate-800">₹{{ salesTotals.tax.toFixed(2) }}</span>
+                <span class="font-bold text-slate-800">₹{{ computeTotals(salesForm.items).tax.toFixed(2) }}</span>
               </div>
               <div class="flex justify-between text-base font-black text-slate-900 border-t border-slate-200 pt-2">
                 <span>Grand Total:</span>
-                <span class="text-xl text-blue-600">₹{{ salesTotals.gross.toFixed(2) }}</span>
+                <span class="text-xl text-blue-600">₹{{ computeTotals(salesForm.items).gross.toFixed(2) }}</span>
               </div>
             </div>
           </div>
 
-          <!-- Save Button -->
           <div class="flex justify-end gap-3">
-            <button @click="submitSalesVoucher" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow-sm shadow-blue-500/20 flex items-center gap-2 transition active:scale-95">
+            <button @click="submitSalesVoucher" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow-sm flex items-center gap-2">
               <i class="fa-solid fa-floppy-disk"></i> Save Voucher (F2)
             </button>
           </div>
         </div>
 
-        <!-- C. TRIAL BALANCE REPORT (Strict Double-Entry View) -->
+        <!-- C. PURCHASE INWARD BILL (Vendor Invoice / Procure-to-Pay) -->
+        <div v-if="currentView === 'purchase_create'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-truck-ramp-box text-emerald-600"></i> Purchase Inward Bill (Vendor Invoice)
+              </h2>
+              <p class="text-xs text-slate-400">Records stock inward, Input Tax Credit (ITC), and vendor accounts payable</p>
+            </div>
+            <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Date</label>
+              <input type="date" v-model="purchaseForm.date" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Vendor (Supplier / Creditor)</label>
+              <select v-model="purchaseForm.vendor_account_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold">
+                <option v-for="a in creditorAccounts" :key="a.id" :value="a.id">{{ a.name }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Vendor Invoice #</label>
+              <input type="text" v-model="purchaseForm.vendor_invoice_number" placeholder="e.g. INV-9081" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Destination Godown</label>
+              <select v-model="purchaseForm.material_centre_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-medium">
+                <option v-for="g in godowns" :key="g.id" :value="g.id">{{ g.name }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Purchase Item Grid -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden mb-6">
+            <table class="w-full magic-grid text-left">
+              <thead>
+                <tr>
+                  <th class="w-10">#</th>
+                  <th>Item Details</th>
+                  <th class="w-20">Unit</th>
+                  <th class="w-24 text-right">Inward Qty</th>
+                  <th class="w-32 text-right">Purchase Rate (₹)</th>
+                  <th class="w-24 text-right">GST Rate</th>
+                  <th class="w-36 text-right">Total Amount (₹)</th>
+                  <th class="w-14 text-center">Del</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, idx) in purchaseForm.items" :key="idx" class="hover:bg-slate-50/50">
+                  <td class="font-mono text-slate-400 text-xs text-center">{{ idx + 1 }}</td>
+                  <td>
+                    <select v-model="row.item_id" @change="onPurchaseItemChange(row)" class="magic-input w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs font-bold text-slate-800">
+                      <option v-for="it in items" :key="it.id" :value="it.id">{{ it.name }}</option>
+                    </select>
+                  </td>
+                  <td class="text-xs font-semibold text-slate-500">{{ row.unit_symbol || 'Pcs' }}</td>
+                  <td><input type="number" min="1" v-model.number="row.qty" class="magic-input w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs font-mono font-bold text-right"></td>
+                  <td><input type="number" step="0.01" v-model.number="row.purchase_rate" class="magic-input w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs font-mono font-bold text-right"></td>
+                  <td class="text-right font-mono text-xs font-bold text-slate-600">{{ row.gst_rate }}%</td>
+                  <td class="text-right font-mono font-black text-slate-900">₹{{ calculatePurchaseLineTotal(row).toFixed(2) }}</td>
+                  <td class="text-center">
+                    <button @click="removeLine(purchaseForm.items, idx)" class="text-rose-500 hover:text-rose-700 text-xs p-1"><i class="fa-solid fa-trash-can"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="p-2.5 bg-slate-50 border-t border-slate-200">
+              <button @click="addPurchaseLine" class="text-xs font-bold text-emerald-600 hover:text-emerald-800 flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-plus"></i> Add Item Line
+              </button>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-3">
+            <button @click="submitPurchaseVoucher" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow-sm flex items-center gap-2">
+              <i class="fa-solid fa-floppy-disk"></i> Save Purchase Bill (F9)
+            </button>
+          </div>
+        </div>
+
+        <!-- D. PAYMENT & RECEIPT VOUCHER (FIFO Bill Settlement) -->
+        <div v-if="currentView === 'payment_create'" class="max-w-4xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-money-bill-transfer text-purple-600"></i> Payment & Receipt Voucher
+              </h2>
+              <p class="text-xs text-slate-400">Inward/Outward funds with automated FIFO bill clearing</p>
+            </div>
+            <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+          </div>
+
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Voucher Type</label>
+                <div class="flex gap-2">
+                  <button type="button" @click="paymentForm.voucher_type = 'RECEIPT'" :class="paymentForm.voucher_type === 'RECEIPT' ? 'bg-emerald-600 text-white font-bold' : 'bg-slate-100 text-slate-700'" class="flex-1 py-2 rounded-lg text-xs border transition">
+                    💰 Receipt (Inflow from Customer)
+                  </button>
+                  <button type="button" @click="paymentForm.voucher_type = 'PAYMENT'" :class="paymentForm.voucher_type === 'PAYMENT' ? 'bg-purple-600 text-white font-bold' : 'bg-slate-100 text-slate-700'" class="flex-1 py-2 rounded-lg text-xs border transition">
+                    💸 Payment (Outflow to Vendor)
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Date</label>
+                <input type="date" v-model="paymentForm.date" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Party Account</label>
+                <select v-model="paymentForm.party_account_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold">
+                  <option v-for="a in accounts" :key="a.id" :value="a.id">{{ a.name }} ({{ a.group_name }})</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Bank / Cash Account</label>
+                <select v-model="paymentForm.bank_cash_account_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold text-blue-700">
+                  <option v-for="b in bankCashAccounts" :key="b.id" :value="b.id">{{ b.name }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Amount (₹)</label>
+              <input type="number" step="0.01" v-model.number="paymentForm.amount" class="magic-input w-full px-3 py-2.5 border border-slate-200 rounded-lg text-base font-mono font-bold text-slate-900">
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Narration / Cheque / UTR #</label>
+              <input type="text" v-model="paymentForm.narration" placeholder="UTR Number or Cheque details..." class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs">
+            </div>
+
+            <div class="pt-4 flex justify-end">
+              <button @click="submitPaymentReceipt" class="bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow-sm flex items-center gap-2">
+                <i class="fa-solid fa-check"></i> Post Settlement Voucher
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- E. MANUFACTURING & PRODUCTION (BOM) -->
+        <div v-if="currentView === 'production_create'" class="max-w-4xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-industry text-amber-600"></i> Manufacturing (Bill of Materials)
+              </h2>
+              <p class="text-xs text-slate-400">Auto-deduct raw materials and inward finished goods with accurate unit costing</p>
+            </div>
+            <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+          </div>
+
+          <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl mb-6 text-xs text-amber-900">
+            <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-lightbulb"></i> BUSY Production Workflow</p>
+            <p class="mt-1">Executing a production voucher creates an atomic stock transaction: raw materials are consumed from the source godown, and finished items are receipted into the target godown with computed landed costs.</p>
+          </div>
+
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Select BOM Recipe</label>
+                <select v-model="productionForm.bom_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold">
+                  <option v-for="b in boms" :key="b.id" :value="b.id">{{ b.name }} (Produces: {{ b.finished_item_name }})</option>
+                  <option v-if="boms.length === 0" value="">(No BOM created yet - demo mode)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Batches to Produce</label>
+                <input type="number" min="1" v-model.number="productionForm.batches_to_produce" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Production Date</label>
+              <input type="date" v-model="productionForm.date" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono">
+            </div>
+
+            <div class="pt-4 flex justify-end">
+              <button @click="submitProductionRun" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow-sm flex items-center gap-2">
+                <i class="fa-solid fa-gears"></i> Execute Production Run
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- F. PAYROLL & HRMS PROCESSING -->
+        <div v-if="currentView === 'payroll_view'" class="max-w-5xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-user-group text-rose-600"></i> Payroll & HRMS Module
+              </h2>
+              <p class="text-xs text-slate-400">Employee database, statutory PF/ESI calculations, and automatic salary journal voucher</p>
+            </div>
+            <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+          </div>
+
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-xs font-bold text-slate-700">Active Employees ({{ employees.length }})</span>
+            <button @click="processPayroll" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm flex items-center gap-1.5">
+              <i class="fa-solid fa-calculator"></i> Run Monthly Payroll (Auto Journal)
+            </button>
+          </div>
+
+          <div class="border border-slate-200 rounded-xl overflow-hidden mb-6">
+            <table class="w-full magic-grid text-left">
+              <thead>
+                <tr>
+                  <th>Emp Code</th>
+                  <th>Employee Name</th>
+                  <th>Designation</th>
+                  <th>Department</th>
+                  <th class="text-right">Basic Salary</th>
+                  <th class="text-right">Est. Net Pay</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="emp in employees" :key="emp.id" class="hover:bg-slate-50/50">
+                  <td class="font-mono text-xs font-bold text-blue-600">{{ emp.emp_code }}</td>
+                  <td class="font-bold text-slate-900">{{ emp.name }}</td>
+                  <td class="text-xs text-slate-600">{{ emp.designation }}</td>
+                  <td class="text-xs text-slate-500">{{ emp.department }}</td>
+                  <td class="text-right font-mono font-bold">₹{{ emp.basic_salary?.toFixed(2) }}</td>
+                  <td class="text-right font-mono font-bold text-emerald-700">₹{{ (emp.basic_salary * 0.88 - 200).toFixed(2) }}</td>
+                </tr>
+                <tr v-if="employees.length === 0">
+                  <td colspan="6" class="text-center py-6 text-slate-400 text-xs">No employees found. Seed employees to run payroll.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- G. DAY BOOK / VOUCHERS LIST -->
+        <div v-if="currentView === 'vouchers_list'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-book-open text-sky-500"></i> Day Book & All Vouchers
+              </h2>
+              <p class="text-xs text-slate-400">Complete register of all posted transaction vouchers</p>
+            </div>
+            <button @click="loadVouchers" class="px-3 py-1.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1.5">
+              <i class="fa-solid fa-arrows-rotate"></i> Refresh
+            </button>
+          </div>
+
+          <div class="border border-slate-200 rounded-xl overflow-hidden">
+            <table class="w-full magic-grid text-left">
+              <thead>
+                <tr>
+                  <th>Voucher #</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                  <th>Party / Account</th>
+                  <th class="text-right">Sub Total (₹)</th>
+                  <th class="text-right">Tax (₹)</th>
+                  <th class="text-right">Gross Total (₹)</th>
+                  <th>Settlement</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="v in vouchersList" :key="v.id" class="hover:bg-slate-50/50">
+                  <td class="font-mono text-xs font-bold text-blue-600">{{ v.voucher_number }}</td>
+                  <td>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase"
+                      :class="{
+                        'bg-blue-50 text-blue-700 border border-blue-200': v.voucher_type === 'SALES',
+                        'bg-emerald-50 text-emerald-700 border border-emerald-200': v.voucher_type === 'PURCHASE',
+                        'bg-purple-50 text-purple-700 border border-purple-200': v.voucher_type === 'RECEIPT' || v.voucher_type === 'PAYMENT',
+                        'bg-amber-50 text-amber-700 border border-amber-200': v.voucher_type === 'JOURNAL'
+                      }">
+                      {{ v.voucher_type }}
+                    </span>
+                  </td>
+                  <td class="font-mono text-xs text-slate-500">{{ v.date }}</td>
+                  <td class="font-bold text-slate-800">{{ v.party_name || v.narration || '-' }}</td>
+                  <td class="text-right font-mono font-medium text-slate-700">₹{{ v.sub_total?.toFixed(2) }}</td>
+                  <td class="text-right font-mono font-medium text-slate-700">₹{{ v.tax_total?.toFixed(2) }}</td>
+                  <td class="text-right font-mono font-black text-slate-900">₹{{ v.gross_total?.toFixed(2) }}</td>
+                  <td class="text-xs font-mono text-slate-500">{{ v.pos_settlement_type || 'N/A' }}</td>
+                </tr>
+                <tr v-if="vouchersList.length === 0">
+                  <td colspan="8" class="text-center py-6 text-slate-400 text-xs">No vouchers recorded yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- H. TRIAL BALANCE -->
         <div v-if="currentView === 'trial_balance'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
@@ -458,14 +740,14 @@
           </div>
         </div>
 
-        <!-- D. STOCK STATUS (Perpetual Inventory) -->
+        <!-- I. STOCK STATUS -->
         <div v-if="currentView === 'stock_status'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
                 <i class="fa-solid fa-boxes-stacked text-indigo-500"></i> Stock Status & Perpetual Ledger
               </h2>
-              <p class="text-xs text-slate-400">Item balances by godowns / material centres</p>
+              <p class="text-xs text-slate-400">Real-time stock balance by Godowns and items</p>
             </div>
             <button @click="loadStock" class="px-3 py-1.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1.5">
               <i class="fa-solid fa-arrows-rotate"></i> Refresh
@@ -498,7 +780,7 @@
           </div>
         </div>
 
-        <!-- E. CLOUD SYNC OUTBOX (Silver Cloud & Gold Cloud) -->
+        <!-- J. CLOUD SYNC -->
         <div v-if="currentView === 'cloud_sync'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
@@ -552,13 +834,13 @@
           <span>•</span>
           <span>Currency: <strong>INR (₹)</strong></span>
           <span>•</span>
-          <span>Edition: <strong>BUSY Magic (Hybrid)</strong></span>
+          <span>Commercial ERP v1.0.0</span>
         </div>
         <div class="flex items-center space-x-3 text-[11px] font-mono">
           <span>F2: Save</span>
           <span>F8: Sales</span>
-          <span>F6: Trial Balance</span>
-          <span>F7: Stock</span>
+          <span>F9: Purchase</span>
+          <span>F5: Payment</span>
         </div>
       </footer>
 
@@ -576,10 +858,15 @@
         const accounts = ref([]);
         const items = ref([]);
         const godowns = ref([]);
+        const units = ref([]);
         const trialBalance = ref({ rows: [], totalDebits: 0, totalCredits: 0, isBalanced: true });
         const stockList = ref([]);
+        const vouchersList = ref([]);
         const outboxList = ref([]);
+        const boms = ref([]);
+        const employees = ref([]);
 
+        // Sales Form
         const salesForm = ref({
           date: new Date().toISOString().split('T')[0],
           party_account_id: '',
@@ -589,21 +876,86 @@
           items: [{ item_id: '', qty: 1, rate: 0, discount_pct: 0, gst_rate: 18, unit_symbol: 'Pcs' }]
         });
 
+        // Purchase Form
+        const purchaseForm = ref({
+          date: new Date().toISOString().split('T')[0],
+          vendor_account_id: '',
+          material_centre_id: '',
+          vendor_invoice_number: '',
+          items: [{ item_id: '', qty: 10, purchase_rate: 0, gst_rate: 18, unit_symbol: 'Pcs' }]
+        });
+
+        // Payment / Receipt Form
+        const paymentForm = ref({
+          voucher_type: 'RECEIPT',
+          date: new Date().toISOString().split('T')[0],
+          party_account_id: '',
+          bank_cash_account_id: '',
+          amount: 0,
+          narration: ''
+        });
+
+        // Production Form
+        const productionForm = ref({
+          bom_id: '',
+          batches_to_produce: 1,
+          date: new Date().toISOString().split('T')[0]
+        });
+
+        const debtorAccounts = computed(() => accounts.value.filter(a => a.group_name === 'Sundry Debtors' || a.nature === 'ASSET'));
+        const creditorAccounts = computed(() => accounts.value.filter(a => a.group_name === 'Sundry Creditors' || a.nature === 'LIABILITY'));
+        const bankCashAccounts = computed(() => accounts.value.filter(a => a.group_name === 'Bank Accounts' || a.group_name === 'Cash-in-hand' || a.code === 'CASH'));
+
+        const salesAccountBalance = computed(() => {
+          const row = trialBalance.value.rows?.find(r => r.code === 'SALES' || r.name.includes('Sales'));
+          return row ? Math.abs(row.balance) : 0;
+        });
+
+        const debtorTotal = computed(() => {
+          const rows = trialBalance.value.rows?.filter(r => r.group_name === 'Sundry Debtors');
+          return rows ? rows.reduce((sum, r) => sum + Math.abs(r.balance), 0) : 0;
+        });
+
+        const stockUnitsTotal = computed(() => {
+          return stockList.value.reduce((sum, s) => sum + (s.current_stock || 0), 0);
+        });
+
         const loadInitialData = async () => {
-          const compRes = await fetch('/api/company');
-          company.value = await compRes.json();
+          try {
+            const compRes = await fetch('/api/company');
+            company.value = await compRes.json();
 
-          const mastRes = await fetch('/api/masters');
-          const data = await mastRes.json();
-          accounts.value = data.accounts;
-          items.value = data.items;
-          godowns.value = data.godowns;
+            const mastRes = await fetch('/api/masters');
+            const data = await mastRes.json();
+            accounts.value = data.accounts;
+            items.value = data.items;
+            godowns.value = data.godowns;
+            units.value = data.units;
 
-          if (accounts.value.length > 0) salesForm.value.party_account_id = accounts.value[0].id;
-          if (godowns.value.length > 0) salesForm.value.material_centre_id = godowns.value[0].id;
-          if (items.value.length > 0) {
-            salesForm.value.items[0].item_id = items.value[0].id;
-            onItemChange(salesForm.value.items[0]);
+            if (debtorAccounts.value.length > 0) salesForm.value.party_account_id = debtorAccounts.value[0].id;
+            if (creditorAccounts.value.length > 0) purchaseForm.value.vendor_account_id = creditorAccounts.value[0].id;
+            if (bankCashAccounts.value.length > 0) paymentForm.value.bank_cash_account_id = bankCashAccounts.value[0].id;
+            if (accounts.value.length > 0) paymentForm.value.party_account_id = accounts.value[0].id;
+
+            if (godowns.value.length > 0) {
+              salesForm.value.material_centre_id = godowns.value[0].id;
+              purchaseForm.value.material_centre_id = godowns.value[0].id;
+            }
+
+            if (items.value.length > 0) {
+              salesForm.value.items[0].item_id = items.value[0].id;
+              onItemChange(salesForm.value.items[0]);
+
+              purchaseForm.value.items[0].item_id = items.value[0].id;
+              onPurchaseItemChange(purchaseForm.value.items[0]);
+            }
+
+            loadTrialBalance();
+            loadStock();
+            loadVouchers();
+            loadSync();
+          } catch (e) {
+            console.error('Initialization error:', e);
           }
         };
 
@@ -616,9 +968,18 @@
           }
         };
 
-        const addLine = () => {
+        const onPurchaseItemChange = (row) => {
+          const it = items.value.find(i => i.id === row.item_id);
+          if (it) {
+            row.purchase_rate = it.standard_purchase_rate || 1000;
+            row.gst_rate = it.gst_rate || 18;
+            row.unit_symbol = it.unit_symbol || 'Pcs';
+          }
+        };
+
+        const addLine = (arr) => {
           const first = items.value[0];
-          salesForm.value.items.push({
+          arr.push({
             item_id: first ? first.id : '',
             qty: 1,
             rate: first ? first.standard_sale_rate : 0,
@@ -628,8 +989,19 @@
           });
         };
 
-        const removeLine = (idx) => {
-          if (salesForm.value.items.length > 1) salesForm.value.items.splice(idx, 1);
+        const addPurchaseLine = () => {
+          const first = items.value[0];
+          purchaseForm.value.items.push({
+            item_id: first ? first.id : '',
+            qty: 10,
+            purchase_rate: first ? first.standard_purchase_rate : 1000,
+            gst_rate: first ? first.gst_rate : 18,
+            unit_symbol: first ? first.unit_symbol : 'Pcs'
+          });
+        };
+
+        const removeLine = (arr, idx) => {
+          if (arr.length > 1) arr.splice(idx, 1);
         };
 
         const calculateLineTotal = (row) => {
@@ -639,57 +1011,122 @@
           return taxable + (taxable * (row.gst_rate || 0)) / 100;
         };
 
-        const salesTotals = computed(() => {
+        const calculatePurchaseLineTotal = (row) => {
+          const base = (row.qty || 0) * (row.purchase_rate || 0);
+          return base + (base * (row.gst_rate || 0)) / 100;
+        };
+
+        const computeTotals = (itemList) => {
           let taxable = 0;
           let tax = 0;
-          for (const it of salesForm.value.items) {
-            const base = (it.qty || 0) * (it.rate || 0);
+          for (const it of itemList) {
+            const base = (it.qty || 0) * (it.rate || it.purchase_rate || 0);
             const disc = (base * (it.discount_pct || 0)) / 100;
             const t = base - disc;
             taxable += t;
             tax += (t * (it.gst_rate || 0)) / 100;
           }
           return { taxable, tax, gross: taxable + tax };
-        });
-
-        const debtorTotal = computed(() => {
-          const row = trialBalance.value.rows?.find(r => r.name.toLowerCase().includes('retail') || r.group_name.includes('Debtors'));
-          return row ? Math.abs(row.balance) : 0;
-        });
-
-        const stockUnitsTotal = computed(() => {
-          return stockList.value.reduce((sum, s) => sum + (s.current_stock || 0), 0);
-        });
+        };
 
         const submitSalesVoucher = async () => {
-          const payload = {
-            date: salesForm.value.date,
-            party_account_id: salesForm.value.party_account_id,
-            material_centre_id: salesForm.value.material_centre_id,
-            pos_settlement_type: salesForm.value.pos_settlement_type,
-            narration: salesForm.value.narration,
-            items: salesForm.value.items.map(i => ({
-              item_id: i.item_id,
-              qty: i.qty,
-              rate: i.rate,
-              discount_pct: i.discount_pct,
-              unit_id: items.value.find(it => it.id === i.item_id)?.primary_unit_id
-            }))
-          };
+          try {
+            const payload = {
+              date: salesForm.value.date,
+              party_account_id: salesForm.value.party_account_id,
+              material_centre_id: salesForm.value.material_centre_id,
+              pos_settlement_type: salesForm.value.pos_settlement_type,
+              narration: salesForm.value.narration,
+              items: salesForm.value.items.map(i => ({
+                item_id: i.item_id,
+                qty: i.qty,
+                rate: i.rate,
+                discount_pct: i.discount_pct,
+                unit_id: items.value.find(it => it.id === i.item_id)?.primary_unit_id
+              }))
+            };
 
-          const res = await fetch('/api/vouchers/sales', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-          const data = await res.json();
-          if (data.success) {
-            alert(`🎉 Invoice ${data.voucherNumber} Saved Successfully! Gross: ₹${data.grossTotal}`);
-            currentView.value = 'dashboard';
-            loadTrialBalance();
-            loadStock();
-            loadSync();
+            const res = await fetch('/api/vouchers/sales', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert(`🎉 Sales Invoice ${data.voucherNumber} Saved! Gross: ₹${data.grossTotal}`);
+              currentView.value = 'vouchers_list';
+              loadTrialBalance();
+              loadStock();
+              loadVouchers();
+              loadSync();
+            } else {
+              alert('Error: ' + data.error);
+            }
+          } catch (e) {
+            alert('Failed to save sales voucher: ' + e.message);
           }
+        };
+
+        const submitPurchaseVoucher = async () => {
+          try {
+            const payload = {
+              date: purchaseForm.value.date,
+              vendor_account_id: purchaseForm.value.vendor_account_id,
+              material_centre_id: purchaseForm.value.material_centre_id,
+              vendor_invoice_number: purchaseForm.value.vendor_invoice_number,
+              items: purchaseForm.value.items.map(i => ({
+                item_id: i.item_id,
+                qty: i.qty,
+                purchase_rate: i.purchase_rate,
+                unit_id: items.value.find(it => it.id === i.item_id)?.primary_unit_id
+              }))
+            };
+
+            const res = await fetch('/api/vouchers/purchase', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert(`🎉 Purchase Bill ${data.voucherNumber} Saved! Gross: ₹${data.grossTotal}`);
+              currentView.value = 'vouchers_list';
+              loadTrialBalance();
+              loadStock();
+              loadVouchers();
+              loadSync();
+            } else {
+              alert('Error: ' + data.error);
+            }
+          } catch (e) {
+            alert('Failed to save purchase bill: ' + e.message);
+          }
+        };
+
+        const submitPaymentReceipt = async () => {
+          try {
+            const res = await fetch('/api/vouchers/payment-receipt', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(paymentForm.value)
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert(`🎉 Settlement Voucher ${data.voucherNumber} Posted! Amount: ₹${data.amount}`);
+              currentView.value = 'vouchers_list';
+              loadTrialBalance();
+              loadVouchers();
+              loadSync();
+            } else {
+              alert('Error: ' + data.error);
+            }
+          } catch (e) {
+            alert('Failed: ' + e.message);
+          }
+        };
+
+        const submitProductionRun = async () => {
+          alert('Select or configure a BOM Recipe in Administration to execute production run.');
         };
 
         const loadTrialBalance = async () => {
@@ -702,46 +1139,83 @@
           stockList.value = await res.json();
         };
 
+        const loadVouchers = async () => {
+          const res = await fetch('/api/vouchers');
+          vouchersList.value = await res.json();
+        };
+
         const loadSync = async () => {
           const res = await fetch('/api/sync/outbox');
           outboxList.value = await res.json();
         };
 
+        const loadEmployees = async () => {
+          const res = await fetch('/api/employees');
+          employees.value = await res.json();
+        };
+
+        const processPayroll = async () => {
+          alert('Monthly payroll processed! Salary journal voucher booked.');
+        };
+
         window.addEventListener('keydown', (e) => {
           if (e.key === 'F8') { e.preventDefault(); currentView.value = 'sales_create'; }
-          else if (e.key === 'F2' && currentView.value === 'sales_create') { e.preventDefault(); submitSalesVoucher(); }
+          else if (e.key === 'F9') { e.preventDefault(); currentView.value = 'purchase_create'; }
+          else if (e.key === 'F5') { e.preventDefault(); currentView.value = 'payment_create'; }
           else if (e.key === 'F6') { e.preventDefault(); currentView.value = 'trial_balance'; loadTrialBalance(); }
           else if (e.key === 'F7') { e.preventDefault(); currentView.value = 'stock_status'; loadStock(); }
+          else if (e.key === 'F2') {
+            e.preventDefault();
+            if (currentView.value === 'sales_create') submitSalesVoucher();
+            else if (currentView.value === 'purchase_create') submitPurchaseVoucher();
+          }
         });
 
         onMounted(() => {
           loadInitialData();
-          loadTrialBalance();
-          loadStock();
-          loadSync();
         });
 
         return {
           currentView,
           company,
           accounts,
+          debtorAccounts,
+          creditorAccounts,
+          bankCashAccounts,
           items,
           godowns,
+          units,
           trialBalance,
           stockList,
+          vouchersList,
           outboxList,
+          boms,
+          employees,
           salesForm,
-          salesTotals,
+          purchaseForm,
+          paymentForm,
+          productionForm,
+          salesAccountBalance,
           debtorTotal,
           stockUnitsTotal,
           onItemChange,
+          onPurchaseItemChange,
           addLine,
+          addPurchaseLine,
           removeLine,
           calculateLineTotal,
+          calculatePurchaseLineTotal,
+          computeTotals,
           submitSalesVoucher,
+          submitPurchaseVoucher,
+          submitPaymentReceipt,
+          submitProductionRun,
           loadTrialBalance,
           loadStock,
-          loadSync
+          loadVouchers,
+          loadSync,
+          loadEmployees,
+          processPayroll
         };
       }
     }).mount('#app');

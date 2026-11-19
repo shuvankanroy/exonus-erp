@@ -1,10 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import { initDatabase } from './db/schema.js';
+import { extendCommercialSchema } from './db/commercialSchema.js';
 import { seedCompanyAndStandardMasters } from './db/seed.js';
 import { createSalesVoucher } from './services/salesService.js';
 import { createPurchaseVoucher } from './services/purchaseService.js';
 import { createPaymentReceiptVoucher } from './services/paymentService.js';
+import { executeProductionRun } from './services/manufacturingService.js';
+import { processMonthlyPayroll } from './services/payrollService.js';
+import { generateEWayBill, generateEInvoice } from './services/gstComplianceService.js';
 import { getTrialBalance, getStockStatus } from './services/reportService.js';
 import { randomUUID } from 'crypto';
 import path from 'path';
@@ -21,6 +25,8 @@ if (!fs.existsSync(dataDir)) {
 }
 
 const db = initDatabase(path.join(dataDir, 'exonus.db'));
+// Extend full commercial schema tables (BOM, Payroll, Orders, E-Way/E-Invoice)
+extendCommercialSchema(db);
 
 // Check if company exists, if not seed default demo company
 const existingCompany = db.prepare('SELECT * FROM companies LIMIT 1').get() as any;
@@ -151,7 +157,69 @@ app.post('/api/vouchers/payment-receipt', (req, res) => {
   }
 });
 
-// 7. Real-Time Reports
+// 7. Manufacturing & Production BOM
+app.get('/api/boms', (req, res) => {
+  const boms = db.prepare(`
+    SELECT b.*, i.name as finished_item_name, u.symbol as output_unit_symbol, mc.name as target_godown_name
+    FROM bill_of_materials b
+    JOIN items i ON b.finished_item_id = i.id
+    JOIN units u ON b.output_unit_id = u.id
+    JOIN material_centres mc ON b.target_godown_id = mc.id
+    WHERE b.company_id = ?
+  `).all(activeCompanyId);
+  res.json(boms);
+});
+
+app.post('/api/vouchers/production', (req, res) => {
+  try {
+    const result = executeProductionRun(db, {
+      ...req.body,
+      company_id: activeCompanyId,
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 8. Payroll HRMS & Salary Processing
+app.get('/api/employees', (req, res) => {
+  const emps = db.prepare('SELECT * FROM employees WHERE company_id = ? ORDER BY name').all(activeCompanyId);
+  res.json(emps);
+});
+
+app.post('/api/payroll/process', (req, res) => {
+  try {
+    const result = processMonthlyPayroll(db, {
+      ...req.body,
+      company_id: activeCompanyId,
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 9. GST E-Way Bill & E-Invoice Generation
+app.post('/api/gst/eway-bill', (req, res) => {
+  try {
+    const result = generateEWayBill(db, req.body);
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/gst/einvoice', (req, res) => {
+  try {
+    const result = generateEInvoice(db, req.body.voucher_id);
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 10. Real-Time Reports
 app.get('/api/reports/trial-balance', (req, res) => {
   const tb = getTrialBalance(db, activeCompanyId);
   res.json(tb);
