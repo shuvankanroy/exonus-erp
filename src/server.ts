@@ -10,6 +10,7 @@ import { createSalesOrder, createDeliveryChallan, getSalesOrders, createSalesQuo
 import { createPurchaseOrder, createGoodsReceiptNote, getPurchaseOrders, getGoodsReceiptNotes } from './services/procurementService.js';
 import { getBillSundries, saveBillSundry, seedDefaultBillSundries } from './services/billSundryService.js';
 import { getBankAccounts, getBankReconciliationStatement, updateBankClearance, ensureDefaultBankAccount } from './services/brsService.js';
+import { executeStockTransfer, getGodownStockReport, getGodownsSummary } from './services/stockTransferService.js';
 import { executeProductionRun } from './services/manufacturingService.js';
 import { processMonthlyPayroll } from './services/payrollService.js';
 import { generateEWayBill, generateEInvoice } from './services/gstComplianceService.js';
@@ -585,6 +586,38 @@ app.get('/api/reports/trial-balance', (req, res) => {
 app.get('/api/reports/stock-status', (req, res) => {
   const stock = getStockStatus(db, activeCompanyId);
   res.json(stock);
+});
+
+// 10.1 Multi-Godown Reports & Transfers
+app.get('/api/godowns/summary', (req, res) => {
+  try {
+    const summary = getGodownsSummary(db, activeCompanyId);
+    res.json(summary);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/godowns/report', (req, res) => {
+  try {
+    const godownId = req.query.godown_id as string;
+    const report = getGodownStockReport(db, activeCompanyId, godownId);
+    res.json(report);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/stock/transfer', (req, res) => {
+  try {
+    const result = executeStockTransfer(db, {
+      ...req.body,
+      company_id: activeCompanyId,
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
 });
 
 // 8. Cloud Outbox Status (Silver Cloud & Gold Cloud Sync)

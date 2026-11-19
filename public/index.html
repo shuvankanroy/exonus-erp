@@ -462,6 +462,91 @@
               </div>
             </div>
           </div>
+
+          <!-- MODAL: STOCK TRANSFER -->
+          <div v-if="showStockTransferModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-100 overflow-hidden">
+              <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-right-left text-indigo-600"></i> Godown-to-Godown Stock Transfer
+                </h3>
+                <button @click="showStockTransferModal = false" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+              </div>
+
+              <div class="p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Source Godown (From)</label>
+                    <select v-model="stockTransferForm.source_material_centre_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-800">
+                      <option v-for="g in godowns" :key="g.id" :value="g.id">{{ g.name }}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Destination Godown (To)</label>
+                    <select v-model="stockTransferForm.destination_material_centre_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold text-indigo-700">
+                      <option v-for="g in godowns" :key="g.id" :value="g.id">{{ g.name }}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Transfer Date</label>
+                    <input type="date" v-model="stockTransferForm.date" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Transfer Reason / Narration</label>
+                    <input type="text" v-model="stockTransferForm.narration" placeholder="e.g. Regional warehouse replenishment" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs">
+                  </div>
+                </div>
+
+                <!-- Transfer Items -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden">
+                  <div class="p-2.5 bg-slate-50 border-b border-slate-200 font-bold text-xs text-slate-700">Items to Transfer</div>
+                  <table class="w-full magic-grid text-left text-xs">
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th class="w-24 text-right">Transfer Qty</th>
+                        <th class="w-28 text-right">Unit Rate (₹)</th>
+                        <th class="w-10 text-center">Del</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(row, idx) in stockTransferForm.items" :key="idx">
+                        <td>
+                          <select v-model="row.item_id" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-bold">
+                            <option v-for="it in items" :key="it.id" :value="it.id">{{ it.name }}</option>
+                          </select>
+                        </td>
+                        <td>
+                          <input type="number" min="1" v-model.number="row.qty" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-mono text-right font-bold">
+                        </td>
+                        <td>
+                          <input type="number" step="0.01" v-model.number="row.rate" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-mono text-right">
+                        </td>
+                        <td class="text-center">
+                          <button @click="stockTransferForm.items.splice(idx, 1)" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div class="p-2 bg-slate-50 border-t border-slate-200">
+                    <button @click="stockTransferForm.items.push({ item_id: items[0]?.id || '', qty: 5, rate: 100 })" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                      <i class="fa-solid fa-plus-circle"></i> Add Item Line
+                    </button>
+                  </div>
+                </div>
+
+                <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+                  <button @click="showStockTransferModal = false" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+                  <button @click="submitStockTransfer" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2 rounded-lg shadow-sm flex items-center gap-1.5">
+                    <i class="fa-solid fa-check"></i> Execute Stock Transfer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- PARTIES MASTER (Customer & Vendor Management) -->
@@ -1345,20 +1430,51 @@
           </div>
         </div>
 
-        <!-- I. STOCK STATUS -->
+        <!-- I. STOCK STATUS & MULTI-GODOWN TRANSFERS -->
         <div v-if="currentView === 'stock_status'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
-                <i class="fa-solid fa-boxes-stacked text-indigo-500"></i> Stock Status & Perpetual Ledger
+                <i class="fa-solid fa-boxes-stacked text-indigo-500"></i> Multi-Godown Stock & Transfer Engine
               </h2>
-              <p class="text-xs text-slate-400">Real-time stock balance by Godowns and items</p>
+              <p class="text-xs text-slate-400">Warehouse inventory status, perpetual stock movements, and Godown-to-Godown stock transfers</p>
             </div>
-            <button @click="loadStock" class="px-3 py-1.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1.5">
-              <i class="fa-solid fa-arrows-rotate"></i> Refresh
-            </button>
+            <div class="flex gap-2">
+              <button @click="showStockTransferModal = true" class="px-3 py-1.5 text-xs font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm flex items-center gap-1.5">
+                <i class="fa-solid fa-right-left"></i> New Stock Transfer
+              </button>
+              <button @click="loadStock" class="px-3 py-1.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1.5">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh
+              </button>
+            </div>
           </div>
 
+          <!-- Godown Summary Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div v-for="g in godownsSummary" :key="g.material_centre_id" class="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="font-extrabold text-slate-800 text-sm flex items-center gap-1.5">
+                    <i class="fa-solid fa-warehouse text-indigo-600 text-xs"></i> {{ g.godown_name }}
+                  </h4>
+                  <p class="text-[10px] text-slate-400 mt-0.5 truncate">{{ g.address || 'Central Godown' }}</p>
+                </div>
+                <span v-if="g.is_default" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 uppercase">Default</span>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-200/60 flex justify-between font-mono text-xs">
+                <div>
+                  <span class="text-[10px] text-slate-400 uppercase font-sans">Total Qty</span>
+                  <p class="font-bold text-slate-800">{{ g.total_quantity }} units</p>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] text-slate-400 uppercase font-sans">Valuation</span>
+                  <p class="font-bold text-emerald-700 font-mono">₹{{ g.total_stock_value.toFixed(2) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stock Items Register -->
           <div class="border border-slate-200 rounded-xl overflow-hidden">
             <table class="w-full magic-grid text-left">
               <thead>
@@ -1372,13 +1488,17 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="s in stockList" :key="s.item_id" class="hover:bg-slate-50/50">
+                <tr v-for="s in stockList" :key="s.item_id + (s.godown_name || '')" class="hover:bg-slate-50/50">
                   <td class="font-bold text-slate-900">{{ s.item_name }}</td>
                   <td class="font-mono text-xs text-slate-400">{{ s.hsn_code }}</td>
-                  <td class="text-xs font-medium text-slate-600">{{ s.godown_name }}</td>
+                  <td class="text-xs font-bold text-indigo-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-location-dot text-slate-400 text-[10px]"></i> {{ s.godown_name }}
+                  </td>
                   <td class="text-right font-mono font-bold text-emerald-600">+{{ s.total_inward }} {{ s.unit }}</td>
                   <td class="text-right font-mono font-bold text-rose-600">-{{ s.total_outward }} {{ s.unit }}</td>
-                  <td class="text-right font-mono font-black text-slate-900">{{ s.current_stock }} {{ s.unit }}</td>
+                  <td class="text-right font-mono font-black" :class="s.current_stock >= 0 ? 'text-slate-900' : 'text-rose-600'">
+                    {{ s.current_stock }} {{ s.unit }}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -1569,11 +1689,13 @@
         const currentView = ref('dashboard');
         const showAddPartyModal = ref(false);
         const showAddItemModal = ref(false);
+        const showStockTransferModal = ref(false);
         const company = ref(null);
         const accounts = ref([]);
         const groups = ref([]);
         const items = ref([]);
         const godowns = ref([]);
+        const godownsSummary = ref([]);
         const units = ref([]);
         const trialBalance = ref({ rows: [], totalDebits: 0, totalCredits: 0, isBalanced: true });
         const stockList = ref([]);
@@ -1633,6 +1755,15 @@
           goods_receipt_note_id: null,
           items: [{ item_id: '', qty: 10, purchase_rate: 0, gst_rate: 18, unit_symbol: 'Pcs' }],
           sundries: []
+        });
+
+        // Stock Transfer Form
+        const stockTransferForm = ref({
+          date: new Date().toISOString().split('T')[0],
+          source_material_centre_id: '',
+          destination_material_centre_id: '',
+          narration: '',
+          items: [{ item_id: '', qty: 5, rate: 100 }]
         });
 
         // Payment / Receipt Form
@@ -2150,8 +2281,44 @@
         };
 
         const loadStock = async () => {
-          const res = await fetch('/api/reports/stock-status');
-          stockList.value = await res.json();
+          try {
+            const [stockRes, godownsRes] = await Promise.all([
+              fetch('/api/reports/stock-status'),
+              fetch('/api/godowns/summary')
+            ]);
+            stockList.value = await stockRes.json();
+            godownsSummary.value = await godownsRes.json();
+          } catch (e) {
+            console.error('Failed to load stock:', e);
+          }
+        };
+
+        const submitStockTransfer = async () => {
+          if (!stockTransferForm.value.source_material_centre_id || !stockTransferForm.value.destination_material_centre_id) {
+            return alert('Please select both Source and Destination Godowns');
+          }
+          if (stockTransferForm.value.source_material_centre_id === stockTransferForm.value.destination_material_centre_id) {
+            return alert('Source and Destination Godowns must be different');
+          }
+          try {
+            const res = await fetch('/api/stock/transfer', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(stockTransferForm.value)
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert(`🎉 Stock Transfer ${data.voucherNumber} Executed! ${data.totalItems} items moved from ${data.sourceGodown} to ${data.destGodown}`);
+              showStockTransferModal.value = false;
+              loadStock();
+              loadVouchers();
+              loadSync();
+            } else {
+              alert('Error: ' + data.error);
+            }
+          } catch (e) {
+            alert('Failed to execute stock transfer: ' + e.message);
+          }
         };
 
         const loadVouchers = async () => {
@@ -2256,7 +2423,11 @@
           brsStatement,
           loadBRS,
           markChequeCleared,
-          markChequeUncleared
+          markChequeUncleared,
+          showStockTransferModal,
+          godownsSummary,
+          stockTransferForm,
+          submitStockTransfer
         };
       }
     }).mount('#app');
