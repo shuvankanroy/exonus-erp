@@ -17,6 +17,7 @@ import { generateEWayBill, generateEInvoice } from './services/gstComplianceServ
 import { getTrialBalance, getStockStatus } from './services/reportService.js';
 import { calculateProfitAndLoss, calculateBalanceSheet, getAccountLedgerStatement, getGSTSummaryReport, getBillOutstandingReport } from './services/finalReportsService.js';
 import { createContraVoucher } from './services/contraService.js';
+import { getCompanyFeatures, updateCompanyFeatures, getVoucherSeriesList, updateVoucherSeries, freezeDataUpToDate, getActiveFreezeDate } from './services/configurationService.js';
 import { randomUUID } from 'crypto';
 import path from 'path';
 import fs from 'fs';
@@ -687,6 +688,67 @@ app.get('/api/reports/outstandings', (req, res) => {
     const type = (req.query.type as string)?.toUpperCase() === 'PAYABLE' ? 'PAYABLE' : 'RECEIVABLE';
     const report = getBillOutstandingReport(db, activeCompanyId, type);
     res.json(report);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// 10.3 Configuration & Administration (BUSY Features/Options & Series Engine)
+app.get('/api/config/features', (req, res) => {
+  try {
+    const features = getCompanyFeatures(db, activeCompanyId);
+    res.json(features);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/config/features', (req, res) => {
+  try {
+    const result = updateCompanyFeatures(db, {
+      ...req.body,
+      company_id: activeCompanyId,
+    });
+    res.json(result);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/config/series', (req, res) => {
+  try {
+    const list = getVoucherSeriesList(db, activeCompanyId);
+    res.json(list);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/config/series', (req, res) => {
+  try {
+    const result = updateVoucherSeries(db, req.body);
+    res.json(result);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/config/freeze', (req, res) => {
+  try {
+    const activeDate = getActiveFreezeDate(db, activeCompanyId);
+    res.json({ freeze_up_to_date: activeDate });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/config/freeze', (req, res) => {
+  try {
+    const result = freezeDataUpToDate(db, {
+      ...req.body,
+      company_id: activeCompanyId,
+    });
+    res.json({ success: true, ...result });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
