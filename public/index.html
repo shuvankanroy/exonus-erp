@@ -244,6 +244,14 @@
                 <a @click="currentView = 'cloud_sync'; loadSync();" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-cloud-arrow-up text-violet-500 w-4"></i> Cloud Sync Relay Outbox</a>
               </div>
             </div>
+            <!-- 7. Help -->
+            <div class="relative group cursor-pointer py-1">
+              <span class="hover:text-white flex items-center gap-1">Help <i class="fa-solid fa-chevron-down text-[9px] opacity-60"></i></span>
+              <div class="absolute left-0 top-full hidden group-hover:block bg-white text-slate-800 shadow-xl border border-slate-200 rounded-lg py-1.5 w-56 z-50 text-xs font-normal">
+                <a @click="currentView = 'help_shortcuts'" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-keyboard text-indigo-500 w-4"></i> Shortcut Keys Guide</a>
+                <a @click="currentView = 'help_about'" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-circle-info text-blue-500 w-4"></i> About Exonus ERP</a>
+              </div>
+            </div>
           </div>
 
           <div class="text-[11px] font-mono text-slate-400">
@@ -481,6 +489,57 @@
           </div>
         </div>
 
+
+        <!-- Help Views -->
+        <div v-if="currentView === 'help_shortcuts'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-2xl">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-keyboard text-sky-600"></i> BUSY Magic Standard Keyboard Shortcuts
+              </h2>
+              <p class="text-xs text-slate-400">Comprehensive keyboard reference for lightning-fast voucher entry and navigation</p>
+            </div>
+            <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div class="border border-slate-100 rounded-lg p-3 space-y-2 bg-slate-50/50">
+              <h3 class="font-bold text-slate-700 border-b pb-1">Operational Vouchers</h3>
+              <div class="flex justify-between py-1 border-b border-dashed border-slate-200"><span>Sales Invoice</span><kbd class="bg-white shadow-sm border px-2 py-0.5 rounded font-mono font-bold text-slate-700">F8</kbd></div>
+              <div class="flex justify-between py-1 border-b border-dashed border-slate-200"><span>Purchase Bill</span><kbd class="bg-white shadow-sm border px-2 py-0.5 rounded font-mono font-bold text-slate-700">F9</kbd></div>
+              <div class="flex justify-between py-1 border-b border-dashed border-slate-200"><span>Payment Voucher</span><kbd class="bg-white shadow-sm border px-2 py-0.5 rounded font-mono font-bold text-slate-700">F5</kbd></div>
+              <div class="flex justify-between py-1 border-b border-dashed border-slate-200"><span>Receipt Voucher</span><kbd class="bg-white shadow-sm border px-2 py-0.5 rounded font-mono font-bold text-slate-700">F6</kbd></div>
+              <div class="flex justify-between py-1 border-b border-dashed border-slate-200"><span>Journal Voucher</span><kbd class="bg-white shadow-sm border px-2 py-0.5 rounded font-mono font-bold text-slate-700">F7</kbd></div>
+              <div class="flex justify-between py-1"><span>Contra Voucher</span><kbd class="bg-white shadow-sm border px-2 py-0.5 rounded font-mono font-bold text-slate-700">F4</kbd></div>
+            </div>
+            <div class="border border-slate-100 rounded-lg p-3 space-y-2 bg-slate-50/50">
+              <h3 class="font-bold text-slate-700 border-b pb-1">Global Navigation Actions</h3>
+              <div class="flex justify-between py-1 border-b border-dashed border-slate-200"><span>Save / Submit Voucher</span><kbd class="bg-white shadow-sm border px-2 py-0.5 rounded font-mono font-bold text-slate-700">F2</kbd></div>
+              <div class="flex justify-between py-1 border-b border-dashed border-slate-200"><span>Account Ledger Statement</span><kbd class="bg-white shadow-sm border px-2 py-0.5 rounded font-mono font-bold text-slate-700">Alt + L</kbd></div>
+              <div class="flex justify-between py-1 border-b border-dashed border-slate-200"><span>Add New Master Account</span><kbd class="bg-white shadow-sm border px-2 py-0.5 rounded font-mono font-bold text-slate-700">F3</kbd></div>
+              <div class="flex justify-between py-1"><span>Quick Print Active Document</span><kbd class="bg-white shadow-sm border px-2 py-0.5 rounded font-mono font-bold text-slate-700">Ctrl + P</kbd></div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentView === 'help_about'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-xl">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-circle-info text-blue-600"></i> About Exonus ERP
+              </h2>
+              <p class="text-xs text-slate-400">System specifications, compliance standards and database engine details</p>
+            </div>
+            <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+          </div>
+          <div class="space-y-3 text-xs text-slate-700 leading-relaxed">
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5">
+              <p><span class="font-bold text-slate-900">Product Edition:</span> Exonus ERP — BUSY Magic Enterprise Edition</p>
+              <p><span class="font-bold text-slate-900">Database Engine:</span> Local-First SQLite in WAL Mode (Atomic ACID transactions)</p>
+              <p><span class="font-bold text-slate-900">Financial Standard:</span> Pure Double-Entry General Ledger (bash.00 Discrepancy Balance Sheet)</p>
+              <p><span class="font-bold text-slate-900">Statutory Compliance:</span> Indian Goods & Services Tax (GST) — GSTR-1, GSTR-3B, E-Way Bill, E-Invoice</p>
+            </div>
+          </div>
+        </div>
 
         <!-- VIEW: CONTRA VOUCHER -->
         <div v-if="currentView === 'contra_create'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
@@ -2657,19 +2716,24 @@
       // Administration / Configuration State
       const activeConfigTab = ref('regional');
       const companyFeatures = ref({
+        country: 'India',
+        state_code: '07',
         currency_symbol: '₹',
-        currency_name: 'INR',
-        date_format: 'DD/MM/YYYY',
-        bill_by_bill: 1,
-        credit_limits: 1,
-        multi_currency: 0,
-        enable_godowns: 1,
-        batch_management: 1,
-        serial_no_tracking: 0,
-        gst_enabled: 1,
-        default_gst_rate: 18,
-        e_invoicing: 1,
-        e_way_bill: 1
+        currency_formal_name: 'Indian Rupee',
+        currency_decimal_places: 2,
+        bill_by_bill_tracking: true,
+        credit_limits_enforce: true,
+        auto_round_off: true,
+        multi_currency_enabled: false,
+        multi_godown_enabled: true,
+        batch_tracking_enabled: true,
+        serial_tracking_enabled: false,
+        valuation_method: 'FIFO',
+        gst_enabled: true,
+        gstin: '07AAAAA0000A1Z5',
+        composition_scheme: false,
+        e_way_bill_enabled: true,
+        e_invoice_enabled: true
       });
       const voucherSeriesList = ref([]);
       const freezeInputDate = ref('');
@@ -3104,19 +3168,7 @@
           const roundOff = gross - unroundedGross;
 
           return {
-        activeConfigTab,
-        companyFeatures,
-        voucherSeriesList,
-        freezeInputDate,
-        freezeReason,
-        activeFreezeCutoffDate,
-        loadFeatures,
-        saveFeatures,
-        loadSeriesList,
-        saveSeries,
-        loadFreezeDate,
-        submitFreeze,
- 
+
             baseTaxable, 
             taxable: adjustedTaxable, 
             tax: adjustedTax, 
@@ -3757,9 +3809,24 @@
 
         onMounted(() => {
           loadInitialData();
+          loadFeatures();
+          loadSeriesList();
+          loadFreezeDate();
         });
 
         return {
+          activeConfigTab,
+          companyFeatures,
+          voucherSeriesList,
+          freezeInputDate,
+          freezeReason,
+          activeFreezeCutoffDate,
+          loadFeatures,
+          saveFeatures,
+          loadSeriesList,
+          saveSeries,
+          loadFreezeDate,
+          submitFreeze,
           currentView,
           showAddPartyModal,
           showAddItemModal,
