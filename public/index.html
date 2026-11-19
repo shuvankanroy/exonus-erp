@@ -143,6 +143,8 @@
   <script src="/desk/modules/stock_ledger.js"></script>
   <script src="/desk/modules/masters.js"></script>
   <script src="/desk/modules/accounting.js"></script>
+  <script src="/desk/modules/fast_vouchers.js"></script>
+  <script src="/desk/modules/general_pages.js"></script>
 
   <!-- APPLICATION BOOTSTRAP -->
   <script>
@@ -155,17 +157,22 @@
       window.router.register('masters/items', (c, p) => window.renderItemsPage(c, p));
       window.router.register('vouchers/daybook', (c, p) => window.renderVouchersPage(c, p));
       window.router.register('audit/trial-balance', (c, p) => window.renderTrialBalancePage(c, p));
+      window.router.register('company/profile', (c, p) => window.renderCompanyProfilePage(c, p));
+      window.router.register('reports/gst', (c, p) => window.renderGSTReportsPage(c, p));
+      window.router.register('help/shortcuts', (c, p) => window.renderShortcutsHelpPage(c, p));
+      window.router.register('sales/create', (c, p) => window.renderSalesCreatePage(c, p));
 
-      // 404 Fallback
+      // 404 Fallback - redirect gracefully
       window.router.register('404', (c) => {
-        c.innerHTML = '<div class="p-8 text-center text-slate-500">Page not found. <a href="#stock/workspace" class="text-blue-600 font-bold">Return to Stock Workspace</a></div>';
+        window.router.navigate('stock/workspace');
       });
 
       // Keyboard Shortcuts (<kbd>F6</kbd>, <kbd>F7</kbd>, <kbd>F8</kbd>, <kbd>F9</kbd>)
       window.addEventListener('keydown', (e) => {
         if (e.key === 'F6') { e.preventDefault(); window.router.navigate('audit/trial-balance'); }
         if (e.key === 'F7') { e.preventDefault(); window.router.navigate('stock/tree'); }
-        if (e.key === 'F8' || e.key === 'F9') { e.preventDefault(); window.router.navigate('vouchers/daybook'); }
+        if (e.key === 'F8') { e.preventDefault(); window.router.navigate('sales/create'); }
+        if (e.key === 'F9') { e.preventDefault(); window.router.navigate('vouchers/daybook'); }
       });
 
       // Init Router
