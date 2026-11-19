@@ -89,6 +89,121 @@ app.get('/api/company', (req, res) => {
   res.json(company);
 });
 
+// 1.1 Complete Company Setup (First-run wizard or re-configuration)
+app.post('/api/company/setup', (req, res) => {
+  try {
+    const {
+      name,
+      trade_name,
+      industry_type,
+      gstin,
+      pan,
+      cin,
+      gst_type,
+      udyam_no,
+      state_code,
+      state_name,
+      address,
+      city,
+      pin_code,
+      phone,
+      email,
+      website,
+      financial_year_start,
+      financial_year_end,
+      books_commencing_from,
+      currency_symbol,
+      bank_name,
+      bank_acc_no,
+      bank_ifsc,
+      bank_branch
+    } = req.body;
+
+    if (!name || !name.trim()) throw new Error('Company Legal Name is required');
+    if (!state_code) throw new Error('State / Jurisdiction is required');
+
+    // Auto derive PAN from GSTIN if missing
+    let derivedPan = pan;
+    if (!derivedPan && gstin && gstin.trim().length >= 10) {
+      const cleanGst = gstin.trim().toUpperCase();
+      if (cleanGst.length >= 12) {
+        derivedPan = cleanGst.substring(2, 12);
+      }
+    }
+
+    db.prepare(`
+      UPDATE companies SET
+        name = ?,
+        trade_name = ?,
+        industry_type = ?,
+        gstin = ?,
+        pan = ?,
+        cin = ?,
+        gst_type = ?,
+        udyam_no = ?,
+        state_code = ?,
+        state_name = ?,
+        address = ?,
+        city = ?,
+        pin_code = ?,
+        phone = ?,
+        email = ?,
+        website = ?,
+        financial_year_start = COALESCE(?, financial_year_start),
+        financial_year_end = COALESCE(?, financial_year_end),
+        books_commencing_from = COALESCE(?, financial_year_start),
+        currency_symbol = COALESCE(?, '₹'),
+        bank_name = ?,
+        bank_acc_no = ?,
+        bank_ifsc = ?,
+        bank_branch = ?,
+        setup_completed = 1,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(
+      name.trim(),
+      (trade_name && trade_name.trim()) || name.trim(),
+      industry_type || 'Trading / Wholesale & Distribution',
+      (gstin && gstin.trim().toUpperCase()) || '',
+      (derivedPan && derivedPan.trim().toUpperCase()) || '',
+      (cin && cin.trim().toUpperCase()) || '',
+      gst_type || 'Regular Taxpayer',
+      (udyam_no && udyam_no.trim().toUpperCase()) || '',
+      state_code,
+      state_name || '',
+      address || '',
+      city || '',
+      pin_code || '',
+      phone || '',
+      email || '',
+      website || '',
+      financial_year_start || null,
+      financial_year_end || null,
+      books_commencing_from || financial_year_start || null,
+      currency_symbol || '₹',
+      bank_name || '',
+      bank_acc_no || '',
+      bank_ifsc || '',
+      bank_branch || '',
+      activeCompanyId
+    );
+
+    // Also update company features table for state_code and gstin consistency
+    db.prepare(`
+      INSERT INTO company_features (id, company_id, state_code, gstin)
+      VALUES (?, ?, ?, ?)
+      ON CONFLICT(company_id) DO UPDATE SET
+        state_code = excluded.state_code,
+        gstin = excluded.gstin
+    `).run(randomUUID(), activeCompanyId, state_code, (gstin && gstin.trim().toUpperCase()) || '');
+
+    const updated = db.prepare('SELECT * FROM companies WHERE id = ?').get(activeCompanyId);
+    res.json({ success: true, company: updated });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
 // 2. Masters List (Accounts, Items, Godowns, Units)
 app.get('/api/masters', (req, res) => {
   const accounts = db.prepare(`

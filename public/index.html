@@ -171,6 +171,7 @@
               <div class="absolute left-0 top-full hidden group-hover:block bg-white text-slate-800 shadow-xl border border-slate-200 rounded-lg py-1.5 w-60 z-50 text-xs font-normal">
                 <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase border-b border-slate-100">Company Management</div>
                 <a @click="currentView = 'company_profile'" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-building text-blue-600 w-4"></i> Edit / Modify Company Profile</a>
+                <a @click="showSetupWizardModal = true" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2 text-indigo-600 font-semibold"><i class="fa-solid fa-wand-magic-sparkles text-indigo-500 w-4"></i> Company Setup Wizard</a>
                 <a @click="currentView = 'dashboard'" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-indigo-600 w-4"></i> Company Dashboard & Stats</a>
                 <a @click="alert('Data Directory: /home/ankan/.gemini/antigravity/scratch/exonus-erp/data (SQLite WAL Storage)')" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-folder-open text-amber-500 w-4"></i> Set Data Directory</a>
                 <div class="border-t border-slate-100 my-1"></div>
@@ -498,56 +499,189 @@
 
 
         <!-- VIEW: COMPANY PROFILE (MODIFY COMPANY) -->
-        <div v-if="currentView === 'company_profile'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-3xl">
+        <div v-if="currentView === 'company_profile'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-4xl">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
-                <i class="fa-solid fa-building text-blue-600"></i> Company Profile & Statutory Master
+                <i class="fa-solid fa-building text-blue-600"></i> Company Profile & Statutory Setup
               </h2>
-              <p class="text-xs text-slate-400">Manage registered company identity, statutory tax registration, and financial year parameters</p>
+              <p class="text-xs text-slate-400">Master configuration for company registration, statutory GSTIN/PAN, and accounting parameters</p>
             </div>
             <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
           </div>
-          <div class="space-y-4 text-xs">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Company Legal Name</label>
-                <input type="text" v-model="company.name" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-bold text-slate-900">
+
+          <div class="space-y-6 text-xs">
+            <!-- Section 1: Business Identification -->
+            <div class="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-4">
+              <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-id-card text-blue-600"></i> 1. Business Identity & Nature
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Company Legal Name <span class="text-rose-500">*</span></label>
+                  <input type="text" v-model="companyForm.name" placeholder="e.g. Exonus Trading & Retail Pvt Ltd" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-bold text-slate-900 bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Trade / Print Name (Invoice Header)</label>
+                  <input type="text" v-model="companyForm.trade_name" placeholder="e.g. Exonus Supermarket" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-bold text-slate-800 bg-white">
+                </div>
               </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">GSTIN</label>
-                <input type="text" v-model="company.gstin" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold uppercase">
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Industry Type <span class="text-rose-500">*</span></label>
+                  <select v-model="companyForm.industry_type" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-semibold text-slate-800 bg-white">
+                    <option value="Trading / Wholesale & Distribution">Trading / Wholesale & Distribution</option>
+                    <option value="Retail / Supermarket / POS">Retail / Supermarket / POS</option>
+                    <option value="Manufacturing / Assembly">Manufacturing / Assembly</option>
+                    <option value="Services / IT & Consulting">Services / IT & Consulting</option>
+                    <option value="Construction & Real Estate">Construction & Real Estate</option>
+                    <option value="Logistics & Warehousing">Logistics & Warehousing</option>
+                    <option value="Pharmacy & Healthcare">Pharmacy & Healthcare</option>
+                    <option value="Other Commercial Enterprise">Other Commercial Enterprise</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">CIN (Corporate Identity No)</label>
+                  <input type="text" v-model="companyForm.cin" placeholder="e.g. U72200DL2026PTC123456" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono uppercase bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">MSME / Udyam Reg. No</label>
+                  <input type="text" v-model="companyForm.udyam_no" placeholder="e.g. UDYAM-DL-01-0012345" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono uppercase bg-white">
+                </div>
               </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">State / Jurisdiction Code</label>
-                <input type="text" v-model="company.state_code" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono">
+
+            <!-- Section 2: Taxation & Statutory Registrations -->
+            <div class="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-4">
+              <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice text-emerald-600"></i> 2. Statutory & Tax Registrations
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">GSTIN (15 Digits)</label>
+                  <input type="text" v-model="companyForm.gstin" @input="onGSTINInput" placeholder="07AAAAA0000A1Z5" maxlength="15" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold uppercase bg-white">
+                  <span class="text-[10px] text-slate-400">Auto-derives PAN and State</span>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">PAN No. (10 Digits)</label>
+                  <input type="text" v-model="companyForm.pan" placeholder="AAAAA0000A" maxlength="10" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold uppercase bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">GST Registration Type</label>
+                  <select v-model="companyForm.gst_type" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-semibold text-slate-800 bg-white">
+                    <option value="Regular Taxpayer">Regular Taxpayer</option>
+                    <option value="Composition Scheme">Composition Scheme</option>
+                    <option value="Special Economic Zone (SEZ)">Special Economic Zone (SEZ)</option>
+                    <option value="Unregistered / Excluded">Unregistered / Excluded</option>
+                  </select>
+                </div>
               </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Base Currency</label>
-                <input type="text" v-model="company.currency" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-bold">
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Financial Year Start</label>
-                <input type="text" value="01/04/2026" readonly class="magic-input w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-lg text-slate-500 font-mono">
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">State / Jurisdiction <span class="text-rose-500">*</span></label>
+                  <select v-model="companyForm.state_code" @change="onStateSelectChange" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-semibold text-slate-800 bg-white">
+                    <option v-for="st in indianStates" :key="st.code" :value="st.code">{{ st.code }} - {{ st.name }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">State Code (Numeric)</label>
+                  <input type="text" :value="companyForm.state_code" readonly class="magic-input w-full px-3 py-2 border border-slate-200 bg-slate-100 rounded-lg font-mono font-bold text-slate-600">
+                </div>
               </div>
             </div>
-            <div>
-              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Registered Business Address</label>
-              <textarea v-model="company.address" rows="2" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg"></textarea>
+
+            <!-- Section 3: Contact & Address Information -->
+            <div class="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-4">
+              <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-location-dot text-rose-600"></i> 3. Address & Contact Details
+              </h3>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Registered Address Line</label>
+                <textarea v-model="companyForm.address" rows="2" placeholder="Building, Street, Area..." class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg bg-white"></textarea>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">City / District</label>
+                  <input type="text" v-model="companyForm.city" placeholder="e.g. New Delhi" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">PIN Code (6 digits)</label>
+                  <input type="text" v-model="companyForm.pin_code" placeholder="110001" maxlength="6" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Phone / Mobile No.</label>
+                  <input type="text" v-model="companyForm.phone" placeholder="+91 98765 43210" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Official Email</label>
+                  <input type="email" v-model="companyForm.email" placeholder="accounts@exonus.in" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+                </div>
+              </div>
             </div>
+
+            <!-- Section 4: Accounting & Banking Setup -->
+            <div class="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-4">
+              <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-calendar-check text-purple-600"></i> 4. Financial Year & Default Bank Account
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Financial Year Beginning</label>
+                  <input type="date" v-model="companyForm.financial_year_start" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Financial Year Ending</label>
+                  <input type="date" v-model="companyForm.financial_year_end" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Books Commencing From</label>
+                  <input type="date" v-model="companyForm.books_commencing_from" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Currency Symbol</label>
+                  <input type="text" v-model="companyForm.currency_symbol" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-bold text-center bg-white">
+                </div>
+              </div>
+
+              <!-- Bank details for invoices -->
+              <div class="border-t border-slate-200 pt-3">
+                <span class="block text-[11px] font-bold text-slate-500 uppercase mb-2">Default Bank for Invoices & Payments</span>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                  <div>
+                    <label class="block text-[10px] text-slate-500">Bank Name</label>
+                    <input type="text" v-model="companyForm.bank_name" placeholder="HDFC Bank" class="magic-input w-full px-2.5 py-1.5 border border-slate-200 rounded-md text-xs bg-white">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-500">Account Number</label>
+                    <input type="text" v-model="companyForm.bank_acc_no" placeholder="50200012345678" class="magic-input w-full px-2.5 py-1.5 border border-slate-200 rounded-md text-xs font-mono bg-white">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-500">IFSC Code</label>
+                    <input type="text" v-model="companyForm.bank_ifsc" placeholder="HDFC0001234" class="magic-input w-full px-2.5 py-1.5 border border-slate-200 rounded-md text-xs font-mono uppercase bg-white">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-500">Branch Name</label>
+                    <input type="text" v-model="companyForm.bank_branch" placeholder="Connaught Place" class="magic-input w-full px-2.5 py-1.5 border border-slate-200 rounded-md text-xs bg-white">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Database connection alert -->
             <div class="p-3 bg-blue-50 border border-blue-100 rounded-lg text-blue-900 text-xs flex items-center justify-between">
               <div>
-                <span class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-database"></i> Active Data Storage Directory</span>
-                <p class="mt-0.5 text-[11px] font-mono text-blue-700">/home/ankan/.gemini/antigravity/scratch/exonus-erp/data/exonus.db (WAL Mode)</p>
+                <span class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-database"></i> SQLite WAL Embedded Storage Engine</span>
+                <p class="mt-0.5 text-[11px] font-mono text-blue-700">/home/ankan/.gemini/antigravity/scratch/exonus-erp/data/exonus.db</p>
               </div>
-              <span class="px-2.5 py-1 bg-blue-600 text-white font-bold rounded text-[10px]">CONNECTED</span>
+              <span class="px-2.5 py-1 bg-emerald-600 text-white font-bold rounded text-[10px]">ZERO LATENCY WAL</span>
             </div>
-            <div class="pt-4 flex justify-end gap-2">
-              <button @click="currentView = 'dashboard'" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-xs font-bold">Cancel</button>
-              <button @click="alert('Company Profile updated successfully!')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-2 rounded-lg shadow-sm flex items-center gap-1.5">
-                <i class="fa-solid fa-check"></i> Save Company Details
+
+            <div class="pt-2 flex justify-end gap-3">
+              <button @click="currentView = 'dashboard'" class="px-5 py-2.5 text-slate-600 hover:bg-slate-100 rounded-lg text-xs font-bold transition">Cancel</button>
+              <button @click="saveCompanySetup" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-8 py-2.5 rounded-lg shadow-md flex items-center gap-2 transition">
+                <i class="fa-solid fa-check-double"></i> Save Company Setup & Masters
               </button>
             </div>
           </div>
@@ -2768,6 +2902,178 @@
 
     </div>
 
+    <!-- FIRST-RUN COMPANY SETUP WIZARD MODAL -->
+    <div v-if="showSetupWizardModal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
+        
+        <!-- Wizard Header -->
+        <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 text-white p-6 relative">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-2xl font-black text-amber-300 shadow-inner">
+              <i class="fa-solid fa-cube"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-xl font-black tracking-tight">Exonus ERP - Company Setup Wizard</h2>
+                <span class="text-[10px] uppercase font-black bg-amber-400 text-slate-900 px-2 py-0.5 rounded-full tracking-wider">Step 1 of 1</span>
+              </div>
+              <p class="text-xs text-blue-100 mt-0.5">Welcome! Configure your company profile, statutory tax numbers, and financial year parameters to begin.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wizard Scrollable Form Body -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6 text-xs">
+          
+          <!-- Identity -->
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+            <h4 class="font-bold text-slate-800 uppercase text-[11px] flex items-center gap-2">
+              <i class="fa-solid fa-building text-blue-600"></i> Company Identity & Industry
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Company Legal Name <span class="text-rose-500">*</span></label>
+                <input type="text" v-model="companyForm.name" placeholder="e.g. Acme Enterprises Pvt Ltd" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-bold text-slate-900 bg-white">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Trade / Billing Name</label>
+                <input type="text" v-model="companyForm.trade_name" placeholder="e.g. Acme Stores" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg bg-white">
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Industry Type <span class="text-rose-500">*</span></label>
+                <select v-model="companyForm.industry_type" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-semibold text-slate-800 bg-white">
+                  <option value="Trading / Wholesale & Distribution">Trading / Wholesale & Distribution</option>
+                  <option value="Retail / Supermarket / POS">Retail / Supermarket / POS</option>
+                  <option value="Manufacturing / Assembly">Manufacturing / Assembly</option>
+                  <option value="Services / IT & Consulting">Services / IT & Consulting</option>
+                  <option value="Construction & Real Estate">Construction & Real Estate</option>
+                  <option value="Logistics & Warehousing">Logistics & Warehousing</option>
+                  <option value="Pharmacy & Healthcare">Pharmacy & Healthcare</option>
+                  <option value="Other Commercial Enterprise">Other Commercial Enterprise</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">CIN (If Pvt Ltd/Ltd)</label>
+                <input type="text" v-model="companyForm.cin" placeholder="U72200DL2026PTC123456" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono uppercase bg-white">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">MSME / Udyam Reg. No</label>
+                <input type="text" v-model="companyForm.udyam_no" placeholder="UDYAM-XX-00-0000000" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono uppercase bg-white">
+              </div>
+            </div>
+          </div>
+
+          <!-- Statutory -->
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+            <h4 class="font-bold text-slate-800 uppercase text-[11px] flex items-center gap-2">
+              <i class="fa-solid fa-file-invoice text-emerald-600"></i> Taxation & Statutory Registrations
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">GSTIN (15 Digits)</label>
+                <input type="text" v-model="companyForm.gstin" @input="onGSTINInput" placeholder="07AAAAA0000A1Z5" maxlength="15" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold uppercase bg-white">
+                <span class="text-[9px] text-slate-400">Auto-detects State & PAN</span>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">PAN No. (10 Digits)</label>
+                <input type="text" v-model="companyForm.pan" placeholder="AAAAA0000A" maxlength="10" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold uppercase bg-white">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">GST Registration Type</label>
+                <select v-model="companyForm.gst_type" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-semibold text-slate-800 bg-white">
+                  <option value="Regular Taxpayer">Regular Taxpayer</option>
+                  <option value="Composition Scheme">Composition Scheme</option>
+                  <option value="Special Economic Zone (SEZ)">Special Economic Zone (SEZ)</option>
+                  <option value="Unregistered / Excluded">Unregistered / Excluded</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">State / Jurisdiction <span class="text-rose-500">*</span></label>
+                <select v-model="companyForm.state_code" @change="onStateSelectChange" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-semibold text-slate-800 bg-white">
+                  <option v-for="st in indianStates" :key="st.code" :value="st.code">{{ st.code }} - {{ st.name }}</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Jurisdiction Code</label>
+                <input type="text" :value="companyForm.state_code" readonly class="magic-input w-full px-3 py-2 border border-slate-200 bg-slate-100 rounded-lg font-mono font-bold text-slate-600">
+              </div>
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+            <h4 class="font-bold text-slate-800 uppercase text-[11px] flex items-center gap-2">
+              <i class="fa-solid fa-location-dot text-rose-600"></i> Registered Address & Contact
+            </h4>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Registered Address Line</label>
+              <textarea v-model="companyForm.address" rows="2" placeholder="Street, Building, Industrial Area..." class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg bg-white"></textarea>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">City / District</label>
+                <input type="text" v-model="companyForm.city" placeholder="City" class="magic-input w-full px-2.5 py-1.5 border border-slate-200 rounded-md bg-white">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">PIN Code (6 digits)</label>
+                <input type="text" v-model="companyForm.pin_code" placeholder="110001" maxlength="6" class="magic-input w-full px-2.5 py-1.5 border border-slate-200 rounded-md font-mono bg-white">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Phone / Mobile</label>
+                <input type="text" v-model="companyForm.phone" placeholder="+91 98765 43210" class="magic-input w-full px-2.5 py-1.5 border border-slate-200 rounded-md bg-white">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Email</label>
+                <input type="email" v-model="companyForm.email" placeholder="accounts@company.com" class="magic-input w-full px-2.5 py-1.5 border border-slate-200 rounded-md bg-white">
+              </div>
+            </div>
+          </div>
+
+          <!-- Financial Year -->
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+            <h4 class="font-bold text-slate-800 uppercase text-[11px] flex items-center gap-2">
+              <i class="fa-solid fa-calendar-check text-purple-600"></i> Financial Year Parameters
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Financial Year Start</label>
+                <input type="date" v-model="companyForm.financial_year_start" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold bg-white">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Financial Year End</label>
+                <input type="date" v-model="companyForm.financial_year_end" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold bg-white">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Books Commencing From</label>
+                <input type="date" v-model="companyForm.books_commencing_from" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold bg-white">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Wizard Footer -->
+        <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-slate-400 text-xs font-mono">
+            <i class="fa-solid fa-lock text-emerald-600"></i> Local SQLite WAL Storage
+          </div>
+          <div class="flex items-center gap-3">
+            <button v-if="company?.setup_completed" @click="showSetupWizardModal = false" class="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-bold transition">
+              Close
+            </button>
+            <button @click="saveCompanySetup" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-8 py-2.5 rounded-lg shadow-md flex items-center gap-2 transition">
+              <i class="fa-solid fa-check"></i> Complete Setup & Launch ERP
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -2881,6 +3187,132 @@
         const showNewOrderModal = ref(false);
         const showNewPOModal = ref(false);
         const showAddEmployeeModal = ref(false);
+        const showSetupWizardModal = ref(false);
+
+        // Indian States & Union Territories Reference for GSTIN and Statutory Selection
+        const indianStates = ref([
+          { code: '01', name: 'Jammu & Kashmir' },
+          { code: '02', name: 'Himachal Pradesh' },
+          { code: '03', name: 'Punjab' },
+          { code: '04', name: 'Chandigarh' },
+          { code: '05', name: 'Uttarakhand' },
+          { code: '06', name: 'Haryana' },
+          { code: '07', name: 'Delhi' },
+          { code: '08', name: 'Rajasthan' },
+          { code: '09', name: 'Uttar Pradesh' },
+          { code: '10', name: 'Bihar' },
+          { code: '11', name: 'Sikkim' },
+          { code: '12', name: 'Arunachal Pradesh' },
+          { code: '13', name: 'Nagaland' },
+          { code: '14', name: 'Manipur' },
+          { code: '15', name: 'Mizoram' },
+          { code: '16', name: 'Tripura' },
+          { code: '17', name: 'Meghalaya' },
+          { code: '18', name: 'Assam' },
+          { code: '19', name: 'West Bengal' },
+          { code: '20', name: 'Jharkhand' },
+          { code: '21', name: 'Odisha' },
+          { code: '22', name: 'Chhattisgarh' },
+          { code: '23', name: 'Madhya Pradesh' },
+          { code: '24', name: 'Gujarat' },
+          { code: '26', name: 'Dadra & Nagar Haveli and Daman & Diu' },
+          { code: '27', name: 'Maharashtra' },
+          { code: '28', name: 'Andhra Pradesh (Old)' },
+          { code: '29', name: 'Karnataka' },
+          { code: '30', name: 'Goa' },
+          { code: '31', name: 'Lakshadweep' },
+          { code: '32', name: 'Kerala' },
+          { code: '33', name: 'Tamil Nadu' },
+          { code: '34', name: 'Puducherry' },
+          { code: '35', name: 'Andaman & Nicobar Islands' },
+          { code: '36', name: 'Telangana' },
+          { code: '37', name: 'Andhra Pradesh (New)' },
+          { code: '38', name: 'Ladakh' },
+          { code: '97', name: 'Other Territory' }
+        ]);
+
+        // Comprehensive Company Setup Form
+        const companyForm = ref({
+          name: '',
+          trade_name: '',
+          industry_type: 'Trading / Wholesale & Distribution',
+          gstin: '',
+          pan: '',
+          cin: '',
+          gst_type: 'Regular Taxpayer',
+          udyam_no: '',
+          state_code: '07',
+          state_name: 'Delhi',
+          address: '',
+          city: '',
+          pin_code: '',
+          phone: '',
+          email: '',
+          website: '',
+          financial_year_start: '2026-04-01',
+          financial_year_end: '2027-03-31',
+          books_commencing_from: '2026-04-01',
+          currency_symbol: '₹',
+          bank_name: '',
+          bank_acc_no: '',
+          bank_ifsc: '',
+          bank_branch: ''
+        });
+
+        const onGSTINInput = () => {
+          if (!companyForm.value.gstin) return;
+          const g = companyForm.value.gstin.trim().toUpperCase();
+          companyForm.value.gstin = g;
+          // Auto derive state code from first 2 digits
+          if (g.length >= 2) {
+            const prefix = g.substring(0, 2);
+            const foundState = indianStates.value.find(s => s.code === prefix);
+            if (foundState) {
+              companyForm.value.state_code = foundState.code;
+              companyForm.value.state_name = foundState.name;
+            }
+          }
+          // Auto derive PAN from characters 3-12
+          if (g.length >= 12) {
+            companyForm.value.pan = g.substring(2, 12);
+          }
+        };
+
+        const onStateSelectChange = () => {
+          const st = indianStates.value.find(s => s.code === companyForm.value.state_code);
+          if (st) {
+            companyForm.value.state_name = st.name;
+          }
+        };
+
+        const saveCompanySetup = async () => {
+          if (!companyForm.value.name || !companyForm.value.name.trim()) {
+            return alert('Company Legal Name is required');
+          }
+          if (!companyForm.value.state_code) {
+            return alert('State / Jurisdiction is required');
+          }
+
+          try {
+            const res = await fetch('/api/company/setup', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(companyForm.value)
+            });
+            const data = await res.json();
+            if (data.success) {
+              company.value = data.company;
+              showSetupWizardModal.value = false;
+              alert('🎉 Company Setup Saved Successfully! Welcome to ' + data.company.name);
+              loadInitialData();
+              loadFeatures();
+            } else {
+              alert('Error saving setup: ' + data.error);
+            }
+          } catch (e) {
+            alert('Failed to save company setup: ' + e.message);
+          }
+        };
 
         // BUSY Final Results & Display State
         const profitLossData = ref({ trading: {}, operating: {}, directExpenseAccounts: [], directIncomeAccounts: [], indirectExpenseAccounts: [], indirectIncomeAccounts: [] });
@@ -3046,6 +3478,39 @@
           try {
             const compRes = await fetch('/api/company');
             company.value = await compRes.json();
+
+            // Populate companyForm with fetched company details
+            if (company.value) {
+              companyForm.value.name = company.value.name || '';
+              companyForm.value.trade_name = company.value.trade_name || company.value.name || '';
+              companyForm.value.industry_type = company.value.industry_type || 'Trading / Wholesale & Distribution';
+              companyForm.value.gstin = company.value.gstin || '';
+              companyForm.value.pan = company.value.pan || '';
+              companyForm.value.cin = company.value.cin || '';
+              companyForm.value.gst_type = company.value.gst_type || 'Regular Taxpayer';
+              companyForm.value.udyam_no = company.value.udyam_no || '';
+              companyForm.value.state_code = company.value.state_code || '07';
+              companyForm.value.state_name = company.value.state_name || 'Delhi';
+              companyForm.value.address = company.value.address || '';
+              companyForm.value.city = company.value.city || '';
+              companyForm.value.pin_code = company.value.pin_code || '';
+              companyForm.value.phone = company.value.phone || '';
+              companyForm.value.email = company.value.email || '';
+              companyForm.value.website = company.value.website || '';
+              companyForm.value.financial_year_start = company.value.financial_year_start || '2026-04-01';
+              companyForm.value.financial_year_end = company.value.financial_year_end || '2027-03-31';
+              companyForm.value.books_commencing_from = company.value.books_commencing_from || company.value.financial_year_start || '2026-04-01';
+              companyForm.value.currency_symbol = company.value.currency_symbol || '₹';
+              companyForm.value.bank_name = company.value.bank_name || '';
+              companyForm.value.bank_acc_no = company.value.bank_acc_no || '';
+              companyForm.value.bank_ifsc = company.value.bank_ifsc || '';
+              companyForm.value.bank_branch = company.value.bank_branch || '';
+
+              // If setup has never been completed, launch wizard modal automatically
+              if (!company.value.setup_completed) {
+                showSetupWizardModal.value = true;
+              }
+            }
 
             const mastRes = await fetch('/api/masters');
             const data = await mastRes.json();
@@ -3985,7 +4450,13 @@
           loadAccountLedger,
           loadGSTReport,
           loadOutstandings,
-          submitContraVoucher
+          submitContraVoucher,
+          showSetupWizardModal,
+          indianStates,
+          companyForm,
+          onGSTINInput,
+          onStateSelectChange,
+          saveCompanySetup
         };
       }
     }).mount('#app');

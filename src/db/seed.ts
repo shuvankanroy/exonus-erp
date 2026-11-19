@@ -5,16 +5,44 @@ export interface CompanyConfig {
   id: string;
   name: string;
   trade_name?: string;
+  industry_type?: string;
   gstin?: string;
+  pan?: string;
+  cin?: string;
+  gst_type?: string;
+  udyam_no?: string;
   state_code: string;
+  state_name?: string;
+  address?: string;
+  city?: string;
+  pin_code?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
   financial_year_start: string;
   financial_year_end: string;
+  books_commencing_from?: string;
+  currency_symbol?: string;
+  bank_name?: string;
+  bank_acc_no?: string;
+  bank_ifsc?: string;
+  bank_branch?: string;
+  setup_completed?: boolean;
 }
 
 export function seedCompanyAndStandardMasters(db: Database.Database, config: CompanyConfig) {
   const insertCompany = db.prepare(`
-    INSERT INTO companies (id, name, trade_name, gstin, state_code, financial_year_start, financial_year_end)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO companies (
+      id, name, trade_name, industry_type, gstin, pan, cin, gst_type, udyam_no,
+      state_code, state_name, address, city, pin_code, phone, email, website,
+      financial_year_start, financial_year_end, books_commencing_from, currency_symbol,
+      bank_name, bank_acc_no, bank_ifsc, bank_branch, setup_completed
+    ) VALUES (
+      ?, ?, ?, ?, ?, ?, ?, ?, ?,
+      ?, ?, ?, ?, ?, ?, ?, ?,
+      ?, ?, ?, ?,
+      ?, ?, ?, ?, ?
+    )
   `);
 
   const insertGroup = db.prepare(`
@@ -48,10 +76,29 @@ export function seedCompanyAndStandardMasters(db: Database.Database, config: Com
       config.id,
       config.name,
       config.trade_name || config.name,
+      config.industry_type || 'Trading / Wholesale & Distribution',
       config.gstin || '',
+      config.pan || (config.gstin && config.gstin.length >= 12 ? config.gstin.substring(2, 12) : ''),
+      config.cin || '',
+      config.gst_type || 'Regular Taxpayer',
+      config.udyam_no || '',
       config.state_code,
+      config.state_name || 'Delhi',
+      config.address || '',
+      config.city || '',
+      config.pin_code || '',
+      config.phone || '',
+      config.email || '',
+      config.website || '',
       config.financial_year_start,
-      config.financial_year_end
+      config.financial_year_end,
+      config.books_commencing_from || config.financial_year_start,
+      config.currency_symbol || '₹',
+      config.bank_name || '',
+      config.bank_acc_no || '',
+      config.bank_ifsc || '',
+      config.bank_branch || '',
+      config.setup_completed ? 1 : 0
     );
 
     // 2. Standard Primary Groups (BUSY Standard)

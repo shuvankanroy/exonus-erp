@@ -19,12 +19,30 @@ export function initDatabase(dbPath?: string): Database.Database {
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       trade_name TEXT,
+      industry_type TEXT DEFAULT 'Trading / Wholesale & Distribution',
       gstin TEXT,
+      pan TEXT,
+      cin TEXT,
+      gst_type TEXT DEFAULT 'Regular Taxpayer', -- Regular Taxpayer, Composition Scheme, Unregistered, SEZ
+      udyam_no TEXT,
       state_code TEXT NOT NULL, -- e.g., '07' for Delhi, '27' for Maharashtra
+      state_name TEXT,
       address TEXT,
+      city TEXT,
+      pin_code TEXT,
+      phone TEXT,
+      email TEXT,
+      website TEXT,
       financial_year_start TEXT NOT NULL, -- YYYY-MM-DD
       financial_year_end TEXT NOT NULL,
+      books_commencing_from TEXT,
       base_currency TEXT DEFAULT 'INR',
+      currency_symbol TEXT DEFAULT '₹',
+      bank_name TEXT,
+      bank_acc_no TEXT,
+      bank_ifsc TEXT,
+      bank_branch TEXT,
+      setup_completed BOOLEAN DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -303,6 +321,40 @@ export function initDatabase(dbPath?: string): Database.Database {
     CREATE INDEX IF NOT EXISTS idx_stock_item_mc ON stock_entries(item_id, material_centre_id);
     CREATE INDEX IF NOT EXISTS idx_outbox_pending ON sync_outbox(status);
   `);
+
+  // Auto-migration helper for existing databases: ensure new company columns exist
+  const existingCols = db.prepare("PRAGMA table_info(companies)").all() as Array<{ name: string }>;
+  const colNames = new Set(existingCols.map(c => c.name));
+  const newCols: Array<{ name: string; type: string }> = [
+    { name: 'industry_type', type: 'TEXT DEFAULT "Trading / Wholesale & Distribution"' },
+    { name: 'pan', type: 'TEXT' },
+    { name: 'cin', type: 'TEXT' },
+    { name: 'gst_type', type: 'TEXT DEFAULT "Regular Taxpayer"' },
+    { name: 'udyam_no', type: 'TEXT' },
+    { name: 'state_name', type: 'TEXT' },
+    { name: 'city', type: 'TEXT' },
+    { name: 'pin_code', type: 'TEXT' },
+    { name: 'phone', type: 'TEXT' },
+    { name: 'email', type: 'TEXT' },
+    { name: 'website', type: 'TEXT' },
+    { name: 'books_commencing_from', type: 'TEXT' },
+    { name: 'currency_symbol', type: 'TEXT DEFAULT "₹"' },
+    { name: 'bank_name', type: 'TEXT' },
+    { name: 'bank_acc_no', type: 'TEXT' },
+    { name: 'bank_ifsc', type: 'TEXT' },
+    { name: 'bank_branch', type: 'TEXT' },
+    { name: 'setup_completed', type: 'BOOLEAN DEFAULT 0' }
+  ];
+
+  for (const col of newCols) {
+    if (!colNames.has(col.name)) {
+      try {
+        db.exec(`ALTER TABLE companies ADD COLUMN ${col.name} ${col.type}`);
+      } catch (e) {
+        // column may already exist
+      }
+    }
+  }
 
   return db;
 }
