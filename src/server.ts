@@ -8,6 +8,7 @@ import { createPurchaseVoucher } from './services/purchaseService.js';
 import { createPaymentReceiptVoucher } from './services/paymentService.js';
 import { createSalesOrder, createDeliveryChallan, getSalesOrders, createSalesQuotation, getSalesQuotations, convertQuotationToOrder } from './services/orderService.js';
 import { createPurchaseOrder, createGoodsReceiptNote, getPurchaseOrders, getGoodsReceiptNotes } from './services/procurementService.js';
+import { getBillSundries, saveBillSundry, seedDefaultBillSundries } from './services/billSundryService.js';
 import { executeProductionRun } from './services/manufacturingService.js';
 import { processMonthlyPayroll } from './services/payrollService.js';
 import { generateEWayBill, generateEInvoice } from './services/gstComplianceService.js';
@@ -112,8 +113,9 @@ app.get('/api/masters', (req, res) => {
 
   const godowns = db.prepare('SELECT * FROM material_centres WHERE company_id = ?').all(activeCompanyId);
   const units = db.prepare('SELECT * FROM units WHERE company_id = ?').all(activeCompanyId);
+  const billSundries = getBillSundries(db, activeCompanyId);
 
-  res.json({ accounts, groups, items, godowns, units });
+  res.json({ accounts, groups, items, godowns, units, billSundries });
 });
 
 // 2.1 Create Party / Account Master (BUSY Style)
@@ -229,6 +231,28 @@ app.get('/api/accounts/:id/pending-bills', (req, res) => {
     res.json(bills);
   } catch (err: any) {
     res.status(400).json({ error: err.message });
+  }
+});
+
+// 2.6 Bill Sundries Master API
+app.get('/api/bill-sundries', (req, res) => {
+  try {
+    const sundries = getBillSundries(db, activeCompanyId);
+    res.json(sundries);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/bill-sundries', (req, res) => {
+  try {
+    const result = saveBillSundry(db, {
+      ...req.body,
+      company_id: activeCompanyId,
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
   }
 });
 

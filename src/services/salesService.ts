@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import { randomUUID } from 'crypto';
+import { calculateBillSundries, AppliedSundryInput } from './billSundryService.js';
 
 export interface SalesVoucherInput {
   company_id: string;
@@ -11,6 +12,7 @@ export interface SalesVoucherInput {
   delivery_challan_id?: string; // Optional Link to Delivery Challan
   narration?: string;
   pos_settlement_type?: 'CASH' | 'UPI' | 'CARD' | 'SPLIT' | 'CREDIT';
+  bill_sundries?: AppliedSundryInput[];
   items: Array<{
     item_id: string;
     batch_id?: string;
@@ -34,13 +36,13 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
   `).get(input.company_id, input.series_name || 'Main') as any;
   if (!series) throw new Error('Voucher series not found');
 
-    // Find system accounts
-    const salesAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'SALES'").get(input.company_id) as any;
-    const cgstAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'CGST_OUT'").get(input.company_id) as any;
-    const sgstAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'SGST_OUT'").get(input.company_id) as any;
-    const igstAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'IGST_OUT'").get(input.company_id) as any;
-    const roundOffAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'ROUND_OFF'").get(input.company_id) as any;
-    const cashAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'CASH'").get(input.company_id) as any;
+  // Find system accounts
+  const salesAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'SALES'").get(input.company_id) as any;
+  const cgstAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'CGST_OUT'").get(input.company_id) as any;
+  const sgstAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'SGST_OUT'").get(input.company_id) as any;
+  const igstAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'IGST_OUT'").get(input.company_id) as any;
+  const roundOffAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'ROUND_OFF'").get(input.company_id) as any;
+  const cashAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'CASH'").get(input.company_id) as any;
 
   // Determine Inter-state vs Intra-state GST
   const isInterState = party.state_code && party.state_code !== company.state_code;
@@ -52,36 +54,18 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
     db.prepare('UPDATE voucher_series SET current_number = ? WHERE id = ?').run(nextNum, series.id);
 
     const voucherId = randomUUID();
-    let totalTaxable = 0;
-    let totalCgst = 0;
-    let totalSgst = 0;
-    let totalIgst = 0;
 
-    // Process line items
-    const processedItems = input.items.map((it) => {
+    // Prepare raw lines
+    let baseTaxableTotal = 0;
+    const rawLines = input.items.map((it) => {
       const itemRow = db.prepare('SELECT * FROM items WHERE id = ?').get(it.item_id) as any;
       if (!itemRow) throw new Error(`Item ${it.item_id} not found`);
 
       const discountRate = it.discount_pct || 0;
       const baseAmount = it.qty * it.rate;
       const discountAmount = Math.round(((baseAmount * discountRate) / 100) * 100) / 100;
-      const taxable = Math.round((baseAmount - discountAmount) * 100) / 100;
-
-      let cgst = 0;
-      let sgst = 0;
-      let igst = 0;
-
-      if (isInterState) {
-        igst = Math.round(((taxable * itemRow.gst_rate) / 100) * 100) / 100;
-      } else {
-        cgst = Math.round(((taxable * (itemRow.gst_rate / 2)) / 100) * 100) / 100;
-        sgst = Math.round(((taxable * (itemRow.gst_rate / 2)) / 100) * 100) / 100;
-      }
-
-      totalTaxable = Math.round((totalTaxable + taxable) * 100) / 100;
-      totalCgst = Math.round((totalCgst + cgst) * 100) / 100;
-      totalSgst = Math.round((totalSgst + sgst) * 100) / 100;
-      totalIgst = Math.round((totalIgst + igst) * 100) / 100;
+      const lineTaxable = Math.round((baseAmount - discountAmount) * 100) / 100;
+      baseTaxableTotal = Math.round((baseTaxableTotal + lineTaxable) * 100) / 100;
 
       return {
         id: randomUUID(),
@@ -92,22 +76,30 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
         unit_id: it.unit_id,
         rate: it.rate,
         discount_pct: discountRate,
-        taxable_amount: taxable,
+        taxable_amount: lineTaxable,
         gst_rate: itemRow.gst_rate,
-        cgst_amount: cgst,
-        sgst_amount: sgst,
-        igst_amount: igst,
-        net_amount: Math.round((taxable + cgst + sgst + igst) * 100) / 100,
       };
     });
 
-    const taxTotal = Math.round((totalCgst + totalSgst + totalIgst) * 100) / 100;
-    const computedGross = Math.round((totalTaxable + taxTotal) * 100) / 100;
-    // Commercial Round-Off to Nearest Rupee
-    const grossTotal = Math.round(computedGross);
-    const roundOffDiff = Math.round((grossTotal - computedGross) * 100) / 100;
+    // 2. Dynamic Bill Sundries Calculation Engine (Pre-tax & Post-tax GST compliance)
+    const sundryResult = calculateBillSundries(
+      db,
+      input.company_id,
+      baseTaxableTotal,
+      input.bill_sundries || [],
+      Boolean(isInterState),
+      rawLines
+    );
 
-    // 2. Insert Voucher Header
+    const totalTaxable = sundryResult.adjustedTaxableTotal;
+    const totalCgst = sundryResult.totalCgst;
+    const totalSgst = sundryResult.totalSgst;
+    const totalIgst = sundryResult.totalIgst;
+    const taxTotal = sundryResult.taxTotal;
+    const grossTotal = sundryResult.finalGross;
+    const roundOffDiff = sundryResult.roundOffDiff;
+
+    // 3. Insert Voucher Header
     db.prepare(`
       INSERT INTO vouchers (
         id, company_id, series_id, voucher_type, voucher_number, date, 
@@ -119,7 +111,7 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
       totalTaxable, taxTotal, grossTotal, input.pos_settlement_type || 'CREDIT'
     );
 
-    // 3. Insert Voucher Items & Deduct Perpetual Stock
+    // 4. Insert Voucher Items & Deduct Perpetual Stock
     const insertVchItem = db.prepare(`
       INSERT INTO voucher_items (
         id, voucher_id, item_id, batch_id, material_centre_id, qty, unit_id, rate, 
@@ -133,10 +125,10 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    for (const line of processedItems) {
+    for (const line of sundryResult.adjustedLines as any[]) {
       insertVchItem.run(
         line.id, voucherId, line.item_id, line.batch_id, line.material_centre_id,
-        line.qty, line.unit_id, line.rate, line.discount_pct, line.taxable_amount,
+        line.qty, line.unit_id, line.rate, line.discount_pct, line.adjusted_taxable_amount,
         line.gst_rate, line.cgst_amount, line.sgst_amount, line.igst_amount, line.net_amount
       );
 
@@ -159,6 +151,16 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
       }
     }
 
+    // 5. Insert Applied Bill Sundry Lines
+    const insertSundryLine = db.prepare(`
+      INSERT INTO voucher_bill_sundry_lines (id, voucher_id, bill_sundry_id, rate, amount)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+
+    for (const sl of sundryResult.calculatedLines) {
+      insertSundryLine.run(sl.id, voucherId, sl.bill_sundry_id, sl.rate, sl.amount);
+    }
+
     if (input.sales_order_id) {
       const remainingPending = db.prepare(`
         SELECT SUM(pending_qty) as total_pending FROM sales_order_items WHERE order_id = ?
@@ -171,7 +173,7 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
       db.prepare("UPDATE delivery_challans SET status = 'INVOICED' WHERE id = ?").run(input.delivery_challan_id);
     }
 
-    // 4. Double-Entry General Ledger Postings
+    // 6. Double-Entry General Ledger Postings (Immutable Ledger)
     const insertLedger = db.prepare(`
       INSERT INTO ledger_entries (
         id, company_id, voucher_id, account_id, debit, credit, entry_date, narration
@@ -183,8 +185,20 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
     const debitAccountId = isCashSettlement ? cashAcc.id : input.party_account_id;
     insertLedger.run(randomUUID(), input.company_id, voucherId, debitAccountId, grossTotal, 0, input.date, `Sales: ${voucherNumber}`);
 
-    // Credit Sales Account (Taxable Value)
-    insertLedger.run(randomUUID(), input.company_id, voucherId, salesAcc.id, 0, totalTaxable, input.date, `Sales: ${voucherNumber}`);
+    // Credit Sales Account (Base Item Taxable Total)
+    insertLedger.run(randomUUID(), input.company_id, voucherId, salesAcc.id, 0, baseTaxableTotal, input.date, `Sales: ${voucherNumber}`);
+
+    // Post Applied Bill Sundries to General Ledger
+    for (const sl of sundryResult.calculatedLines) {
+      if (sl.amount === 0 || !sl.linked_account_id) continue;
+      if (sl.type === 'ADDITION') {
+        // Income or recovery of expense: Credit sundry ledger
+        insertLedger.run(randomUUID(), input.company_id, voucherId, sl.linked_account_id, 0, sl.amount, input.date, sl.name);
+      } else {
+        // Deduction / discount allowed: Debit sundry expense ledger
+        insertLedger.run(randomUUID(), input.company_id, voucherId, sl.linked_account_id, sl.amount, 0, input.date, sl.name);
+      }
+    }
 
     // Credit GST Output Accounts
     if (totalCgst > 0) insertLedger.run(randomUUID(), input.company_id, voucherId, cgstAcc.id, 0, totalCgst, input.date, 'CGST Output');
@@ -202,7 +216,7 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
       }
     }
 
-    // 5. Bill-by-Bill Reference Entry (Only for Credit sales)
+    // 7. Bill-by-Bill Reference Entry (Only for Credit sales)
     if (!isCashSettlement) {
       db.prepare(`
         INSERT INTO bill_references (
@@ -214,7 +228,7 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
       );
     }
 
-    // 6. Outbox Sync Queue (Replicates to Cloud for Silver Cloud & Gold Cloud)
+    // 8. Outbox Sync Queue (Replicates to Cloud for Silver Cloud & Gold Cloud)
     db.prepare(`
       INSERT INTO sync_outbox (id, company_id, entity_type, entity_id, action, payload)
       VALUES (?, ?, 'VOUCHER', ?, 'CREATE', ?)
@@ -228,7 +242,8 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
       voucherNumber,
       grossTotal,
       taxTotal,
-      taxableTotal: totalTaxable
+      taxableTotal: totalTaxable,
+      sundryLines: sundryResult.calculatedLines
     };
   })();
 }

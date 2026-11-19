@@ -769,23 +769,97 @@
             </div>
           </div>
 
+          <!-- Bill Sundries Table (BUSY Style Discount, Freight, Insurance) -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden mb-6 bg-slate-50/50">
+            <div class="px-4 py-2.5 bg-slate-100/70 border-b border-slate-200 flex justify-between items-center">
+              <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-calculator text-blue-600"></i> Bill Sundries (Pre/Post GST Adjustments)
+              </span>
+              <button @click="addSundryLine(salesForm)" class="text-[11px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                <i class="fa-solid fa-plus-circle"></i> Add Sundry
+              </button>
+            </div>
+            <table v-if="salesForm.sundries && salesForm.sundries.length > 0" class="w-full magic-grid text-left">
+              <thead>
+                <tr>
+                  <th class="w-10">#</th>
+                  <th>Bill Sundry Name</th>
+                  <th class="w-28 text-center">Type</th>
+                  <th class="w-28 text-center">GST Base</th>
+                  <th class="w-32 text-right">Rate (%) / Value</th>
+                  <th class="w-36 text-right">Amount (₹)</th>
+                  <th class="w-14 text-center">Del</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(s, sIdx) in salesForm.sundries" :key="sIdx">
+                  <td class="font-mono text-slate-400 text-xs text-center">{{ sIdx + 1 }}</td>
+                  <td>
+                    <select v-model="s.bill_sundry_id" class="magic-input w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs font-bold">
+                      <option v-for="bs in billSundries" :key="bs.id" :value="bs.id">{{ bs.name }}</option>
+                    </select>
+                  </td>
+                  <td class="text-center font-bold text-[10px]">
+                    <span :class="billSundries.find(b => b.id === s.bill_sundry_id)?.type === 'ADDITION' ? 'text-emerald-600' : 'text-rose-600'">
+                      {{ billSundries.find(b => b.id === s.bill_sundry_id)?.type }}
+                    </span>
+                  </td>
+                  <td class="text-center text-[10px] font-mono">
+                    <span class="px-1.5 py-0.5 rounded" :class="billSundries.find(b => b.id === s.bill_sundry_id)?.impact_taxable_value ? 'bg-indigo-50 text-indigo-700' : 'bg-slate-100 text-slate-600'">
+                      {{ billSundries.find(b => b.id === s.bill_sundry_id)?.impact_taxable_value ? 'PRE-TAX' : 'POST-TAX' }}
+                    </span>
+                  </td>
+                  <td>
+                    <input v-if="billSundries.find(b => b.id === s.bill_sundry_id)?.calc_mode === 'PERCENTAGE'" type="number" step="0.1" v-model.number="s.rate" placeholder="Rate %" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-mono text-right">
+                    <input v-else type="number" step="0.01" v-model.number="s.amount" placeholder="Amount" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-mono text-right">
+                  </td>
+                  <td class="text-right font-mono font-bold text-slate-800">
+                    ₹{{ calculateSundryAmount(s, computeTotals(salesForm.items, salesForm.sundries).baseTaxable).toFixed(2) }}
+                  </td>
+                  <td class="text-center">
+                    <button @click="salesForm.sundries.splice(sIdx, 1)" class="text-rose-500 hover:text-rose-700 text-xs p-1"><i class="fa-solid fa-trash-can"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-else class="p-3 text-center text-xs text-slate-400">
+              No bill sundries applied. Click "+ Add Sundry" to add Trade Discount, Freight, Insurance, or Round-Off.
+            </div>
+          </div>
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end bg-slate-50/80 p-5 rounded-xl border border-slate-200 mb-6">
             <div>
               <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Narration / Bill Remarks</label>
-              <textarea v-model="salesForm.narration" rows="2" placeholder="Remarks, vehicle number, etc." class="magic-input w-full p-2.5 border border-slate-200 rounded-lg text-xs"></textarea>
+              <textarea v-model="salesForm.narration" rows="3" placeholder="Remarks, vehicle number, etc." class="magic-input w-full p-2.5 border border-slate-200 rounded-lg text-xs"></textarea>
             </div>
             <div class="space-y-1.5 text-right font-mono">
               <div class="flex justify-between text-xs text-slate-500">
-                <span>Sub-Total (Taxable):</span>
-                <span class="font-bold text-slate-800">₹{{ computeTotals(salesForm.items).taxable.toFixed(2) }}</span>
+                <span>Base Items Taxable:</span>
+                <span class="font-bold text-slate-800">₹{{ computeTotals(salesForm.items, salesForm.sundries).baseTaxable.toFixed(2) }}</span>
+              </div>
+              <div v-if="computeTotals(salesForm.items, salesForm.sundries).preTaxAdj !== 0" class="flex justify-between text-xs text-indigo-600">
+                <span>Pre-Tax Sundry Adjustment:</span>
+                <span class="font-bold">₹{{ computeTotals(salesForm.items, salesForm.sundries).preTaxAdj.toFixed(2) }}</span>
+              </div>
+              <div class="flex justify-between text-xs text-slate-500">
+                <span>Adjusted Taxable Base:</span>
+                <span class="font-bold text-slate-800">₹{{ computeTotals(salesForm.items, salesForm.sundries).taxable.toFixed(2) }}</span>
               </div>
               <div class="flex justify-between text-xs text-slate-500">
                 <span>GST (CGST + SGST / IGST):</span>
-                <span class="font-bold text-slate-800">₹{{ computeTotals(salesForm.items).tax.toFixed(2) }}</span>
+                <span class="font-bold text-slate-800">₹{{ computeTotals(salesForm.items, salesForm.sundries).tax.toFixed(2) }}</span>
+              </div>
+              <div v-if="computeTotals(salesForm.items, salesForm.sundries).postTaxAdj !== 0" class="flex justify-between text-xs text-purple-600">
+                <span>Post-Tax Sundry Adjustment:</span>
+                <span class="font-bold">₹{{ computeTotals(salesForm.items, salesForm.sundries).postTaxAdj.toFixed(2) }}</span>
+              </div>
+              <div v-if="computeTotals(salesForm.items, salesForm.sundries).roundOff !== 0" class="flex justify-between text-xs text-slate-400">
+                <span>Round-Off (+/-):</span>
+                <span class="font-bold">₹{{ computeTotals(salesForm.items, salesForm.sundries).roundOff.toFixed(2) }}</span>
               </div>
               <div class="flex justify-between text-base font-black text-slate-900 border-t border-slate-200 pt-2">
                 <span>Grand Total:</span>
-                <span class="text-xl text-blue-600">₹{{ computeTotals(salesForm.items).gross.toFixed(2) }}</span>
+                <span class="text-xl text-blue-600">₹{{ computeTotals(salesForm.items, salesForm.sundries).gross.toFixed(2) }}</span>
               </div>
             </div>
           </div>
@@ -878,6 +952,101 @@
               <button @click="addPurchaseLine" class="text-xs font-bold text-emerald-600 hover:text-emerald-800 flex items-center gap-1.5">
                 <i class="fa-solid fa-circle-plus"></i> Add Item Line
               </button>
+            </div>
+          </div>
+
+          <!-- Bill Sundries Table (Purchase Inward Adjustments) -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden mb-6 bg-slate-50/50">
+            <div class="px-4 py-2.5 bg-slate-100/70 border-b border-slate-200 flex justify-between items-center">
+              <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-calculator text-emerald-600"></i> Bill Sundries (Freight, Insurance & Discounts)
+              </span>
+              <button @click="addSundryLine(purchaseForm)" class="text-[11px] font-bold text-emerald-600 hover:text-emerald-800 flex items-center gap-1">
+                <i class="fa-solid fa-plus-circle"></i> Add Sundry
+              </button>
+            </div>
+            <table v-if="purchaseForm.sundries && purchaseForm.sundries.length > 0" class="w-full magic-grid text-left">
+              <thead>
+                <tr>
+                  <th class="w-10">#</th>
+                  <th>Bill Sundry Name</th>
+                  <th class="w-28 text-center">Type</th>
+                  <th class="w-28 text-center">GST Base</th>
+                  <th class="w-32 text-right">Rate (%) / Value</th>
+                  <th class="w-36 text-right">Amount (₹)</th>
+                  <th class="w-14 text-center">Del</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(s, sIdx) in purchaseForm.sundries" :key="sIdx">
+                  <td class="font-mono text-slate-400 text-xs text-center">{{ sIdx + 1 }}</td>
+                  <td>
+                    <select v-model="s.bill_sundry_id" class="magic-input w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs font-bold">
+                      <option v-for="bs in billSundries" :key="bs.id" :value="bs.id">{{ bs.name }}</option>
+                    </select>
+                  </td>
+                  <td class="text-center font-bold text-[10px]">
+                    <span :class="billSundries.find(b => b.id === s.bill_sundry_id)?.type === 'ADDITION' ? 'text-emerald-600' : 'text-rose-600'">
+                      {{ billSundries.find(b => b.id === s.bill_sundry_id)?.type }}
+                    </span>
+                  </td>
+                  <td class="text-center text-[10px] font-mono">
+                    <span class="px-1.5 py-0.5 rounded" :class="billSundries.find(b => b.id === s.bill_sundry_id)?.impact_taxable_value ? 'bg-indigo-50 text-indigo-700' : 'bg-slate-100 text-slate-600'">
+                      {{ billSundries.find(b => b.id === s.bill_sundry_id)?.impact_taxable_value ? 'PRE-TAX' : 'POST-TAX' }}
+                    </span>
+                  </td>
+                  <td>
+                    <input v-if="billSundries.find(b => b.id === s.bill_sundry_id)?.calc_mode === 'PERCENTAGE'" type="number" step="0.1" v-model.number="s.rate" placeholder="Rate %" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-mono text-right">
+                    <input v-else type="number" step="0.01" v-model.number="s.amount" placeholder="Amount" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-mono text-right">
+                  </td>
+                  <td class="text-right font-mono font-bold text-slate-800">
+                    ₹{{ calculateSundryAmount(s, computeTotals(purchaseForm.items, purchaseForm.sundries).baseTaxable).toFixed(2) }}
+                  </td>
+                  <td class="text-center">
+                    <button @click="purchaseForm.sundries.splice(sIdx, 1)" class="text-rose-500 hover:text-rose-700 text-xs p-1"><i class="fa-solid fa-trash-can"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-else class="p-3 text-center text-xs text-slate-400">
+              No bill sundries applied. Click "+ Add Sundry" to add Freight, Packaging, Insurance or Discounts.
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end bg-slate-50/80 p-5 rounded-xl border border-slate-200 mb-6">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Narration / Vendor Remarks</label>
+              <textarea v-model="purchaseForm.narration" rows="3" placeholder="Vendor remarks or logistics notes" class="magic-input w-full p-2.5 border border-slate-200 rounded-lg text-xs"></textarea>
+            </div>
+            <div class="space-y-1.5 text-right font-mono">
+              <div class="flex justify-between text-xs text-slate-500">
+                <span>Base Items Taxable:</span>
+                <span class="font-bold text-slate-800">₹{{ computeTotals(purchaseForm.items, purchaseForm.sundries).baseTaxable.toFixed(2) }}</span>
+              </div>
+              <div v-if="computeTotals(purchaseForm.items, purchaseForm.sundries).preTaxAdj !== 0" class="flex justify-between text-xs text-indigo-600">
+                <span>Pre-Tax Sundry Adjustment:</span>
+                <span class="font-bold">₹{{ computeTotals(purchaseForm.items, purchaseForm.sundries).preTaxAdj.toFixed(2) }}</span>
+              </div>
+              <div class="flex justify-between text-xs text-slate-500">
+                <span>Adjusted Taxable Base:</span>
+                <span class="font-bold text-slate-800">₹{{ computeTotals(purchaseForm.items, purchaseForm.sundries).taxable.toFixed(2) }}</span>
+              </div>
+              <div class="flex justify-between text-xs text-slate-500">
+                <span>Input GST Credit:</span>
+                <span class="font-bold text-slate-800">₹{{ computeTotals(purchaseForm.items, purchaseForm.sundries).tax.toFixed(2) }}</span>
+              </div>
+              <div v-if="computeTotals(purchaseForm.items, purchaseForm.sundries).postTaxAdj !== 0" class="flex justify-between text-xs text-purple-600">
+                <span>Post-Tax Sundry Adjustment:</span>
+                <span class="font-bold">₹{{ computeTotals(purchaseForm.items, purchaseForm.sundries).postTaxAdj.toFixed(2) }}</span>
+              </div>
+              <div v-if="computeTotals(purchaseForm.items, purchaseForm.sundries).roundOff !== 0" class="flex justify-between text-xs text-slate-400">
+                <span>Round-Off (+/-):</span>
+                <span class="font-bold">₹{{ computeTotals(purchaseForm.items, purchaseForm.sundries).roundOff.toFixed(2) }}</span>
+              </div>
+              <div class="flex justify-between text-base font-black text-slate-900 border-t border-slate-200 pt-2">
+                <span>Total Invoice Value:</span>
+                <span class="text-xl text-emerald-600">₹{{ computeTotals(purchaseForm.items, purchaseForm.sundries).gross.toFixed(2) }}</span>
+              </div>
             </div>
           </div>
 
@@ -1296,6 +1465,7 @@
         const outboxList = ref([]);
         const boms = ref([]);
         const employees = ref([]);
+        const billSundries = ref([]);
 
         // New Party Form
         const newPartyForm = ref({
@@ -1327,7 +1497,8 @@
           sales_order_id: null,
           pos_settlement_type: 'CREDIT',
           narration: '',
-          items: [{ item_id: '', qty: 1, rate: 0, discount_pct: 0, gst_rate: 18, unit_symbol: 'Pcs' }]
+          items: [{ item_id: '', qty: 1, rate: 0, discount_pct: 0, gst_rate: 18, unit_symbol: 'Pcs' }],
+          sundries: []
         });
 
         // Purchase Form
@@ -1338,7 +1509,8 @@
           vendor_invoice_number: '',
           purchase_order_id: null,
           goods_receipt_note_id: null,
-          items: [{ item_id: '', qty: 10, purchase_rate: 0, gst_rate: 18, unit_symbol: 'Pcs' }]
+          items: [{ item_id: '', qty: 10, purchase_rate: 0, gst_rate: 18, unit_symbol: 'Pcs' }],
+          sundries: []
         });
 
         // Payment / Receipt Form
@@ -1390,6 +1562,7 @@
             items.value = data.items;
             godowns.value = data.godowns;
             units.value = data.units;
+            billSundries.value = data.billSundries || [];
 
             if (partyGroups.value.length > 0) newPartyForm.value.group_id = partyGroups.value[0].id;
             if (units.value.length > 0) newItemForm.value.primary_unit_id = units.value[0].id;
@@ -1479,17 +1652,75 @@
           return base + (base * (row.gst_rate || 0)) / 100;
         };
 
-        const computeTotals = (itemList) => {
-          let taxable = 0;
-          let tax = 0;
+        const calculateSundryAmount = (sundryLine, baseTaxable) => {
+          const bs = billSundries.value.find(s => s.id === sundryLine.bill_sundry_id);
+          if (!bs) return 0;
+          if (bs.calc_mode === 'PERCENTAGE') {
+            return ((baseTaxable * (sundryLine.rate || 0)) / 100);
+          } else {
+            return (sundryLine.amount || 0);
+          }
+        };
+
+        const addSundryLine = (form) => {
+          if (!form.sundries) form.sundries = [];
+          const first = billSundries.value[0];
+          if (!first) return;
+          form.sundries.push({
+            bill_sundry_id: first.id,
+            rate: first.calc_mode === 'PERCENTAGE' ? 5 : 0,
+            amount: first.calc_mode === 'LUMPSUM' ? 100 : 0
+          });
+        };
+
+        const computeTotals = (itemList, sundryList = []) => {
+          let baseTaxable = 0;
+          let initialTax = 0;
           for (const it of itemList) {
             const base = (it.qty || 0) * (it.rate || it.purchase_rate || 0);
             const disc = (base * (it.discount_pct || 0)) / 100;
             const t = base - disc;
-            taxable += t;
-            tax += (t * (it.gst_rate || 0)) / 100;
+            baseTaxable += t;
+            initialTax += (t * (it.gst_rate || 0)) / 100;
           }
-          return { taxable, tax, gross: taxable + tax };
+
+          let preTaxAdj = 0;
+          let postTaxAdj = 0;
+
+          for (const s of (sundryList || [])) {
+            const bs = billSundries.value.find(b => b.id === s.bill_sundry_id);
+            if (!bs) continue;
+            const val = calculateSundryAmount(s, baseTaxable);
+            const signedVal = bs.type === 'ADDITION' ? val : -val;
+            if (bs.impact_taxable_value) {
+              preTaxAdj += signedVal;
+            } else {
+              postTaxAdj += signedVal;
+            }
+          }
+
+          const adjustedTaxable = Math.max(0, baseTaxable + preTaxAdj);
+          // Recalculate tax proportionally
+          let adjustedTax = 0;
+          if (baseTaxable > 0) {
+            adjustedTax = initialTax * (adjustedTaxable / baseTaxable);
+          } else {
+            adjustedTax = 0;
+          }
+
+          const unroundedGross = adjustedTaxable + adjustedTax + postTaxAdj;
+          const gross = Math.round(unroundedGross);
+          const roundOff = gross - unroundedGross;
+
+          return { 
+            baseTaxable, 
+            taxable: adjustedTaxable, 
+            tax: adjustedTax, 
+            preTaxAdj,
+            postTaxAdj,
+            roundOff,
+            gross 
+          };
         };
 
         const submitNewParty = async () => {
@@ -1550,6 +1781,7 @@
               sales_order_id: salesForm.value.sales_order_id,
               pos_settlement_type: salesForm.value.pos_settlement_type,
               narration: salesForm.value.narration,
+              bill_sundries: salesForm.value.sundries || [],
               items: salesForm.value.items.map(i => ({
                 item_id: i.item_id,
                 qty: i.qty,
@@ -1589,6 +1821,7 @@
               vendor_invoice_number: purchaseForm.value.vendor_invoice_number,
               purchase_order_id: purchaseForm.value.purchase_order_id,
               goods_receipt_note_id: purchaseForm.value.goods_receipt_note_id,
+              bill_sundries: purchaseForm.value.sundries || [],
               items: purchaseForm.value.items.map(i => ({
                 item_id: i.item_id,
                 qty: i.qty,
@@ -1818,6 +2051,9 @@
           removeLine,
           calculateLineTotal,
           calculatePurchaseLineTotal,
+          calculateSundryAmount,
+          addSundryLine,
+          billSundries,
           computeTotals,
           submitNewParty,
           submitNewItem,

@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import { randomUUID } from 'crypto';
+import { calculateBillSundries, AppliedSundryInput } from './billSundryService.js';
 
 export interface PurchaseVoucherInput {
   company_id: string;
@@ -12,6 +13,7 @@ export interface PurchaseVoucherInput {
   vendor_invoice_number?: string;
   vendor_invoice_date?: string;
   narration?: string;
+  bill_sundries?: AppliedSundryInput[];
   items: Array<{
     item_id: string;
     batch_number?: string;
@@ -41,6 +43,7 @@ export function createPurchaseVoucher(db: Database.Database, input: PurchaseVouc
   const cgstInAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'CGST_IN'").get(input.company_id) as any;
   const sgstInAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'SGST_IN'").get(input.company_id) as any;
   const igstInAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'IGST_IN'").get(input.company_id) as any;
+  const roundOffAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'ROUND_OFF'").get(input.company_id) as any;
 
   const isInterState = vendor.state_code && vendor.state_code !== company.state_code;
 
@@ -50,12 +53,10 @@ export function createPurchaseVoucher(db: Database.Database, input: PurchaseVouc
     db.prepare('UPDATE voucher_series SET current_number = ? WHERE id = ?').run(nextNum, series.id);
 
     const voucherId = randomUUID();
-    let totalTaxable = 0;
-    let totalCgst = 0;
-    let totalSgst = 0;
-    let totalIgst = 0;
 
-    const processedItems = input.items.map((it) => {
+    // Raw lines
+    let baseTaxableTotal = 0;
+    const rawLines = input.items.map((it) => {
       const itemRow = db.prepare('SELECT * FROM items WHERE id = ?').get(it.item_id) as any;
       if (!itemRow) throw new Error(`Item ${it.item_id} not found`);
 
@@ -76,24 +77,9 @@ export function createPurchaseVoucher(db: Database.Database, input: PurchaseVouc
 
       const discountRate = it.discount_pct || 0;
       const baseAmount = it.qty * it.purchase_rate;
-      const discountAmount = (baseAmount * discountRate) / 100;
-      const taxable = baseAmount - discountAmount;
-
-      let cgst = 0;
-      let sgst = 0;
-      let igst = 0;
-
-      if (isInterState) {
-        igst = (taxable * itemRow.gst_rate) / 100;
-      } else {
-        cgst = (taxable * (itemRow.gst_rate / 2)) / 100;
-        sgst = (taxable * (itemRow.gst_rate / 2)) / 100;
-      }
-
-      totalTaxable += taxable;
-      totalCgst += cgst;
-      totalSgst += sgst;
-      totalIgst += igst;
+      const discountAmount = Math.round(((baseAmount * discountRate) / 100) * 100) / 100;
+      const lineTaxable = Math.round((baseAmount - discountAmount) * 100) / 100;
+      baseTaxableTotal = Math.round((baseTaxableTotal + lineTaxable) * 100) / 100;
 
       return {
         id: randomUUID(),
@@ -104,17 +90,28 @@ export function createPurchaseVoucher(db: Database.Database, input: PurchaseVouc
         unit_id: it.unit_id,
         rate: it.purchase_rate,
         discount_pct: discountRate,
-        taxable_amount: taxable,
+        taxable_amount: lineTaxable,
         gst_rate: itemRow.gst_rate,
-        cgst_amount: cgst,
-        sgst_amount: sgst,
-        igst_amount: igst,
-        net_amount: taxable + cgst + sgst + igst,
       };
     });
 
-    const taxTotal = totalCgst + totalSgst + totalIgst;
-    const grossTotal = Math.round((totalTaxable + taxTotal) * 100) / 100;
+    // Calculate dynamic bill sundries
+    const sundryResult = calculateBillSundries(
+      db,
+      input.company_id,
+      baseTaxableTotal,
+      input.bill_sundries || [],
+      Boolean(isInterState),
+      rawLines
+    );
+
+    const totalTaxable = sundryResult.adjustedTaxableTotal;
+    const totalCgst = sundryResult.totalCgst;
+    const totalSgst = sundryResult.totalSgst;
+    const totalIgst = sundryResult.totalIgst;
+    const taxTotal = sundryResult.taxTotal;
+    const grossTotal = sundryResult.finalGross;
+    const roundOffDiff = sundryResult.roundOffDiff;
 
     // 1. Insert Voucher Header
     db.prepare(`
@@ -125,11 +122,11 @@ export function createPurchaseVoucher(db: Database.Database, input: PurchaseVouc
     `).run(
       voucherId, input.company_id, series.id, voucherNumber, input.date,
       input.vendor_account_id, input.material_centre_id,
-      input.narration || `Vendor Inv: ${input.vendor_invoice_number || 'N/A'}`,
+      input.narration || (input.vendor_invoice_number ? `Vendor Inv: ${input.vendor_invoice_number}` : ''),
       totalTaxable, taxTotal, grossTotal
     );
 
-    // 2. Insert Items & Inward Perpetual Stock
+    // 2. Insert Voucher Items & Inward Stock
     const insertVchItem = db.prepare(`
       INSERT INTO voucher_items (
         id, voucher_id, item_id, batch_id, material_centre_id, qty, unit_id, rate, 
@@ -143,10 +140,10 @@ export function createPurchaseVoucher(db: Database.Database, input: PurchaseVouc
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    for (const line of processedItems) {
+    for (const line of sundryResult.adjustedLines as any[]) {
       insertVchItem.run(
         line.id, voucherId, line.item_id, line.batch_id, line.material_centre_id,
-        line.qty, line.unit_id, line.rate, line.discount_pct, line.taxable_amount,
+        line.qty, line.unit_id, line.rate, line.discount_pct, line.adjusted_taxable_amount,
         line.gst_rate, line.cgst_amount, line.sgst_amount, line.igst_amount, line.net_amount
       );
 
@@ -169,6 +166,16 @@ export function createPurchaseVoucher(db: Database.Database, input: PurchaseVouc
       }
     }
 
+    // Insert applied sundry lines
+    const insertSundryLine = db.prepare(`
+      INSERT INTO voucher_bill_sundry_lines (id, voucher_id, bill_sundry_id, rate, amount)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+
+    for (const sl of sundryResult.calculatedLines) {
+      insertSundryLine.run(sl.id, voucherId, sl.bill_sundry_id, sl.rate, sl.amount);
+    }
+
     if (input.purchase_order_id) {
       const remainingPending = db.prepare(`
         SELECT SUM(pending_qty) as total_pending FROM purchase_order_items WHERE po_id = ?
@@ -188,13 +195,36 @@ export function createPurchaseVoucher(db: Database.Database, input: PurchaseVouc
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    // Debit Purchase Account (Taxable Value)
-    insertLedger.run(randomUUID(), input.company_id, voucherId, purchaseAcc.id, totalTaxable, 0, input.date, `Purchase: ${voucherNumber}`);
+    // Debit Purchase Account (Base Item Taxable Total)
+    insertLedger.run(randomUUID(), input.company_id, voucherId, purchaseAcc.id, baseTaxableTotal, 0, input.date, `Purchase: ${voucherNumber}`);
+
+    // Post Applied Bill Sundries to General Ledger
+    for (const sl of sundryResult.calculatedLines) {
+      if (sl.amount === 0 || !sl.linked_account_id) continue;
+      if (sl.type === 'ADDITION') {
+        // Expense incurred by buyer (e.g. Freight Paid, Packaging): Debit expense
+        insertLedger.run(randomUUID(), input.company_id, voucherId, sl.linked_account_id, sl.amount, 0, input.date, sl.name);
+      } else {
+        // Discount received from vendor: Credit discount income
+        insertLedger.run(randomUUID(), input.company_id, voucherId, sl.linked_account_id, 0, sl.amount, input.date, sl.name);
+      }
+    }
 
     // Debit Input GST (Tax Credit)
     if (totalCgst > 0) insertLedger.run(randomUUID(), input.company_id, voucherId, cgstInAcc.id, totalCgst, 0, input.date, 'CGST Input Credit');
     if (totalSgst > 0) insertLedger.run(randomUUID(), input.company_id, voucherId, sgstInAcc.id, totalSgst, 0, input.date, 'SGST Input Credit');
     if (totalIgst > 0) insertLedger.run(randomUUID(), input.company_id, voucherId, igstInAcc.id, totalIgst, 0, input.date, 'IGST Input Credit');
+
+    // Post Round-Off differential
+    if (roundOffDiff !== 0 && roundOffAcc) {
+      if (roundOffDiff > 0) {
+        // We added cents: Credit Round-Off
+        insertLedger.run(randomUUID(), input.company_id, voucherId, roundOffAcc.id, 0, roundOffDiff, input.date, 'Round-Off (+)');
+      } else {
+        // We deducted cents: Debit Round-Off
+        insertLedger.run(randomUUID(), input.company_id, voucherId, roundOffAcc.id, Math.abs(roundOffDiff), 0, input.date, 'Round-Off (-)');
+      }
+    }
 
     // Credit Vendor Account (Gross Total Liability)
     insertLedger.run(randomUUID(), input.company_id, voucherId, input.vendor_account_id, 0, grossTotal, input.date, `Purchase: ${voucherNumber}`);
@@ -223,7 +253,8 @@ export function createPurchaseVoucher(db: Database.Database, input: PurchaseVouc
       voucherNumber,
       grossTotal,
       taxTotal,
-      taxableTotal: totalTaxable
+      taxableTotal: totalTaxable,
+      sundryLines: sundryResult.calculatedLines
     };
   })();
 }
