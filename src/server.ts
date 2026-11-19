@@ -15,6 +15,8 @@ import { executeProductionRun, createBillOfMaterials, getBillOfMaterialsList, ge
 import { processMonthlyPayroll, getEmployees, createOrUpdateEmployee } from './services/payrollService.js';
 import { generateEWayBill, generateEInvoice } from './services/gstComplianceService.js';
 import { getTrialBalance, getStockStatus } from './services/reportService.js';
+import { calculateProfitAndLoss, calculateBalanceSheet, getAccountLedgerStatement, getGSTSummaryReport, getBillOutstandingReport } from './services/finalReportsService.js';
+import { createContraVoucher } from './services/contraService.js';
 import { randomUUID } from 'crypto';
 import path from 'path';
 import fs from 'fs';
@@ -489,6 +491,19 @@ app.post('/api/vouchers/payment-receipt', (req, res) => {
   }
 });
 
+// 6.1 Create Contra Voucher (Cash/Bank Transfer)
+app.post('/api/vouchers/contra', (req, res) => {
+  try {
+    const result = createContraVoucher(db, {
+      ...req.body,
+      company_id: activeCompanyId,
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
 // 7. Manufacturing & Production BOM
 app.get('/api/boms', (req, res) => {
   try {
@@ -626,6 +641,55 @@ app.get('/api/reports/trial-balance', (req, res) => {
 app.get('/api/reports/stock-status', (req, res) => {
   const stock = getStockStatus(db, activeCompanyId);
   res.json(stock);
+});
+
+// 10.2 Final Results & Advanced MIS Reports (BUSY Magic Display Engine)
+app.get('/api/reports/profit-loss', (req, res) => {
+  try {
+    const pl = calculateProfitAndLoss(db, activeCompanyId);
+    res.json(pl);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/reports/balance-sheet', (req, res) => {
+  try {
+    const bs = calculateBalanceSheet(db, activeCompanyId);
+    res.json(bs);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/reports/account-ledger', (req, res) => {
+  try {
+    const accountId = req.query.account_id as string;
+    if (!accountId) throw new Error('account_id is required');
+    const statement = getAccountLedgerStatement(db, activeCompanyId, accountId);
+    res.json(statement);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/reports/gst-summary', (req, res) => {
+  try {
+    const gstReport = getGSTSummaryReport(db, activeCompanyId);
+    res.json(gstReport);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/reports/outstandings', (req, res) => {
+  try {
+    const type = (req.query.type as string)?.toUpperCase() === 'PAYABLE' ? 'PAYABLE' : 'RECEIVABLE';
+    const report = getBillOutstandingReport(db, activeCompanyId, type);
+    res.json(report);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 // 10.1 Multi-Godown Reports & Transfers

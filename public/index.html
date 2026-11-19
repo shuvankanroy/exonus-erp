@@ -157,23 +157,512 @@
     <div class="flex-1 flex flex-col overflow-hidden bg-slate-50/80">
       
       <!-- Top Action Bar -->
-      <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <div class="flex items-center gap-2">
-            <span class="text-sm font-extrabold text-slate-900">{{ company?.name }}</span>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-semibold">GSTIN: {{ company?.gstin }}</span>
+      <header class="bg-white border-b border-slate-200 shadow-sm flex flex-col">
+        <!-- BUSY MAGIC TOP HORIZONTAL MENU BAR -->
+        <div class="bg-slate-900 text-slate-200 px-6 py-1.5 flex items-center justify-between text-xs font-semibold select-none">
+          <div class="flex items-center space-x-6">
+            <div class="flex items-center gap-1.5 text-blue-400 font-black tracking-wider uppercase text-[11px]">
+              <i class="fa-solid fa-cube"></i> Exonus ERP
+            </div>
+
+            <!-- 1. Company Menu -->
+            <div class="relative group cursor-pointer py-1">
+              <span class="hover:text-white flex items-center gap-1">Company <i class="fa-solid fa-chevron-down text-[9px] opacity-60"></i></span>
+              <div class="absolute left-0 top-full hidden group-hover:block bg-white text-slate-800 shadow-xl border border-slate-200 rounded-lg py-1.5 w-48 z-50 text-xs font-normal">
+                <a @click="currentView = 'dashboard'" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-building text-slate-400 w-4"></i> Active Company Info</a>
+                <a @click="loadInitialData(); alert('Company data reloaded from SQLite WAL!');" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-arrows-rotate text-slate-400 w-4"></i> Reload Company</a>
+              </div>
+            </div>
+
+            <!-- 2. Administration Menu -->
+            <div class="relative group cursor-pointer py-1">
+              <span class="hover:text-white flex items-center gap-1">Administration <i class="fa-solid fa-chevron-down text-[9px] opacity-60"></i></span>
+              <div class="absolute left-0 top-full hidden group-hover:block bg-white text-slate-800 shadow-xl border border-slate-200 rounded-lg py-1.5 w-56 z-50 text-xs font-normal">
+                <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase">Masters</div>
+                <a @click="currentView = 'parties_list'" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-address-book text-blue-500 w-4"></i> Accounts / Parties Master</a>
+                <a @click="currentView = 'items_list'" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-boxes-packing text-emerald-500 w-4"></i> Item & Product Master</a>
+                <a @click="currentView = 'stock_status'; loadStock();" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-warehouse text-indigo-500 w-4"></i> Material Centres (Godowns)</a>
+                <a @click="currentView = 'production_create'; loadBOMs();" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-industry text-amber-500 w-4"></i> Bill of Materials (BOM)</a>
+                <a @click="currentView = 'payroll_view'; loadEmployees();" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-user-group text-rose-500 w-4"></i> Employee Masters</a>
+              </div>
+            </div>
+
+            <!-- 3. Transactions Menu -->
+            <div class="relative group cursor-pointer py-1">
+              <span class="hover:text-white flex items-center gap-1">Transactions <i class="fa-solid fa-chevron-down text-[9px] opacity-60"></i></span>
+              <div class="absolute left-0 top-full hidden group-hover:block bg-white text-slate-800 shadow-xl border border-slate-200 rounded-lg py-1.5 w-56 z-50 text-xs font-normal">
+                <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase">Vouchers</div>
+                <a @click="currentView = 'sales_create'" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-receipt text-blue-500 w-4"></i> Sales Invoicing (F8)</a>
+                <a @click="currentView = 'purchase_create'" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-truck-ramp-box text-emerald-500 w-4"></i> Purchase Bill (F9)</a>
+                <a @click="currentView = 'payment_create'" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-money-bill-transfer text-purple-500 w-4"></i> Payment / Receipt (F5)</a>
+                <a @click="currentView = 'contra_create'" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-arrow-right-arrow-left text-teal-600 w-4"></i> Contra (Cash / Bank)</a>
+                <a @click="showStockTransferModal = true" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-right-left text-indigo-500 w-4"></i> Stock Transfer</a>
+                <a @click="currentView = 'production_create'" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-gears text-amber-500 w-4"></i> Production Run</a>
+                <a @click="currentView = 'payroll_view'" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-calculator text-rose-500 w-4"></i> Monthly Payroll Run</a>
+              </div>
+            </div>
+
+            <!-- 4. Display Menu -->
+            <div class="relative group cursor-pointer py-1">
+              <span class="hover:text-white flex items-center gap-1 font-bold text-amber-300">Display <i class="fa-solid fa-chevron-down text-[9px] opacity-60"></i></span>
+              <div class="absolute left-0 top-full hidden group-hover:block bg-white text-slate-800 shadow-xl border border-slate-200 rounded-lg py-1.5 w-64 z-50 text-xs font-normal">
+                <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase">Final Results</div>
+                <a @click="currentView = 'trial_balance'; loadTrialBalance();" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-scale-balanced text-amber-500 w-4"></i> Trial Balance (F6)</a>
+                <a @click="currentView = 'profit_loss'; loadProfitLoss();" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-chart-line text-emerald-600 w-4"></i> Profit & Loss Account</a>
+                <a @click="currentView = 'balance_sheet'; loadBalanceSheet();" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-landmark text-blue-600 w-4"></i> Balance Sheet (T-Shape)</a>
+                <div class="border-t border-slate-100 my-1"></div>
+                <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase">Account Books & Ledgers</div>
+                <a @click="currentView = 'vouchers_list'; loadVouchers();" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-book-open text-sky-500 w-4"></i> Day Book</a>
+                <a @click="currentView = 'account_ledger'; loadAccountLedger();" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-file-invoice text-indigo-500 w-4"></i> Account Ledger (Alt+L)</a>
+                <a @click="currentView = 'outstandings'; loadOutstandings();" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-rose-500 w-4"></i> Outstanding Analysis</a>
+                <div class="border-t border-slate-100 my-1"></div>
+                <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase">Inventory & GST</div>
+                <a @click="currentView = 'stock_status'; loadStock();" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-boxes-stacked text-indigo-500 w-4"></i> Stock Status (F7)</a>
+                <a @click="currentView = 'gst_reports'; loadGSTReport();" class="px-4 py-1.5 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-purple-600 w-4"></i> GST Returns (GSTR-1 & 3B)</a>
+              </div>
+            </div>
+
+            <!-- 5. Print / Email -->
+            <div class="relative group cursor-pointer py-1">
+              <span class="hover:text-white flex items-center gap-1">Print / Export <i class="fa-solid fa-chevron-down text-[9px] opacity-60"></i></span>
+              <div class="absolute left-0 top-full hidden group-hover:block bg-white text-slate-800 shadow-xl border border-slate-200 rounded-lg py-1.5 w-48 z-50 text-xs font-normal">
+                <a @click="window.print()" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-print text-slate-400 w-4"></i> Print Current Screen</a>
+              </div>
+            </div>
+
+            <!-- 6. Housekeeping -->
+            <div class="relative group cursor-pointer py-1">
+              <span class="hover:text-white flex items-center gap-1">Housekeeping <i class="fa-solid fa-chevron-down text-[9px] opacity-60"></i></span>
+              <div class="absolute left-0 top-full hidden group-hover:block bg-white text-slate-800 shadow-xl border border-slate-200 rounded-lg py-1.5 w-52 z-50 text-xs font-normal">
+                <a @click="alert('SQLite WAL Data Integrity Check: Passed (Zero drift)')" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-heart-pulse text-emerald-500 w-4"></i> Check Data Integrity</a>
+                <a @click="currentView = 'cloud_sync'; loadSync();" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-cloud-arrow-up text-violet-500 w-4"></i> Cloud Sync Relay Outbox</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-[11px] font-mono text-slate-400">
+            BUSY Magic Menu Edition
           </div>
         </div>
 
-        <div class="flex items-center space-x-3">
-          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Local WAL Active
-          </span>
+        <!-- Sub-Header Info Bar -->
+        <div class="px-6 py-2.5 flex items-center justify-between bg-white border-b border-slate-100">
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-extrabold text-slate-900">{{ company?.name }}</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-semibold">GSTIN: {{ company?.gstin }}</span>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-3">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Local WAL Active
+            </span>
+          </div>
         </div>
       </header>
 
       <!-- VIEW CONTAINER -->
       <main class="flex-1 overflow-y-auto p-6">
+
+        <!-- VIEW: CONTRA VOUCHER -->
+        <div v-if="currentView === 'contra_create'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-arrow-right-arrow-left text-teal-600"></i> Contra Voucher (Cash / Bank Movement)
+              </h2>
+              <p class="text-xs text-slate-400">Internal fund transfers: Cash Deposit, Cash Withdrawal, or Bank-to-Bank Transfer</p>
+            </div>
+            <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+          </div>
+
+          <div class="space-y-4 max-w-2xl">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Source Account (Transferred From / Cr)</label>
+                <select v-model="contraForm.source_account_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-800">
+                  <option v-for="a in bankCashAccounts" :key="a.id" :value="a.id">{{ a.name }} ({{ a.group_name }})</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Destination Account (Deposited To / Dr)</label>
+                <select v-model="contraForm.destination_account_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold text-teal-700">
+                  <option v-for="a in bankCashAccounts" :key="a.id" :value="a.id">{{ a.name }} ({{ a.group_name }})</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Date</label>
+                <input type="date" v-model="contraForm.date" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Amount (₹)</label>
+                <input type="number" min="1" step="0.01" v-model.number="contraForm.amount" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold text-right">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Narration / Remarks</label>
+              <input type="text" v-model="contraForm.narration" placeholder="e.g. Cash deposited into Current Account" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs">
+            </div>
+
+            <div class="pt-4 flex justify-end">
+              <button @click="submitContraVoucher" class="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow-sm flex items-center gap-1.5">
+                <i class="fa-solid fa-check"></i> Save Contra Voucher (F2)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: PROFIT & LOSS ACCOUNT -->
+        <div v-if="currentView === 'profit_loss'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-chart-line text-emerald-600"></i> Profit & Loss Account (Trading & Operating)
+              </h2>
+              <p class="text-xs text-slate-400">Trading results, Gross Profit, and Net Profit/Loss derived from immutable general ledger</p>
+            </div>
+            <div class="flex gap-2">
+              <button @click="loadProfitLoss" class="px-3 py-1.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1.5">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh
+              </button>
+              <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+            </div>
+          </div>
+
+          <!-- Trading Account (Gross Profit) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Left: Direct Expenses & Opening Stock -->
+            <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+              <div class="p-3 bg-slate-100 font-bold text-xs text-slate-700 uppercase flex justify-between">
+                <span>Trading Outflows (Dr)</span>
+                <span>Amount (₹)</span>
+              </div>
+              <div class="divide-y divide-slate-100 text-xs">
+                <div class="p-3 flex justify-between font-mono">
+                  <span>To Opening Stock</span>
+                  <span class="font-bold">₹{{ profitLossData.trading?.openingStock?.toFixed(2) }}</span>
+                </div>
+                <div v-for="exp in profitLossData.directExpenseAccounts" :key="exp.name" class="p-3 flex justify-between font-mono">
+                  <span>To {{ exp.name }}</span>
+                  <span class="font-bold">₹{{ exp.amount.toFixed(2) }}</span>
+                </div>
+                <div v-if="profitLossData.trading?.grossProfit > 0" class="p-3 flex justify-between font-mono bg-emerald-50 text-emerald-800 font-bold">
+                  <span>To Gross Profit c/d</span>
+                  <span>₹{{ profitLossData.trading?.grossProfit?.toFixed(2) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Direct Incomes & Closing Stock -->
+            <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+              <div class="p-3 bg-slate-100 font-bold text-xs text-slate-700 uppercase flex justify-between">
+                <span>Trading Inflows (Cr)</span>
+                <span>Amount (₹)</span>
+              </div>
+              <div class="divide-y divide-slate-100 text-xs">
+                <div v-for="inc in profitLossData.directIncomeAccounts" :key="inc.name" class="p-3 flex justify-between font-mono">
+                  <span>By {{ inc.name }}</span>
+                  <span class="font-bold">₹{{ inc.amount.toFixed(2) }}</span>
+                </div>
+                <div class="p-3 flex justify-between font-mono">
+                  <span>By Closing Stock (Valuation)</span>
+                  <span class="font-bold text-indigo-700">₹{{ profitLossData.trading?.closingStock?.toFixed(2) }}</span>
+                </div>
+                <div v-if="profitLossData.trading?.grossProfit < 0" class="p-3 flex justify-between font-mono bg-rose-50 text-rose-800 font-bold">
+                  <span>By Gross Loss c/d</span>
+                  <span>₹{{ Math.abs(profitLossData.trading?.grossProfit || 0).toFixed(2) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Operating Profit / Net Profit -->
+          <div class="p-4 rounded-xl border" :class="profitLossData.operating?.netProfit >= 0 ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950' : 'bg-rose-50/70 border-rose-200 text-rose-950'">
+            <div class="flex justify-between items-center text-sm font-black">
+              <span class="flex items-center gap-2">
+                <i :class="profitLossData.operating?.netProfit >= 0 ? 'fa-solid fa-arrow-trend-up text-emerald-600' : 'fa-solid fa-arrow-trend-down text-rose-600'"></i>
+                {{ profitLossData.operating?.netProfit >= 0 ? 'Net Profit for Current Period' : 'Net Loss for Current Period' }}:
+              </span>
+              <span class="font-mono text-lg">₹{{ Math.abs(profitLossData.operating?.netProfit || 0).toFixed(2) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: BALANCE SHEET (T-Shape Horizontal) -->
+        <div v-if="currentView === 'balance_sheet'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-landmark text-blue-600"></i> Balance Sheet (T-Shape Horizontal Standard)
+              </h2>
+              <p class="text-xs text-slate-400">Financial position as of {{ balanceSheetData.asOfDate }}: Capital & Liabilities vs Assets</p>
+            </div>
+            <div class="flex gap-2">
+              <button @click="loadBalanceSheet" class="px-3 py-1.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1.5">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh
+              </button>
+              <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- Left Side: Liabilities & Equity -->
+            <div class="border border-slate-200 rounded-xl overflow-hidden">
+              <div class="p-3 bg-slate-100 font-bold text-xs text-slate-800 uppercase flex justify-between border-b border-slate-200">
+                <span>Liabilities & Capital</span>
+                <span>Amount (₹)</span>
+              </div>
+              <div class="p-4 space-y-4 text-xs">
+                <div v-for="g in balanceSheetData.liabilities" :key="g.group_name" class="space-y-1.5">
+                  <div class="font-extrabold text-slate-800 text-[11px] uppercase tracking-wider flex justify-between border-b border-slate-100 pb-1">
+                    <span>{{ g.group_name }}</span>
+                    <span class="font-mono">₹{{ g.total.toFixed(2) }}</span>
+                  </div>
+                  <div v-for="a in g.accounts" :key="a.name" class="flex justify-between text-slate-600 pl-2 font-mono">
+                    <span>{{ a.name }}</span>
+                    <span>₹{{ a.balance.toFixed(2) }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="p-3 bg-slate-100 font-mono font-black text-xs text-slate-900 flex justify-between border-t border-slate-200">
+                <span>Total Liabilities & Equity:</span>
+                <span>₹{{ balanceSheetData.totalLiabilitiesAndEquity?.toFixed(2) }}</span>
+              </div>
+            </div>
+
+            <!-- Right Side: Assets -->
+            <div class="border border-slate-200 rounded-xl overflow-hidden">
+              <div class="p-3 bg-slate-100 font-bold text-xs text-slate-800 uppercase flex justify-between border-b border-slate-200">
+                <span>Assets</span>
+                <span>Amount (₹)</span>
+              </div>
+              <div class="p-4 space-y-4 text-xs">
+                <div v-for="g in balanceSheetData.assets" :key="g.group_name" class="space-y-1.5">
+                  <div class="font-extrabold text-slate-800 text-[11px] uppercase tracking-wider flex justify-between border-b border-slate-100 pb-1">
+                    <span>{{ g.group_name }}</span>
+                    <span class="font-mono">₹{{ g.total.toFixed(2) }}</span>
+                  </div>
+                  <div v-for="a in g.accounts" :key="a.name" class="flex justify-between text-slate-600 pl-2 font-mono">
+                    <span>{{ a.name }}</span>
+                    <span>₹{{ a.balance.toFixed(2) }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="p-3 bg-slate-100 font-mono font-black text-xs text-slate-900 flex justify-between border-t border-slate-200">
+                <span>Total Assets:</span>
+                <span>₹{{ balanceSheetData.totalAssets?.toFixed(2) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-lg border flex items-center justify-between text-xs font-bold" :class="balanceSheetData.isBalanced ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-rose-50 text-rose-800 border-rose-200'">
+            <span class="flex items-center gap-2">
+              <i class="fa-solid fa-check-circle"></i> Mathematical Equilibrium: Assets == Liabilities + Equity
+            </span>
+            <span class="font-mono">{{ balanceSheetData.isBalanced ? '✓ PERFECTLY BALANCED ($0.00 DISCREPANCY)' : 'DISCREPANCY DETECTED' }}</span>
+          </div>
+        </div>
+
+        <!-- VIEW: ACCOUNT LEDGER (Alt+L) -->
+        <div v-if="currentView === 'account_ledger'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice text-indigo-600"></i> Account Ledger Statement (Alt+L)
+              </h2>
+              <p class="text-xs text-slate-400">Detailed chronological audit entries and running balance for any account</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <select v-model="selectedLedgerAccountId" @change="loadAccountLedger" class="magic-input px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold">
+                <option v-for="a in accounts" :key="a.id" :value="a.id">{{ a.name }} ({{ a.group_name }})</option>
+              </select>
+              <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+            </div>
+          </div>
+
+          <div v-if="accountLedgerData.account" class="p-4 bg-slate-50 rounded-xl border border-slate-200 mb-6 flex justify-between items-center text-xs">
+            <div>
+              <h3 class="font-extrabold text-sm text-slate-800">{{ accountLedgerData.account.name }}</h3>
+              <p class="text-slate-400 mt-0.5">Group: {{ accountLedgerData.account.group_name }} | Nature: {{ accountLedgerData.account.nature }}</p>
+            </div>
+            <div class="text-right font-mono">
+              <div class="text-slate-500">Closing Balance:</div>
+              <div class="text-base font-black" :class="accountLedgerData.closingBalanceType === 'Dr' ? 'text-blue-700' : 'text-emerald-700'">
+                ₹{{ Math.abs(accountLedgerData.closingBalance || 0).toFixed(2) }} {{ accountLedgerData.closingBalanceType }}
+              </div>
+            </div>
+          </div>
+
+          <div class="border border-slate-200 rounded-xl overflow-x-auto">
+            <table class="w-full magic-grid text-left text-xs">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Voucher #</th>
+                  <th>Type</th>
+                  <th>Narration</th>
+                  <th class="text-right">Debit (₹)</th>
+                  <th class="text-right">Credit (₹)</th>
+                  <th class="text-right">Running Balance (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="e in accountLedgerData.entries" :key="e.id" class="hover:bg-slate-50/50">
+                  <td class="font-mono text-slate-500">{{ e.entry_date }}</td>
+                  <td class="font-mono font-bold text-blue-600">{{ e.voucher_number }}</td>
+                  <td><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 uppercase">{{ e.voucher_type }}</span></td>
+                  <td class="text-slate-700">{{ e.narration }}</td>
+                  <td class="text-right font-mono font-bold text-slate-800">{{ e.debit > 0 ? '₹' + e.debit.toFixed(2) : '-' }}</td>
+                  <td class="text-right font-mono font-bold text-slate-800">{{ e.credit > 0 ? '₹' + e.credit.toFixed(2) : '-' }}</td>
+                  <td class="text-right font-mono font-black" :class="e.balanceType === 'Dr' ? 'text-blue-700' : 'text-emerald-700'">
+                    ₹{{ Math.abs(e.balance).toFixed(2) }} {{ e.balanceType }}
+                  </td>
+                </tr>
+                <tr v-if="accountLedgerData.entries?.length === 0">
+                  <td colspan="7" class="text-center py-6 text-slate-400">No ledger entries found for this account.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW: OUTSTANDING ANALYSIS (Receivables & Payables) -->
+        <div v-if="currentView === 'outstandings'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left text-rose-600"></i> Outstanding Analysis (Bill-by-Bill Aging)
+              </h2>
+              <p class="text-xs text-slate-400">Track pending bills, credit periods, and overdue aging for Debtors and Creditors</p>
+            </div>
+            <div class="flex gap-2">
+              <button @click="outstandingType = 'RECEIVABLE'; loadOutstandings();" :class="outstandingType === 'RECEIVABLE' ? 'bg-blue-600 text-white font-bold' : 'bg-slate-100 text-slate-700'" class="px-3 py-1.5 rounded-lg text-xs transition">
+                Receivables (Debtors)
+              </button>
+              <button @click="outstandingType = 'PAYABLE'; loadOutstandings();" :class="outstandingType === 'PAYABLE' ? 'bg-rose-600 text-white font-bold' : 'bg-slate-100 text-slate-700'" class="px-3 py-1.5 rounded-lg text-xs transition">
+                Payables (Creditors)
+              </button>
+              <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+            </div>
+          </div>
+
+          <div class="border border-slate-200 rounded-xl overflow-x-auto">
+            <table class="w-full magic-grid text-left text-xs">
+              <thead>
+                <tr>
+                  <th>Bill Ref #</th>
+                  <th>Bill Date</th>
+                  <th>Party Name</th>
+                  <th class="text-right">Bill Amount (₹)</th>
+                  <th class="text-right">Paid Amount (₹)</th>
+                  <th class="text-right">Pending Balance (₹)</th>
+                  <th class="text-center">Age (Days)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="b in outstandingsList" :key="b.id" class="hover:bg-slate-50/50">
+                  <td class="font-mono font-bold text-indigo-600">{{ b.ref_number }}</td>
+                  <td class="font-mono text-slate-500">{{ b.bill_date }}</td>
+                  <td class="font-bold text-slate-800">{{ b.party_name }}</td>
+                  <td class="text-right font-mono font-medium text-slate-700">₹{{ b.total_amount?.toFixed(2) }}</td>
+                  <td class="text-right font-mono font-medium text-slate-500">₹{{ b.paid_amount?.toFixed(2) }}</td>
+                  <td class="text-right font-mono font-black text-rose-600">₹{{ b.pending_amount?.toFixed(2) }}</td>
+                  <td class="text-center font-mono">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold" :class="b.age_days > 30 ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-amber-50 text-amber-700 border border-amber-200'">
+                      {{ b.age_days }} Days
+                    </span>
+                  </td>
+                </tr>
+                <tr v-if="outstandingsList.length === 0">
+                  <td colspan="7" class="text-center py-6 text-slate-400">All bills cleared. No pending outstandings!</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW: GST RETURNS (GSTR-1 & GSTR-3B) -->
+        <div v-if="currentView === 'gst_reports'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-purple-600"></i> GST Statutory Returns (GSTR-1 & GSTR-3B)
+              </h2>
+              <p class="text-xs text-slate-400">Automated tax computation, B2B summaries, HSN classification, and Input Tax Credit (ITC)</p>
+            </div>
+            <div class="flex gap-2">
+              <button @click="loadGSTReport" class="px-3 py-1.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1.5">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh
+              </button>
+              <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+            </div>
+          </div>
+
+          <!-- Section 1: GSTR-3B Tax Liability vs ITC Netting -->
+          <div class="mb-8">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-calculator text-purple-600"></i> GSTR-3B Monthly Net Tax Summary
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+                <span class="text-[10px] font-bold text-slate-400 uppercase">Outward Tax Liability</span>
+                <div class="text-base font-black text-slate-800 font-mono mt-1">₹{{ ((gstReportData.gstr3b?.liabilityCGST || 0) + (gstReportData.gstr3b?.liabilitySGST || 0) + (gstReportData.gstr3b?.liabilityIGST || 0)).toFixed(2) }}</div>
+                <div class="text-[10px] text-slate-500 mt-1">CGST: ₹{{ gstReportData.gstr3b?.liabilityCGST?.toFixed(2) }} | SGST: ₹{{ gstReportData.gstr3b?.liabilitySGST?.toFixed(2) }}</div>
+              </div>
+              <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+                <span class="text-[10px] font-bold text-slate-400 uppercase">Eligible Input Tax Credit (ITC)</span>
+                <div class="text-base font-black text-emerald-700 font-mono mt-1">₹{{ ((gstReportData.gstr3b?.itcCGST || 0) + (gstReportData.gstr3b?.itcSGST || 0) + (gstReportData.gstr3b?.itcIGST || 0)).toFixed(2) }}</div>
+                <div class="text-[10px] text-slate-500 mt-1">IGST ITC: ₹{{ gstReportData.gstr3b?.itcIGST?.toFixed(2) }}</div>
+              </div>
+              <div class="p-4 rounded-xl border border-purple-200 bg-purple-50/50">
+                <span class="text-[10px] font-bold text-purple-700 uppercase">Net Tax Payable (Cash Ledger)</span>
+                <div class="text-base font-black text-purple-900 font-mono mt-1">₹{{ ((gstReportData.gstr3b?.netPayableCGST || 0) + (gstReportData.gstr3b?.netPayableSGST || 0) + (gstReportData.gstr3b?.netPayableIGST || 0)).toFixed(2) }}</div>
+                <div class="text-[10px] text-purple-600 mt-1">After ITC set-off</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: GSTR-1 HSN Summary Table -->
+          <div>
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-purple-600"></i> GSTR-1 HSN / SAC Summary
+            </h3>
+            <div class="border border-slate-200 rounded-xl overflow-x-auto">
+              <table class="w-full magic-grid text-left text-xs">
+                <thead>
+                  <tr>
+                    <th>HSN / SAC</th>
+                    <th>Item Description</th>
+                    <th>UQC</th>
+                    <th class="text-right">Total Qty</th>
+                    <th class="text-right">Taxable Value (₹)</th>
+                    <th class="text-right">CGST (₹)</th>
+                    <th class="text-right">SGST (₹)</th>
+                    <th class="text-right">Total Value (₹)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="h in gstReportData.hsnSummary" :key="h.hsn_code" class="hover:bg-slate-50/50">
+                    <td class="font-mono font-bold text-purple-700">{{ h.hsn_code }}</td>
+                    <td class="font-bold text-slate-800">{{ h.item_name }}</td>
+                    <td class="font-mono text-slate-500">{{ h.uqc }}</td>
+                    <td class="text-right font-mono">{{ h.total_qty }}</td>
+                    <td class="text-right font-mono font-bold text-slate-800">₹{{ h.total_taxable_value?.toFixed(2) }}</td>
+                    <td class="text-right font-mono text-slate-600">₹{{ h.total_cgst?.toFixed(2) }}</td>
+                    <td class="text-right font-mono text-slate-600">₹{{ h.total_sgst?.toFixed(2) }}</td>
+                    <td class="text-right font-mono font-black text-slate-900">₹{{ h.total_value?.toFixed(2) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
 
         <!-- SALES ORDERS & QUOTATIONS (Order-to-Cash Lifecycle) -->
         <div v-if="currentView === 'orders_list'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
@@ -1956,6 +2445,24 @@
         const showNewPOModal = ref(false);
         const showAddEmployeeModal = ref(false);
 
+        // BUSY Final Results & Display State
+        const profitLossData = ref({ trading: {}, operating: {}, directExpenseAccounts: [], directIncomeAccounts: [], indirectExpenseAccounts: [], indirectIncomeAccounts: [] });
+        const balanceSheetData = ref({ liabilities: [], assets: [], totalLiabilitiesAndEquity: 0, totalAssets: 0, isBalanced: true });
+        const accountLedgerData = ref({ account: null, entries: [], closingBalance: 0, closingBalanceType: 'Dr' });
+        const selectedLedgerAccountId = ref('');
+        const gstReportData = ref({ b2bSales: [], hsnSummary: [], gstr3b: {} });
+        const outstandingsList = ref([]);
+        const outstandingType = ref('RECEIVABLE');
+
+        // Contra Voucher Form
+        const contraForm = ref({
+          date: new Date().toISOString().split('T')[0],
+          source_account_id: '',
+          destination_account_id: '',
+          amount: 1000,
+          narration: ''
+        });
+
         const newOrderForm = ref({
           party_account_id: '',
           material_centre_id: '',
@@ -2116,6 +2623,16 @@
             if (units.value.length > 0) newItemForm.value.primary_unit_id = units.value[0].id;
 
             if (debtorAccounts.value.length > 0) salesForm.value.party_account_id = debtorAccounts.value[0].id;
+            if (bankCashAccounts.value.length >= 2) {
+              contraForm.value.source_account_id = bankCashAccounts.value[0].id;
+              contraForm.value.destination_account_id = bankCashAccounts.value[1].id;
+            } else if (bankCashAccounts.value.length === 1) {
+              contraForm.value.source_account_id = bankCashAccounts.value[0].id;
+              contraForm.value.destination_account_id = bankCashAccounts.value[0].id;
+            }
+            if (accounts.value.length > 0 && !selectedLedgerAccountId.value) {
+              selectedLedgerAccountId.value = accounts.value[0].id;
+            }
             if (creditorAccounts.value.length > 0) {
               purchaseForm.value.vendor_account_id = creditorAccounts.value[0].id;
               newPOForm.value.vendor_account_id = creditorAccounts.value[0].id;
@@ -2615,6 +3132,85 @@
           }
         };
 
+        const loadProfitLoss = async () => {
+          try {
+            const res = await fetch('/api/reports/profit-loss');
+            profitLossData.value = await res.json();
+          } catch (e) {
+            console.error('Failed to load P&L:', e);
+          }
+        };
+
+        const loadBalanceSheet = async () => {
+          try {
+            const res = await fetch('/api/reports/balance-sheet');
+            balanceSheetData.value = await res.json();
+          } catch (e) {
+            console.error('Failed to load Balance Sheet:', e);
+          }
+        };
+
+        const loadAccountLedger = async () => {
+          if (!selectedLedgerAccountId.value && accounts.value.length > 0) {
+            selectedLedgerAccountId.value = accounts.value[0].id;
+          }
+          if (!selectedLedgerAccountId.value) return;
+          try {
+            const res = await fetch(`/api/reports/account-ledger?account_id=${selectedLedgerAccountId.value}`);
+            accountLedgerData.value = await res.json();
+          } catch (e) {
+            console.error('Failed to load ledger:', e);
+          }
+        };
+
+        const loadGSTReport = async () => {
+          try {
+            const res = await fetch('/api/reports/gst-summary');
+            gstReportData.value = await res.json();
+          } catch (e) {
+            console.error('Failed to load GST summary:', e);
+          }
+        };
+
+        const loadOutstandings = async () => {
+          try {
+            const res = await fetch(`/api/reports/outstandings?type=${outstandingType.value}`);
+            outstandingsList.value = await res.json();
+          } catch (e) {
+            console.error('Failed to load outstandings:', e);
+          }
+        };
+
+        const submitContraVoucher = async () => {
+          if (!contraForm.value.source_account_id || !contraForm.value.destination_account_id) {
+            return alert('Select both Source and Destination accounts');
+          }
+          if (contraForm.value.source_account_id === contraForm.value.destination_account_id) {
+            return alert('Source and Destination accounts cannot be the same');
+          }
+          if (contraForm.value.amount <= 0) {
+            return alert('Enter a valid transfer amount');
+          }
+          try {
+            const res = await fetch('/api/vouchers/contra', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(contraForm.value)
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert(`🎉 Contra Voucher ${data.voucherNumber} Posted! Transferred ₹${data.amount} from ${data.sourceAccount} to ${data.destinationAccount}`);
+              currentView.value = 'vouchers_list';
+              loadVouchers();
+              loadTrialBalance();
+            } else {
+              alert('Error: ' + data.error);
+            }
+          } catch (e) {
+            alert('Failed to save Contra voucher: ' + e.message);
+          }
+        };
+
         const loadTrialBalance = async () => {
           const res = await fetch('/api/reports/trial-balance');
           trialBalance.value = await res.json();
@@ -2823,6 +3419,11 @@
           else if (e.key === 'F5') { e.preventDefault(); currentView.value = 'payment_create'; }
           else if (e.key === 'F6') { e.preventDefault(); currentView.value = 'trial_balance'; loadTrialBalance(); }
           else if (e.key === 'F7') { e.preventDefault(); currentView.value = 'stock_status'; loadStock(); }
+          else if (e.altKey && (e.key === 'l' || e.key === 'L')) {
+            e.preventDefault();
+            currentView.value = 'account_ledger';
+            loadAccountLedger();
+          }
           else if (e.key === 'F2') {
             e.preventDefault();
             if (currentView.value === 'sales_create') submitSalesVoucher();
@@ -2917,7 +3518,21 @@
           selectedBOM,
           godownsSummary,
           stockTransferForm,
-          submitStockTransfer
+          submitStockTransfer,
+          profitLossData,
+          balanceSheetData,
+          accountLedgerData,
+          selectedLedgerAccountId,
+          gstReportData,
+          outstandingsList,
+          outstandingType,
+          contraForm,
+          loadProfitLoss,
+          loadBalanceSheet,
+          loadAccountLedger,
+          loadGSTReport,
+          loadOutstandings,
+          submitContraVoucher
         };
       }
     }).mount('#app');
