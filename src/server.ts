@@ -265,9 +265,15 @@ app.get('/api/vouchers', (req, res) => {
       v.*, 
       a.name as party_name,
       v.gross_total as total_debit,
-      v.gross_total as total_credit
+      v.gross_total as total_credit,
+      ewb.eway_bill_number,
+      ewb.vehicle_number,
+      einv.irn_hash,
+      einv.ack_number
     FROM vouchers v
     LEFT JOIN accounts a ON v.party_account_id = a.id
+    LEFT JOIN gst_e_way_bills ewb ON v.id = ewb.voucher_id
+    LEFT JOIN gst_e_invoices einv ON v.id = einv.voucher_id
     WHERE v.company_id = ?
     ORDER BY v.date DESC, v.created_at DESC
     LIMIT 200
