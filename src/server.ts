@@ -91,6 +91,10 @@ app.get('/api/masters', (req, res) => {
     ORDER BY a.name
   `).all(activeCompanyId);
 
+  const groups = db.prepare(`
+    SELECT * FROM account_groups WHERE company_id = ? ORDER BY name
+  `).all(activeCompanyId);
+
   const items = db.prepare(`
     SELECT i.*, u.symbol as unit_symbol 
     FROM items i
@@ -102,7 +106,63 @@ app.get('/api/masters', (req, res) => {
   const godowns = db.prepare('SELECT * FROM material_centres WHERE company_id = ?').all(activeCompanyId);
   const units = db.prepare('SELECT * FROM units WHERE company_id = ?').all(activeCompanyId);
 
-  res.json({ accounts, items, godowns, units });
+  res.json({ accounts, groups, items, godowns, units });
+});
+
+// 2.1 Create Party / Account Master (BUSY Style)
+app.post('/api/accounts', (req, res) => {
+  try {
+    const { name, group_id, gstin, state_code, address, credit_limit, credit_period_days } = req.body;
+    if (!name || !name.trim()) throw new Error('Party name is required');
+    if (!group_id) throw new Error('Account Group is required');
+
+    const id = randomUUID();
+    db.prepare(`
+      INSERT INTO accounts (
+        id, company_id, group_id, name, gstin, state_code, address, credit_limit, credit_period_days, bill_by_bill_enabled
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+    `).run(
+      id, activeCompanyId, group_id, name.trim(), gstin || null,
+      state_code || null, address || null, credit_limit || 0, credit_period_days || 0
+    );
+
+    // Outbox Sync for Silver Cloud & Gold Cloud
+    db.prepare(`
+      INSERT INTO sync_outbox (id, company_id, entity_type, entity_id, action, payload)
+      VALUES (?, ?, 'ACCOUNT', ?, 'CREATE', ?)
+    `).run(
+      randomUUID(), activeCompanyId, id,
+      JSON.stringify({ id, name: name.trim(), group_id, gstin })
+    );
+
+    res.json({ success: true, id, name: name.trim() });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 2.2 Create Item Master (Product / Service)
+app.post('/api/items', (req, res) => {
+  try {
+    const { name, sku, hsn_code, gst_rate, primary_unit_id, standard_sale_rate, standard_purchase_rate } = req.body;
+    if (!name || !name.trim()) throw new Error('Item name is required');
+    if (!hsn_code) throw new Error('HSN code is required');
+    if (!primary_unit_id) throw new Error('Unit of measurement is required');
+
+    const id = randomUUID();
+    db.prepare(`
+      INSERT INTO items (
+        id, company_id, name, sku, hsn_code, gst_rate, primary_unit_id, standard_sale_rate, standard_purchase_rate
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      id, activeCompanyId, name.trim(), sku || null, hsn_code,
+      gst_rate || 18, primary_unit_id, standard_sale_rate || 0, standard_purchase_rate || 0
+    );
+
+    res.json({ success: true, id, name: name.trim() });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
 });
 
 // 3. Transactions / Vouchers
