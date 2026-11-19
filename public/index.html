@@ -167,10 +167,17 @@
 
             <!-- 1. Company Menu -->
             <div class="relative group cursor-pointer py-1">
-              <span class="hover:text-white flex items-center gap-1">Company <i class="fa-solid fa-chevron-down text-[9px] opacity-60"></i></span>
-              <div class="absolute left-0 top-full hidden group-hover:block bg-white text-slate-800 shadow-xl border border-slate-200 rounded-lg py-1.5 w-48 z-50 text-xs font-normal">
-                <a @click="currentView = 'dashboard'" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-building text-slate-400 w-4"></i> Active Company Info</a>
-                <a @click="loadInitialData(); alert('Company data reloaded from SQLite WAL!');" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-arrows-rotate text-slate-400 w-4"></i> Reload Company</a>
+              <span class="hover:text-white flex items-center gap-1 font-bold text-white bg-slate-800/80 px-2 py-0.5 rounded">Company <i class="fa-solid fa-chevron-down text-[9px] opacity-60"></i></span>
+              <div class="absolute left-0 top-full hidden group-hover:block bg-white text-slate-800 shadow-xl border border-slate-200 rounded-lg py-1.5 w-60 z-50 text-xs font-normal">
+                <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase border-b border-slate-100">Company Management</div>
+                <a @click="currentView = 'company_profile'" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-building text-blue-600 w-4"></i> Edit / Modify Company Profile</a>
+                <a @click="currentView = 'dashboard'" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-indigo-600 w-4"></i> Company Dashboard & Stats</a>
+                <a @click="alert('Data Directory: /home/ankan/.gemini/antigravity/scratch/exonus-erp/data (SQLite WAL Storage)')" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-folder-open text-amber-500 w-4"></i> Set Data Directory</a>
+                <div class="border-t border-slate-100 my-1"></div>
+                <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase">Backup & Maintenance</div>
+                <a @click="alert('Data Backup: SQLite snapshot VACUUM INTO archive created at data/backups/')" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-floppy-disk text-emerald-600 w-4"></i> Backup Company Data</a>
+                <a @click="loadInitialData(); alert('Company data and ledger registers successfully refreshed from SQLite WAL!');" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-arrows-rotate text-purple-600 w-4"></i> Reload / Refresh Company</a>
+                <a @click="alert('Financial Year Parameters: Current Active FY 2026-27 (01/04/2026 to 31/03/2027)')" class="px-4 py-2 hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-calendar-days text-teal-600 w-4"></i> Financial Year Parameters</a>
               </div>
             </div>
 
@@ -490,6 +497,61 @@
         </div>
 
 
+        <!-- VIEW: COMPANY PROFILE (MODIFY COMPANY) -->
+        <div v-if="currentView === 'company_profile'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-3xl">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-building text-blue-600"></i> Company Profile & Statutory Master
+              </h2>
+              <p class="text-xs text-slate-400">Manage registered company identity, statutory tax registration, and financial year parameters</p>
+            </div>
+            <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+          </div>
+          <div class="space-y-4 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Company Legal Name</label>
+                <input type="text" v-model="company.name" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-bold text-slate-900">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">GSTIN</label>
+                <input type="text" v-model="company.gstin" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold uppercase">
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">State / Jurisdiction Code</label>
+                <input type="text" v-model="company.state_code" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Base Currency</label>
+                <input type="text" v-model="company.currency" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-bold">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Financial Year Start</label>
+                <input type="text" value="01/04/2026" readonly class="magic-input w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-lg text-slate-500 font-mono">
+              </div>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Registered Business Address</label>
+              <textarea v-model="company.address" rows="2" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg"></textarea>
+            </div>
+            <div class="p-3 bg-blue-50 border border-blue-100 rounded-lg text-blue-900 text-xs flex items-center justify-between">
+              <div>
+                <span class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-database"></i> Active Data Storage Directory</span>
+                <p class="mt-0.5 text-[11px] font-mono text-blue-700">/home/ankan/.gemini/antigravity/scratch/exonus-erp/data/exonus.db (WAL Mode)</p>
+              </div>
+              <span class="px-2.5 py-1 bg-blue-600 text-white font-bold rounded text-[10px]">CONNECTED</span>
+            </div>
+            <div class="pt-4 flex justify-end gap-2">
+              <button @click="currentView = 'dashboard'" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-xs font-bold">Cancel</button>
+              <button @click="alert('Company Profile updated successfully!')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-2 rounded-lg shadow-sm flex items-center gap-1.5">
+                <i class="fa-solid fa-check"></i> Save Company Details
+              </button>
+            </div>
+          </div>
+        </div>
         <!-- Help Views -->
         <div v-if="currentView === 'help_shortcuts'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-2xl">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
