@@ -12,7 +12,7 @@ import { getBillSundries, saveBillSundry, seedDefaultBillSundries } from './serv
 import { getBankAccounts, getBankReconciliationStatement, updateBankClearance, ensureDefaultBankAccount } from './services/brsService.js';
 import { executeStockTransfer, getGodownStockReport, getGodownsSummary } from './services/stockTransferService.js';
 import { executeProductionRun, createBillOfMaterials, getBillOfMaterialsList, getProductionHistory } from './services/manufacturingService.js';
-import { processMonthlyPayroll } from './services/payrollService.js';
+import { processMonthlyPayroll, getEmployees, createOrUpdateEmployee } from './services/payrollService.js';
 import { generateEWayBill, generateEInvoice } from './services/gstComplianceService.js';
 import { getTrialBalance, getStockStatus } from './services/reportService.js';
 import { randomUUID } from 'crypto';
@@ -528,8 +528,24 @@ app.post('/api/vouchers/production', (req, res) => {
 
 // 8. Payroll HRMS & Salary Processing
 app.get('/api/employees', (req, res) => {
-  const emps = db.prepare('SELECT * FROM employees WHERE company_id = ? ORDER BY name').all(activeCompanyId);
-  res.json(emps);
+  try {
+    const emps = getEmployees(db, activeCompanyId);
+    res.json(emps);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/employees', (req, res) => {
+  try {
+    const result = createOrUpdateEmployee(db, {
+      ...req.body,
+      company_id: activeCompanyId,
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
 });
 
 app.post('/api/payroll/process', (req, res) => {

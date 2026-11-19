@@ -1,6 +1,24 @@
 import Database from 'better-sqlite3';
 import { randomUUID } from 'crypto';
 
+export interface EmployeeInput {
+  company_id: string;
+  emp_code: string;
+  name: string;
+  designation: string;
+  department: string;
+  joining_date: string;
+  basic_salary: number;
+  hra?: number;
+  conveyance?: number;
+  special_allowance?: number;
+  pan_number?: string;
+  pf_uan?: string;
+  esi_number?: string;
+  bank_account_number?: string;
+  bank_ifsc?: string;
+}
+
 export interface ProcessPayrollInput {
   company_id: string;
   month: number;
@@ -8,7 +26,138 @@ export interface ProcessPayrollInput {
   payment_date: string;
 }
 
+/**
+ * Creates or updates an Employee Master in Exonus ERP
+ */
+export function createOrUpdateEmployee(db: Database.Database, input: EmployeeInput) {
+  const existing = db.prepare('SELECT id FROM employees WHERE company_id = ? AND emp_code = ?').get(input.company_id, input.emp_code) as any;
+  const id = existing ? existing.id : randomUUID();
+
+  if (existing) {
+    db.prepare(`
+      UPDATE employees SET
+        name = ?, designation = ?, department = ?, joining_date = ?,
+        basic_salary = ?, hra = ?, conveyance = ?, special_allowance = ?,
+        pan_number = ?, pf_uan = ?, esi_number = ?, bank_account_number = ?, bank_ifsc = ?
+      WHERE id = ?
+    `).run(
+      input.name.trim(), input.designation.trim(), input.department.trim(), input.joining_date,
+      input.basic_salary, input.hra || 0, input.conveyance || 0, input.special_allowance || 0,
+      input.pan_number || null, input.pf_uan || null, input.esi_number || null,
+      input.bank_account_number || null, input.bank_ifsc || null, id
+    );
+  } else {
+    db.prepare(`
+      INSERT INTO employees (
+        id, company_id, emp_code, name, designation, department, joining_date,
+        basic_salary, hra, conveyance, special_allowance,
+        pan_number, pf_uan, esi_number, bank_account_number, bank_ifsc, is_active
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+    `).run(
+      id, input.company_id, input.emp_code.trim(), input.name.trim(), input.designation.trim(),
+      input.department.trim(), input.joining_date, input.basic_salary, input.hra || 0,
+      input.conveyance || 0, input.special_allowance || 0, input.pan_number || null,
+      input.pf_uan || null, input.esi_number || null, input.bank_account_number || null,
+      input.bank_ifsc || null
+    );
+  }
+
+  return { id, emp_code: input.emp_code, name: input.name };
+}
+
+/**
+ * Seeds standard sample employees if company employee list is empty
+ */
+export function seedDefaultEmployees(db: Database.Database, companyId: string) {
+  const count = db.prepare('SELECT COUNT(*) as count FROM employees WHERE company_id = ?').get(companyId) as any;
+  if (count && count.count > 0) return;
+
+  const defaults: Omit<EmployeeInput, 'company_id'>[] = [
+    {
+      emp_code: 'EMP-001',
+      name: 'Rajesh Sharma',
+      designation: 'Senior Accountant',
+      department: 'Finance & Accounts',
+      joining_date: '2024-01-15',
+      basic_salary: 35000,
+      hra: 14000,
+      conveyance: 3000,
+      special_allowance: 8000,
+      pan_number: 'ABCPS1234F',
+      pf_uan: '100987654321',
+      bank_account_number: '50100234567891',
+      bank_ifsc: 'HDFC0000123'
+    },
+    {
+      emp_code: 'EMP-002',
+      name: 'Sunita Rao',
+      designation: 'Warehouse & Logistics Manager',
+      department: 'Supply Chain',
+      joining_date: '2024-03-01',
+      basic_salary: 28000,
+      hra: 11200,
+      conveyance: 2500,
+      special_allowance: 5300,
+      pan_number: 'BNPRS5678K',
+      pf_uan: '100987654322',
+      bank_account_number: '50100234567892',
+      bank_ifsc: 'HDFC0000123'
+    },
+    {
+      emp_code: 'EMP-003',
+      name: 'Amit Verma',
+      designation: 'Assembly Line Technician',
+      department: 'Manufacturing',
+      joining_date: '2025-06-10',
+      basic_salary: 15000,
+      hra: 4000,
+      conveyance: 1500,
+      special_allowance: 500,
+      pan_number: 'CRTYV9012L',
+      pf_uan: '100987654323',
+      esi_number: '3100987654',
+      bank_account_number: '50100234567893',
+      bank_ifsc: 'HDFC0000123'
+    }
+  ];
+
+  for (const emp of defaults) {
+    createOrUpdateEmployee(db, { ...emp, company_id: companyId });
+  }
+}
+
+/**
+ * Retrieves all employees with calculated monthly salary breakdown
+ */
+export function getEmployees(db: Database.Database, companyId: string) {
+  seedDefaultEmployees(db, companyId);
+
+  const emps = db.prepare('SELECT * FROM employees WHERE company_id = ? ORDER BY emp_code ASC').all(companyId) as any[];
+
+  return emps.map(emp => {
+    const gross = emp.basic_salary + (emp.hra || 0) + (emp.conveyance || 0) + (emp.special_allowance || 0);
+    const pf = Math.round(emp.basic_salary * 0.12);
+    const esi = gross <= 21000 ? Math.round(gross * 0.0075) : 0;
+    const pt = 200;
+    const net = gross - (pf + esi + pt);
+
+    return {
+      ...emp,
+      gross_salary: gross,
+      pf_deduction: pf,
+      esi_deduction: esi,
+      pt_deduction: pt,
+      net_salary: net
+    };
+  });
+}
+
+/**
+ * Processes monthly payroll for all active employees and posts balancing double-entry salary journal vouchers.
+ */
 export function processMonthlyPayroll(db: Database.Database, input: ProcessPayrollInput) {
+  seedDefaultEmployees(db, input.company_id);
+
   const employees = db.prepare('SELECT * FROM employees WHERE company_id = ? AND is_active = 1').all(input.company_id) as any[];
   if (!employees || employees.length === 0) throw new Error('No active employees found to process payroll');
 
@@ -23,20 +172,20 @@ export function processMonthlyPayroll(db: Database.Database, input: ProcessPayro
       const gross = emp.basic_salary + (emp.hra || 0) + (emp.conveyance || 0) + (emp.special_allowance || 0);
       
       // Standard Statutory Deductions:
-      // Employee PF: 12% of Basic (capped at standard limits)
+      // Employee PF: 12% of Basic
       const pf = Math.round(emp.basic_salary * 0.12);
       // Employee ESI: 0.75% of Gross if Gross <= ₹21,000
       const esi = gross <= 21000 ? Math.round(gross * 0.0075) : 0;
-      // Professional Tax: Flat ₹200 (approximate Indian slab)
+      // Professional Tax: Flat ₹200
       const pt = 200;
 
       const net = gross - (pf + esi + pt);
 
-      totalGross += gross;
-      totalPF += pf;
-      totalESI += esi;
-      totalPT += pt;
-      totalNet += net;
+      totalGross = Math.round((totalGross + gross) * 100) / 100;
+      totalPF = Math.round((totalPF + pf) * 100) / 100;
+      totalESI = Math.round((totalESI + esi) * 100) / 100;
+      totalPT = Math.round((totalPT + pt) * 100) / 100;
+      totalNet = Math.round((totalNet + net) * 100) / 100;
     }
 
     // Book General Ledger Salary Journal Voucher
@@ -103,7 +252,7 @@ export function processMonthlyPayroll(db: Database.Database, input: ProcessPayro
       VALUES (?, ?, ?, ?, 0, ?, ?, 'Net Salaries Payable to Staff')
     `).run(randomUUID(), input.company_id, journalVchId, salaryPayable.id, totalNet, input.payment_date);
 
-    // 3. Credit Statutory Liabilities (PF, ESI, PT) -> GUARANTEES EXACT BALANCING
+    // 3. Credit Statutory Liabilities (PF, ESI, PT) -> Guaranteed exact balancing
     if (totalPF > 0) {
       db.prepare(`
         INSERT INTO ledger_entries (id, company_id, voucher_id, account_id, debit, credit, entry_date, narration)
@@ -125,7 +274,7 @@ export function processMonthlyPayroll(db: Database.Database, input: ProcessPayro
       `).run(randomUUID(), input.company_id, journalVchId, ptPayable.id, totalPT, input.payment_date);
     }
 
-    // Record Payroll Run Table
+    // 4. Record Payroll Run Table
     const payrollRunId = randomUUID();
     db.prepare(`
       INSERT INTO payroll_runs (
@@ -136,6 +285,15 @@ export function processMonthlyPayroll(db: Database.Database, input: ProcessPayro
       totalGross, totalPF, totalESI, totalPT, totalNet, journalVchId
     );
 
+    // 5. Outbox Sync for Cloud Relay
+    db.prepare(`
+      INSERT INTO sync_outbox (id, company_id, entity_type, entity_id, action, payload)
+      VALUES (?, ?, 'PAYROLL_RUN', ?, 'CREATE', ?)
+    `).run(
+      randomUUID(), input.company_id, payrollRunId,
+      JSON.stringify({ month: input.month, year: input.year, totalGross, totalNet, vchNumber })
+    );
+
     return {
       payrollRunId,
       journalVchNumber: vchNumber,
@@ -143,6 +301,7 @@ export function processMonthlyPayroll(db: Database.Database, input: ProcessPayro
       totalGrossSalary: totalGross,
       totalPFDeduction: totalPF,
       totalESIDeduction: totalESI,
+      totalPTDeduction: totalPT,
       totalNetPayable: totalNet,
     };
   })();

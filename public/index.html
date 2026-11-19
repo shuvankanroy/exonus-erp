@@ -1289,8 +1289,11 @@
                   <th>Employee Name</th>
                   <th>Designation</th>
                   <th>Department</th>
-                  <th class="text-right">Basic Salary</th>
-                  <th class="text-right">Est. Net Pay</th>
+                  <th class="text-right">Basic</th>
+                  <th class="text-right">Gross Pay</th>
+                  <th class="text-right">PF (12%)</th>
+                  <th class="text-right">ESI / PT</th>
+                  <th class="text-right">Net Payable</th>
                 </tr>
               </thead>
               <tbody>
@@ -1299,8 +1302,11 @@
                   <td class="font-bold text-slate-900">{{ emp.name }}</td>
                   <td class="text-xs text-slate-600">{{ emp.designation }}</td>
                   <td class="text-xs text-slate-500">{{ emp.department }}</td>
-                  <td class="text-right font-mono font-bold">₹{{ emp.basic_salary?.toFixed(2) }}</td>
-                  <td class="text-right font-mono font-bold text-emerald-700">₹{{ (emp.basic_salary * 0.88 - 200).toFixed(2) }}</td>
+                  <td class="text-right font-mono font-medium text-slate-600">₹{{ emp.basic_salary?.toFixed(2) }}</td>
+                  <td class="text-right font-mono font-bold text-slate-800">₹{{ (emp.gross_salary || (emp.basic_salary + (emp.hra||0) + (emp.conveyance||0) + (emp.special_allowance||0)))?.toFixed(2) }}</td>
+                  <td class="text-right font-mono text-rose-600">₹{{ (emp.pf_deduction || Math.round(emp.basic_salary * 0.12))?.toFixed(2) }}</td>
+                  <td class="text-right font-mono text-amber-700">₹{{ ((emp.esi_deduction || 0) + (emp.pt_deduction || 200))?.toFixed(2) }}</td>
+                  <td class="text-right font-mono font-black text-emerald-700">₹{{ (emp.net_salary || (emp.basic_salary * 0.88 - 200))?.toFixed(2) }}</td>
                 </tr>
                 <tr v-if="employees.length === 0">
                   <td colspan="6" class="text-center py-6 text-slate-400 text-xs">No employees found. Seed employees to run payroll.</td>
@@ -2369,7 +2375,30 @@
         };
 
         const processPayroll = async () => {
-          alert('Monthly payroll processed! Salary journal voucher booked.');
+          try {
+            const today = new Date().toISOString().split('T')[0];
+            const currentMonth = new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
+            const res = await fetch('/api/payroll/process', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                month: currentMonth,
+                year: currentYear,
+                payment_date: today
+              })
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert(`Monthly Payroll Processed!\nJournal Voucher: ${data.journalVchNumber}\nEmployees: ${data.employeeCount}\nGross Expense: ₹${data.totalGrossSalary.toFixed(2)}\nNet Payable: ₹${data.totalNetPayable.toFixed(2)}\nPF: ₹${data.totalPFDeduction} | ESI: ₹${data.totalESIDeduction} | PT: ₹${data.totalPTDeduction}`);
+              loadEmployees();
+              loadTrialBalance();
+            } else {
+              alert('Payroll processing failed: ' + (data.error || 'Unknown error'));
+            }
+          } catch (err) {
+            alert('Error running payroll: ' + err.message);
+          }
         };
 
         window.addEventListener('keydown', (e) => {
