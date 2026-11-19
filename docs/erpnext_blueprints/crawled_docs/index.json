@@ -1,0 +1,3717 @@
+[
+  {
+    "slug": "2-step-301-redirect-in-your-erpnext-website",
+    "url": "https://docs.frappe.io/erpnext/2-step-301-redirect-in-your-erpnext-website",
+    "priority": false
+  },
+  {
+    "slug": "CRM",
+    "url": "https://docs.frappe.io/erpnext/CRM",
+    "priority": false
+  },
+  {
+    "slug": "Selling-in-different-UOM",
+    "url": "https://docs.frappe.io/erpnext/Selling-in-different-UOM",
+    "priority": true
+  },
+  {
+    "slug": "UAE-regional-fields",
+    "url": "https://docs.frappe.io/erpnext/UAE-regional-fields",
+    "priority": false
+  },
+  {
+    "slug": "access-log",
+    "url": "https://docs.frappe.io/erpnext/access-log",
+    "priority": false
+  },
+  {
+    "slug": "accounting-dimension-filter",
+    "url": "https://docs.frappe.io/erpnext/accounting-dimension-filter",
+    "priority": true
+  },
+  {
+    "slug": "accounting-dimension-problems",
+    "url": "https://docs.frappe.io/erpnext/accounting-dimension-problems",
+    "priority": true
+  },
+  {
+    "slug": "accounting-dimensions",
+    "url": "https://docs.frappe.io/erpnext/accounting-dimensions",
+    "priority": true
+  },
+  {
+    "slug": "accounting-entries",
+    "url": "https://docs.frappe.io/erpnext/accounting-entries",
+    "priority": true
+  },
+  {
+    "slug": "accounting-for-bad-debts",
+    "url": "https://docs.frappe.io/erpnext/accounting-for-bad-debts",
+    "priority": true
+  },
+  {
+    "slug": "accounting-introduction",
+    "url": "https://docs.frappe.io/erpnext/accounting-introduction",
+    "priority": true
+  },
+  {
+    "slug": "accounting-migration-overview",
+    "url": "https://docs.frappe.io/erpnext/accounting-migration-overview",
+    "priority": true
+  },
+  {
+    "slug": "accounting-of-inventory-stock",
+    "url": "https://docs.frappe.io/erpnext/accounting-of-inventory-stock",
+    "priority": true
+  },
+  {
+    "slug": "accounting-period",
+    "url": "https://docs.frappe.io/erpnext/accounting-period",
+    "priority": true
+  },
+  {
+    "slug": "accounting-reports",
+    "url": "https://docs.frappe.io/erpnext/accounting-reports",
+    "priority": true
+  },
+  {
+    "slug": "accounting-setup-checklist",
+    "url": "https://docs.frappe.io/erpnext/accounting-setup-checklist",
+    "priority": true
+  },
+  {
+    "slug": "accounting-workflows-by-business-type",
+    "url": "https://docs.frappe.io/erpnext/accounting-workflows-by-business-type",
+    "priority": true
+  },
+  {
+    "slug": "accounts-receivable-and-payable",
+    "url": "https://docs.frappe.io/erpnext/accounts-receivable-and-payable",
+    "priority": true
+  },
+  {
+    "slug": "accounts-receivables",
+    "url": "https://docs.frappe.io/erpnext/accounts-receivables",
+    "priority": true
+  },
+  {
+    "slug": "accounts-settings",
+    "url": "https://docs.frappe.io/erpnext/accounts-settings",
+    "priority": true
+  },
+  {
+    "slug": "activity-cost",
+    "url": "https://docs.frappe.io/erpnext/activity-cost",
+    "priority": false
+  },
+  {
+    "slug": "activity-type",
+    "url": "https://docs.frappe.io/erpnext/activity-type",
+    "priority": false
+  },
+  {
+    "slug": "add-remove-fields-from-print-format",
+    "url": "https://docs.frappe.io/erpnext/add-remove-fields-from-print-format",
+    "priority": false
+  },
+  {
+    "slug": "adding-attachments-to-outgoing-messages",
+    "url": "https://docs.frappe.io/erpnext/adding-attachments-to-outgoing-messages",
+    "priority": false
+  },
+  {
+    "slug": "adding-margin",
+    "url": "https://docs.frappe.io/erpnext/adding-margin",
+    "priority": false
+  },
+  {
+    "slug": "adding-reference-to-journal-entry",
+    "url": "https://docs.frappe.io/erpnext/adding-reference-to-journal-entry",
+    "priority": true
+  },
+  {
+    "slug": "adding-users",
+    "url": "https://docs.frappe.io/erpnext/adding-users",
+    "priority": false
+  },
+  {
+    "slug": "address",
+    "url": "https://docs.frappe.io/erpnext/address",
+    "priority": false
+  },
+  {
+    "slug": "address-template",
+    "url": "https://docs.frappe.io/erpnext/address-template",
+    "priority": false
+  },
+  {
+    "slug": "adjusting-withhold-amount",
+    "url": "https://docs.frappe.io/erpnext/adjusting-withhold-amount",
+    "priority": false
+  },
+  {
+    "slug": "administrator",
+    "url": "https://docs.frappe.io/erpnext/administrator",
+    "priority": false
+  },
+  {
+    "slug": "advance-in-separate-party-account",
+    "url": "https://docs.frappe.io/erpnext/advance-in-separate-party-account",
+    "priority": false
+  },
+  {
+    "slug": "advance-payment-entry",
+    "url": "https://docs.frappe.io/erpnext/advance-payment-entry",
+    "priority": false
+  },
+  {
+    "slug": "agriculture-module-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/agriculture-module-in-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "allocating-credit-note-and-payment",
+    "url": "https://docs.frappe.io/erpnext/allocating-credit-note-and-payment",
+    "priority": false
+  },
+  {
+    "slug": "allow-over-delivery-billing-against-sales-order-upto-certain-limit",
+    "url": "https://docs.frappe.io/erpnext/allow-over-delivery-billing-against-sales-order-upto-certain-limit",
+    "priority": true
+  },
+  {
+    "slug": "alternative-finished-goods",
+    "url": "https://docs.frappe.io/erpnext/alternative-finished-goods",
+    "priority": false
+  },
+  {
+    "slug": "amazon_integration",
+    "url": "https://docs.frappe.io/erpnext/amazon_integration",
+    "priority": false
+  },
+  {
+    "slug": "amending-purchase-order-after-submit",
+    "url": "https://docs.frappe.io/erpnext/amending-purchase-order-after-submit",
+    "priority": true
+  },
+  {
+    "slug": "amending-sales-order-after-submit",
+    "url": "https://docs.frappe.io/erpnext/amending-sales-order-after-submit",
+    "priority": true
+  },
+  {
+    "slug": "applying-discount",
+    "url": "https://docs.frappe.io/erpnext/applying-discount",
+    "priority": false
+  },
+  {
+    "slug": "appointment",
+    "url": "https://docs.frappe.io/erpnext/appointment",
+    "priority": false
+  },
+  {
+    "slug": "appointment-booking-settings",
+    "url": "https://docs.frappe.io/erpnext/appointment-booking-settings",
+    "priority": false
+  },
+  {
+    "slug": "asset",
+    "url": "https://docs.frappe.io/erpnext/asset",
+    "priority": false
+  },
+  {
+    "slug": "asset-capitalization",
+    "url": "https://docs.frappe.io/erpnext/asset-capitalization",
+    "priority": false
+  },
+  {
+    "slug": "asset-category",
+    "url": "https://docs.frappe.io/erpnext/asset-category",
+    "priority": false
+  },
+  {
+    "slug": "asset-create-sell-scrap-problems",
+    "url": "https://docs.frappe.io/erpnext/asset-create-sell-scrap-problems",
+    "priority": false
+  },
+  {
+    "slug": "asset-depreciation",
+    "url": "https://docs.frappe.io/erpnext/asset-depreciation",
+    "priority": false
+  },
+  {
+    "slug": "asset-depreciation-problems",
+    "url": "https://docs.frappe.io/erpnext/asset-depreciation-problems",
+    "priority": false
+  },
+  {
+    "slug": "asset-location",
+    "url": "https://docs.frappe.io/erpnext/asset-location",
+    "priority": false
+  },
+  {
+    "slug": "asset-maintenance",
+    "url": "https://docs.frappe.io/erpnext/asset-maintenance",
+    "priority": false
+  },
+  {
+    "slug": "asset-maintenance-log",
+    "url": "https://docs.frappe.io/erpnext/asset-maintenance-log",
+    "priority": false
+  },
+  {
+    "slug": "asset-maintenance-team",
+    "url": "https://docs.frappe.io/erpnext/asset-maintenance-team",
+    "priority": false
+  },
+  {
+    "slug": "asset-movement",
+    "url": "https://docs.frappe.io/erpnext/asset-movement",
+    "priority": false
+  },
+  {
+    "slug": "asset-repair",
+    "url": "https://docs.frappe.io/erpnext/asset-repair",
+    "priority": false
+  },
+  {
+    "slug": "asset-reports",
+    "url": "https://docs.frappe.io/erpnext/asset-reports",
+    "priority": false
+  },
+  {
+    "slug": "asset-shift-allocation",
+    "url": "https://docs.frappe.io/erpnext/asset-shift-allocation",
+    "priority": false
+  },
+  {
+    "slug": "asset-value-adjustment",
+    "url": "https://docs.frappe.io/erpnext/asset-value-adjustment",
+    "priority": false
+  },
+  {
+    "slug": "assignment-rule",
+    "url": "https://docs.frappe.io/erpnext/assignment-rule",
+    "priority": false
+  },
+  {
+    "slug": "assistance-sales-purchase-between-companies",
+    "url": "https://docs.frappe.io/erpnext/assistance-sales-purchase-between-companies",
+    "priority": true
+  },
+  {
+    "slug": "authorization-rule",
+    "url": "https://docs.frappe.io/erpnext/authorization-rule",
+    "priority": false
+  },
+  {
+    "slug": "auto-creation-of-material-request",
+    "url": "https://docs.frappe.io/erpnext/auto-creation-of-material-request",
+    "priority": false
+  },
+  {
+    "slug": "auto-email-reports",
+    "url": "https://docs.frappe.io/erpnext/auto-email-reports",
+    "priority": false
+  },
+  {
+    "slug": "auto-repeat",
+    "url": "https://docs.frappe.io/erpnext/auto-repeat",
+    "priority": false
+  },
+  {
+    "slug": "auto-repeat-recurring-orders-and-invoices",
+    "url": "https://docs.frappe.io/erpnext/auto-repeat-recurring-orders-and-invoices",
+    "priority": true
+  },
+  {
+    "slug": "automate_lead_capturing",
+    "url": "https://docs.frappe.io/erpnext/automate_lead_capturing",
+    "priority": false
+  },
+  {
+    "slug": "automating-issue-assignments-to-support-team-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/automating-issue-assignments-to-support-team-in-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "automation",
+    "url": "https://docs.frappe.io/erpnext/automation",
+    "priority": false
+  },
+  {
+    "slug": "awesomebar-global-search",
+    "url": "https://docs.frappe.io/erpnext/awesomebar-global-search",
+    "priority": false
+  },
+  {
+    "slug": "aws_s3",
+    "url": "https://docs.frappe.io/erpnext/aws_s3",
+    "priority": false
+  },
+  {
+    "slug": "balance-in-temporary-account",
+    "url": "https://docs.frappe.io/erpnext/balance-in-temporary-account",
+    "priority": false
+  },
+  {
+    "slug": "balance-sheet",
+    "url": "https://docs.frappe.io/erpnext/balance-sheet",
+    "priority": false
+  },
+  {
+    "slug": "bank",
+    "url": "https://docs.frappe.io/erpnext/bank",
+    "priority": false
+  },
+  {
+    "slug": "bank-account",
+    "url": "https://docs.frappe.io/erpnext/bank-account",
+    "priority": false
+  },
+  {
+    "slug": "bank-accounts-and-modes-of-payment",
+    "url": "https://docs.frappe.io/erpnext/bank-accounts-and-modes-of-payment",
+    "priority": true
+  },
+  {
+    "slug": "bank-guarantee",
+    "url": "https://docs.frappe.io/erpnext/bank-guarantee",
+    "priority": false
+  },
+  {
+    "slug": "bank-reconciliation",
+    "url": "https://docs.frappe.io/erpnext/bank-reconciliation",
+    "priority": false
+  },
+  {
+    "slug": "bank-transaction",
+    "url": "https://docs.frappe.io/erpnext/bank-transaction",
+    "priority": false
+  },
+  {
+    "slug": "banking-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/banking-in-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "batch",
+    "url": "https://docs.frappe.io/erpnext/batch",
+    "priority": true
+  },
+  {
+    "slug": "batch-split",
+    "url": "https://docs.frappe.io/erpnext/batch-split",
+    "priority": true
+  },
+  {
+    "slug": "bill-of-materials",
+    "url": "https://docs.frappe.io/erpnext/bill-of-materials",
+    "priority": false
+  },
+  {
+    "slug": "blanket-order",
+    "url": "https://docs.frappe.io/erpnext/blanket-order",
+    "priority": false
+  },
+  {
+    "slug": "blog-post",
+    "url": "https://docs.frappe.io/erpnext/blog-post",
+    "priority": false
+  },
+  {
+    "slug": "blogs",
+    "url": "https://docs.frappe.io/erpnext/blogs",
+    "priority": false
+  },
+  {
+    "slug": "bom-comparison-tool",
+    "url": "https://docs.frappe.io/erpnext/bom-comparison-tool",
+    "priority": true
+  },
+  {
+    "slug": "bom-costing-in-different-currency",
+    "url": "https://docs.frappe.io/erpnext/bom-costing-in-different-currency",
+    "priority": true
+  },
+  {
+    "slug": "bom-creator",
+    "url": "https://docs.frappe.io/erpnext/bom-creator",
+    "priority": true
+  },
+  {
+    "slug": "bom-creator-new",
+    "url": "https://docs.frappe.io/erpnext/bom-creator-new",
+    "priority": true
+  },
+  {
+    "slug": "bom-operation-time",
+    "url": "https://docs.frappe.io/erpnext/bom-operation-time",
+    "priority": true
+  },
+  {
+    "slug": "bom-search",
+    "url": "https://docs.frappe.io/erpnext/bom-search",
+    "priority": true
+  },
+  {
+    "slug": "bom-stock-analysis",
+    "url": "https://docs.frappe.io/erpnext/bom-stock-analysis",
+    "priority": true
+  },
+  {
+    "slug": "bom-stock-report",
+    "url": "https://docs.frappe.io/erpnext/bom-stock-report",
+    "priority": true
+  },
+  {
+    "slug": "bom-update-tool",
+    "url": "https://docs.frappe.io/erpnext/bom-update-tool",
+    "priority": true
+  },
+  {
+    "slug": "bom_explorer",
+    "url": "https://docs.frappe.io/erpnext/bom_explorer",
+    "priority": true
+  },
+  {
+    "slug": "book-discount-allowed-and-received-separately",
+    "url": "https://docs.frappe.io/erpnext/book-discount-allowed-and-received-separately",
+    "priority": false
+  },
+  {
+    "slug": "booking-customer-deducted-tds-in-payment-entry-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/booking-customer-deducted-tds-in-payment-entry-in-erpnext",
+    "priority": true
+  },
+  {
+    "slug": "braintree-integration",
+    "url": "https://docs.frappe.io/erpnext/braintree-integration",
+    "priority": false
+  },
+  {
+    "slug": "brand",
+    "url": "https://docs.frappe.io/erpnext/brand",
+    "priority": false
+  },
+  {
+    "slug": "budget",
+    "url": "https://docs.frappe.io/erpnext/budget",
+    "priority": false
+  },
+  {
+    "slug": "budget-not-blocking-and-budget-questions",
+    "url": "https://docs.frappe.io/erpnext/budget-not-blocking-and-budget-questions",
+    "priority": false
+  },
+  {
+    "slug": "budget-revision",
+    "url": "https://docs.frappe.io/erpnext/budget-revision",
+    "priority": false
+  },
+  {
+    "slug": "budget-variance-report",
+    "url": "https://docs.frappe.io/erpnext/budget-variance-report",
+    "priority": false
+  },
+  {
+    "slug": "bulk-assign-tasks-in-a-project",
+    "url": "https://docs.frappe.io/erpnext/bulk-assign-tasks-in-a-project",
+    "priority": false
+  },
+  {
+    "slug": "bulk-overwrite",
+    "url": "https://docs.frappe.io/erpnext/bulk-overwrite",
+    "priority": false
+  },
+  {
+    "slug": "bulk-rename",
+    "url": "https://docs.frappe.io/erpnext/bulk-rename",
+    "priority": false
+  },
+  {
+    "slug": "bulk-update",
+    "url": "https://docs.frappe.io/erpnext/bulk-update",
+    "priority": false
+  },
+  {
+    "slug": "buying",
+    "url": "https://docs.frappe.io/erpnext/buying",
+    "priority": true
+  },
+  {
+    "slug": "buying-settings",
+    "url": "https://docs.frappe.io/erpnext/buying-settings",
+    "priority": true
+  },
+  {
+    "slug": "buying_reports",
+    "url": "https://docs.frappe.io/erpnext/buying_reports",
+    "priority": true
+  },
+  {
+    "slug": "calculate-incentive-for-sales-team",
+    "url": "https://docs.frappe.io/erpnext/calculate-incentive-for-sales-team",
+    "priority": true
+  },
+  {
+    "slug": "calculatin-freight-in-taxes-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/calculatin-freight-in-taxes-in-erpnext",
+    "priority": true
+  },
+  {
+    "slug": "calculation-of-valuation-rate-in-fifo-and-moving-average",
+    "url": "https://docs.frappe.io/erpnext/calculation-of-valuation-rate-in-fifo-and-moving-average",
+    "priority": true
+  },
+  {
+    "slug": "campaign",
+    "url": "https://docs.frappe.io/erpnext/campaign",
+    "priority": false
+  },
+  {
+    "slug": "can-we-fetch-shipping-charges-based-items-value-or-weight-in-po",
+    "url": "https://docs.frappe.io/erpnext/can-we-fetch-shipping-charges-based-items-value-or-weight-in-po",
+    "priority": true
+  },
+  {
+    "slug": "cancel-delete-or-change-sales-documents",
+    "url": "https://docs.frappe.io/erpnext/cancel-delete-or-change-sales-documents",
+    "priority": true
+  },
+  {
+    "slug": "capacity-planning",
+    "url": "https://docs.frappe.io/erpnext/capacity-planning",
+    "priority": false
+  },
+  {
+    "slug": "capacity-planning-based-on-production-order",
+    "url": "https://docs.frappe.io/erpnext/capacity-planning-based-on-production-order",
+    "priority": false
+  },
+  {
+    "slug": "cash-flow-report",
+    "url": "https://docs.frappe.io/erpnext/cash-flow-report",
+    "priority": false
+  },
+  {
+    "slug": "centavo-being-printed-in-words-for-usd",
+    "url": "https://docs.frappe.io/erpnext/centavo-being-printed-in-words-for-usd",
+    "priority": false
+  },
+  {
+    "slug": "change-existing-users-email-id",
+    "url": "https://docs.frappe.io/erpnext/change-existing-users-email-id",
+    "priority": false
+  },
+  {
+    "slug": "change-password",
+    "url": "https://docs.frappe.io/erpnext/change-password",
+    "priority": false
+  },
+  {
+    "slug": "change-the-rate-of-items-in-the-sales-cycle",
+    "url": "https://docs.frappe.io/erpnext/change-the-rate-of-items-in-the-sales-cycle",
+    "priority": true
+  },
+  {
+    "slug": "change-valuation-method",
+    "url": "https://docs.frappe.io/erpnext/change-valuation-method",
+    "priority": true
+  },
+  {
+    "slug": "changing-parent-account",
+    "url": "https://docs.frappe.io/erpnext/changing-parent-account",
+    "priority": false
+  },
+  {
+    "slug": "changing-the-properties-of-a-field-based-on-role",
+    "url": "https://docs.frappe.io/erpnext/changing-the-properties-of-a-field-based-on-role",
+    "priority": false
+  },
+  {
+    "slug": "chart-of-accounts",
+    "url": "https://docs.frappe.io/erpnext/chart-of-accounts",
+    "priority": true
+  },
+  {
+    "slug": "chart-of-accounts-importer",
+    "url": "https://docs.frappe.io/erpnext/chart-of-accounts-importer",
+    "priority": true
+  },
+  {
+    "slug": "check-link-between-documents",
+    "url": "https://docs.frappe.io/erpnext/check-link-between-documents",
+    "priority": false
+  },
+  {
+    "slug": "cheque-print-template",
+    "url": "https://docs.frappe.io/erpnext/cheque-print-template",
+    "priority": false
+  },
+  {
+    "slug": "client-scripts",
+    "url": "https://docs.frappe.io/erpnext/client-scripts",
+    "priority": false
+  },
+  {
+    "slug": "close-sales-order",
+    "url": "https://docs.frappe.io/erpnext/close-sales-order",
+    "priority": true
+  },
+  {
+    "slug": "closing-accounting-books-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/closing-accounting-books-in-erpnext",
+    "priority": true
+  },
+  {
+    "slug": "closing-stock-balance",
+    "url": "https://docs.frappe.io/erpnext/closing-stock-balance",
+    "priority": true
+  },
+  {
+    "slug": "common-party-accounting",
+    "url": "https://docs.frappe.io/erpnext/common-party-accounting",
+    "priority": true
+  },
+  {
+    "slug": "common-receivable-account",
+    "url": "https://docs.frappe.io/erpnext/common-receivable-account",
+    "priority": false
+  },
+  {
+    "slug": "company-accounting-defaults",
+    "url": "https://docs.frappe.io/erpnext/company-accounting-defaults",
+    "priority": true
+  },
+  {
+    "slug": "company-restrictions-for-item-customer-and-supplier",
+    "url": "https://docs.frappe.io/erpnext/company-restrictions-for-item-customer-and-supplier",
+    "priority": true
+  },
+  {
+    "slug": "company-setup",
+    "url": "https://docs.frappe.io/erpnext/company-setup",
+    "priority": false
+  },
+  {
+    "slug": "company-wise-naming-series",
+    "url": "https://docs.frappe.io/erpnext/company-wise-naming-series",
+    "priority": false
+  },
+  {
+    "slug": "concepts-and-terms",
+    "url": "https://docs.frappe.io/erpnext/concepts-and-terms",
+    "priority": false
+  },
+  {
+    "slug": "configuring-a-reply-to-email-address-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/configuring-a-reply-to-email-address-in-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "consolidated-financial-statements",
+    "url": "https://docs.frappe.io/erpnext/consolidated-financial-statements",
+    "priority": false
+  },
+  {
+    "slug": "consumed-materials-in-production",
+    "url": "https://docs.frappe.io/erpnext/consumed-materials-in-production",
+    "priority": false
+  },
+  {
+    "slug": "contact",
+    "url": "https://docs.frappe.io/erpnext/contact",
+    "priority": false
+  },
+  {
+    "slug": "contract",
+    "url": "https://docs.frappe.io/erpnext/contract",
+    "priority": false
+  },
+  {
+    "slug": "copy-pasting-multiple-records-from-excel",
+    "url": "https://docs.frappe.io/erpnext/copy-pasting-multiple-records-from-excel",
+    "priority": false
+  },
+  {
+    "slug": "correct-a-submitted-accounting-entry",
+    "url": "https://docs.frappe.io/erpnext/correct-a-submitted-accounting-entry",
+    "priority": true
+  },
+  {
+    "slug": "cost-center",
+    "url": "https://docs.frappe.io/erpnext/cost-center",
+    "priority": false
+  },
+  {
+    "slug": "cost-center-and-budgeting",
+    "url": "https://docs.frappe.io/erpnext/cost-center-and-budgeting",
+    "priority": false
+  },
+  {
+    "slug": "cost_center_allocation",
+    "url": "https://docs.frappe.io/erpnext/cost_center_allocation",
+    "priority": false
+  },
+  {
+    "slug": "country",
+    "url": "https://docs.frappe.io/erpnext/country",
+    "priority": false
+  },
+  {
+    "slug": "coupon-code",
+    "url": "https://docs.frappe.io/erpnext/coupon-code",
+    "priority": false
+  },
+  {
+    "slug": "creating-custom-link-field",
+    "url": "https://docs.frappe.io/erpnext/creating-custom-link-field",
+    "priority": false
+  },
+  {
+    "slug": "credit-limit",
+    "url": "https://docs.frappe.io/erpnext/credit-limit",
+    "priority": false
+  },
+  {
+    "slug": "credit-note",
+    "url": "https://docs.frappe.io/erpnext/credit-note",
+    "priority": false
+  },
+  {
+    "slug": "crm_reports",
+    "url": "https://docs.frappe.io/erpnext/crm_reports",
+    "priority": false
+  },
+  {
+    "slug": "crm_settings",
+    "url": "https://docs.frappe.io/erpnext/crm_settings",
+    "priority": false
+  },
+  {
+    "slug": "currency",
+    "url": "https://docs.frappe.io/erpnext/currency",
+    "priority": false
+  },
+  {
+    "slug": "currency-exchange",
+    "url": "https://docs.frappe.io/erpnext/currency-exchange",
+    "priority": false
+  },
+  {
+    "slug": "currency-exchange-settings",
+    "url": "https://docs.frappe.io/erpnext/currency-exchange-settings",
+    "priority": false
+  },
+  {
+    "slug": "custom-field",
+    "url": "https://docs.frappe.io/erpnext/custom-field",
+    "priority": false
+  },
+  {
+    "slug": "custom-translations",
+    "url": "https://docs.frappe.io/erpnext/custom-translations",
+    "priority": false
+  },
+  {
+    "slug": "customer",
+    "url": "https://docs.frappe.io/erpnext/customer",
+    "priority": true
+  },
+  {
+    "slug": "customer-contact-and-address-relationship",
+    "url": "https://docs.frappe.io/erpnext/customer-contact-and-address-relationship",
+    "priority": true
+  },
+  {
+    "slug": "customer-group",
+    "url": "https://docs.frappe.io/erpnext/customer-group",
+    "priority": true
+  },
+  {
+    "slug": "customer-portal",
+    "url": "https://docs.frappe.io/erpnext/customer-portal",
+    "priority": true
+  },
+  {
+    "slug": "customer-provided-items",
+    "url": "https://docs.frappe.io/erpnext/customer-provided-items",
+    "priority": true
+  },
+  {
+    "slug": "customise-cash-flow-report",
+    "url": "https://docs.frappe.io/erpnext/customise-cash-flow-report",
+    "priority": false
+  },
+  {
+    "slug": "customise-your-items-tables-within-your-print-format-builder",
+    "url": "https://docs.frappe.io/erpnext/customise-your-items-tables-within-your-print-format-builder",
+    "priority": true
+  },
+  {
+    "slug": "customize-form",
+    "url": "https://docs.frappe.io/erpnext/customize-form",
+    "priority": false
+  },
+  {
+    "slug": "customizing-data-visibility-in-child-table",
+    "url": "https://docs.frappe.io/erpnext/customizing-data-visibility-in-child-table",
+    "priority": false
+  },
+  {
+    "slug": "customizing-module-visibility",
+    "url": "https://docs.frappe.io/erpnext/customizing-module-visibility",
+    "priority": false
+  },
+  {
+    "slug": "customizing-sorting-order-in-the-list-view",
+    "url": "https://docs.frappe.io/erpnext/customizing-sorting-order-in-the-list-view",
+    "priority": false
+  },
+  {
+    "slug": "daily-depreciation",
+    "url": "https://docs.frappe.io/erpnext/daily-depreciation",
+    "priority": false
+  },
+  {
+    "slug": "data-export",
+    "url": "https://docs.frappe.io/erpnext/data-export",
+    "priority": false
+  },
+  {
+    "slug": "data-import",
+    "url": "https://docs.frappe.io/erpnext/data-import",
+    "priority": false
+  },
+  {
+    "slug": "datev-integration",
+    "url": "https://docs.frappe.io/erpnext/datev-integration",
+    "priority": false
+  },
+  {
+    "slug": "debit-note",
+    "url": "https://docs.frappe.io/erpnext/debit-note",
+    "priority": false
+  },
+  {
+    "slug": "debit-note-for-price-adjustment",
+    "url": "https://docs.frappe.io/erpnext/debit-note-for-price-adjustment",
+    "priority": false
+  },
+  {
+    "slug": "default-receivable-payable-account",
+    "url": "https://docs.frappe.io/erpnext/default-receivable-payable-account",
+    "priority": false
+  },
+  {
+    "slug": "deferred-accounting",
+    "url": "https://docs.frappe.io/erpnext/deferred-accounting",
+    "priority": true
+  },
+  {
+    "slug": "deferred-expense",
+    "url": "https://docs.frappe.io/erpnext/deferred-expense",
+    "priority": false
+  },
+  {
+    "slug": "deferred-revenue",
+    "url": "https://docs.frappe.io/erpnext/deferred-revenue",
+    "priority": false
+  },
+  {
+    "slug": "delete-entries-linked-with-gl-entries",
+    "url": "https://docs.frappe.io/erpnext/delete-entries-linked-with-gl-entries",
+    "priority": false
+  },
+  {
+    "slug": "delete-submitted-document",
+    "url": "https://docs.frappe.io/erpnext/delete-submitted-document",
+    "priority": false
+  },
+  {
+    "slug": "delete_company_transactions",
+    "url": "https://docs.frappe.io/erpnext/delete_company_transactions",
+    "priority": false
+  },
+  {
+    "slug": "deleting-all-transactions-for-the-company",
+    "url": "https://docs.frappe.io/erpnext/deleting-all-transactions-for-the-company",
+    "priority": false
+  },
+  {
+    "slug": "deleting-custom-reports",
+    "url": "https://docs.frappe.io/erpnext/deleting-custom-reports",
+    "priority": false
+  },
+  {
+    "slug": "delivery-note",
+    "url": "https://docs.frappe.io/erpnext/delivery-note",
+    "priority": true
+  },
+  {
+    "slug": "delivery-note-stock-error",
+    "url": "https://docs.frappe.io/erpnext/delivery-note-stock-error",
+    "priority": true
+  },
+  {
+    "slug": "delivery-trip",
+    "url": "https://docs.frappe.io/erpnext/delivery-trip",
+    "priority": true
+  },
+  {
+    "slug": "demand-driven-forecasting",
+    "url": "https://docs.frappe.io/erpnext/demand-driven-forecasting",
+    "priority": false
+  },
+  {
+    "slug": "depreciation-methods",
+    "url": "https://docs.frappe.io/erpnext/depreciation-methods",
+    "priority": false
+  },
+  {
+    "slug": "difference-between-system-user-and-website-user",
+    "url": "https://docs.frappe.io/erpnext/difference-between-system-user-and-website-user",
+    "priority": false
+  },
+  {
+    "slug": "difference-entry-button",
+    "url": "https://docs.frappe.io/erpnext/difference-entry-button",
+    "priority": false
+  },
+  {
+    "slug": "difference-in-total-and-valuation-in-tax-and-charges",
+    "url": "https://docs.frappe.io/erpnext/difference-in-total-and-valuation-in-tax-and-charges",
+    "priority": true
+  },
+  {
+    "slug": "difference_between_lead_contact_and_customer",
+    "url": "https://docs.frappe.io/erpnext/difference_between_lead_contact_and_customer",
+    "priority": true
+  },
+  {
+    "slug": "disable-rounded-total",
+    "url": "https://docs.frappe.io/erpnext/disable-rounded-total",
+    "priority": false
+  },
+  {
+    "slug": "disable-signup",
+    "url": "https://docs.frappe.io/erpnext/disable-signup",
+    "priority": false
+  },
+  {
+    "slug": "disassembly-order",
+    "url": "https://docs.frappe.io/erpnext/disassembly-order",
+    "priority": false
+  },
+  {
+    "slug": "discount_accounting",
+    "url": "https://docs.frappe.io/erpnext/discount_accounting",
+    "priority": true
+  },
+  {
+    "slug": "distributed-cost-center",
+    "url": "https://docs.frappe.io/erpnext/distributed-cost-center",
+    "priority": false
+  },
+  {
+    "slug": "do-i-need-an-erp",
+    "url": "https://docs.frappe.io/erpnext/do-i-need-an-erp",
+    "priority": false
+  },
+  {
+    "slug": "doctype",
+    "url": "https://docs.frappe.io/erpnext/doctype",
+    "priority": false
+  },
+  {
+    "slug": "document-follow",
+    "url": "https://docs.frappe.io/erpnext/document-follow",
+    "priority": false
+  },
+  {
+    "slug": "document-naming",
+    "url": "https://docs.frappe.io/erpnext/document-naming",
+    "priority": false
+  },
+  {
+    "slug": "document-naming-for-avoiding-tab-series-issues",
+    "url": "https://docs.frappe.io/erpnext/document-naming-for-avoiding-tab-series-issues",
+    "priority": false
+  },
+  {
+    "slug": "document-naming-settings",
+    "url": "https://docs.frappe.io/erpnext/document-naming-settings",
+    "priority": false
+  },
+  {
+    "slug": "document-title",
+    "url": "https://docs.frappe.io/erpnext/document-title",
+    "priority": false
+  },
+  {
+    "slug": "document-title-with-multiple-fields",
+    "url": "https://docs.frappe.io/erpnext/document-title-with-multiple-fields",
+    "priority": false
+  },
+  {
+    "slug": "document-versioning",
+    "url": "https://docs.frappe.io/erpnext/document-versioning",
+    "priority": false
+  },
+  {
+    "slug": "domain-settings",
+    "url": "https://docs.frappe.io/erpnext/domain-settings",
+    "priority": false
+  },
+  {
+    "slug": "download-backup",
+    "url": "https://docs.frappe.io/erpnext/download-backup",
+    "priority": false
+  },
+  {
+    "slug": "downtime-analysis",
+    "url": "https://docs.frappe.io/erpnext/downtime-analysis",
+    "priority": false
+  },
+  {
+    "slug": "downtime-entry",
+    "url": "https://docs.frappe.io/erpnext/downtime-entry",
+    "priority": false
+  },
+  {
+    "slug": "drop-shipping-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/drop-shipping-in-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "dropbox-backup",
+    "url": "https://docs.frappe.io/erpnext/dropbox-backup",
+    "priority": false
+  },
+  {
+    "slug": "due-date-and-payment-terms-problems",
+    "url": "https://docs.frappe.io/erpnext/due-date-and-payment-terms-problems",
+    "priority": false
+  },
+  {
+    "slug": "dunning",
+    "url": "https://docs.frappe.io/erpnext/dunning",
+    "priority": false
+  },
+  {
+    "slug": "duplicate-record",
+    "url": "https://docs.frappe.io/erpnext/duplicate-record",
+    "priority": false
+  },
+  {
+    "slug": "dynamic-link-fields",
+    "url": "https://docs.frappe.io/erpnext/dynamic-link-fields",
+    "priority": false
+  },
+  {
+    "slug": "e-commerce-integrations-for-erpnext",
+    "url": "https://docs.frappe.io/erpnext/e-commerce-integrations-for-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "e-invoice-failed-or-cancel",
+    "url": "https://docs.frappe.io/erpnext/e-invoice-failed-or-cancel",
+    "priority": true
+  },
+  {
+    "slug": "e-waybill-problems",
+    "url": "https://docs.frappe.io/erpnext/e-waybill-problems",
+    "priority": false
+  },
+  {
+    "slug": "e_commerce_search",
+    "url": "https://docs.frappe.io/erpnext/e_commerce_search",
+    "priority": false
+  },
+  {
+    "slug": "e_commerce_settings",
+    "url": "https://docs.frappe.io/erpnext/e_commerce_settings",
+    "priority": false
+  },
+  {
+    "slug": "easy-steps-to-setup-workflow",
+    "url": "https://docs.frappe.io/erpnext/easy-steps-to-setup-workflow",
+    "priority": false
+  },
+  {
+    "slug": "edit-submitted-document",
+    "url": "https://docs.frappe.io/erpnext/edit-submitted-document",
+    "priority": false
+  },
+  {
+    "slug": "editing-a-field-after-submission",
+    "url": "https://docs.frappe.io/erpnext/editing-a-field-after-submission",
+    "priority": false
+  },
+  {
+    "slug": "education-module-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/education-module-in-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "electronic-signature",
+    "url": "https://docs.frappe.io/erpnext/electronic-signature",
+    "priority": false
+  },
+  {
+    "slug": "email",
+    "url": "https://docs.frappe.io/erpnext/email",
+    "priority": false
+  },
+  {
+    "slug": "email-account",
+    "url": "https://docs.frappe.io/erpnext/email-account",
+    "priority": false
+  },
+  {
+    "slug": "email-campaign",
+    "url": "https://docs.frappe.io/erpnext/email-campaign",
+    "priority": false
+  },
+  {
+    "slug": "email-digest",
+    "url": "https://docs.frappe.io/erpnext/email-digest",
+    "priority": false
+  },
+  {
+    "slug": "email-domain",
+    "url": "https://docs.frappe.io/erpnext/email-domain",
+    "priority": false
+  },
+  {
+    "slug": "email-dropbox",
+    "url": "https://docs.frappe.io/erpnext/email-dropbox",
+    "priority": false
+  },
+  {
+    "slug": "email-error",
+    "url": "https://docs.frappe.io/erpnext/email-error",
+    "priority": false
+  },
+  {
+    "slug": "email-inbox",
+    "url": "https://docs.frappe.io/erpnext/email-inbox",
+    "priority": false
+  },
+  {
+    "slug": "email-template",
+    "url": "https://docs.frappe.io/erpnext/email-template",
+    "priority": false
+  },
+  {
+    "slug": "email_group",
+    "url": "https://docs.frappe.io/erpnext/email_group",
+    "priority": false
+  },
+  {
+    "slug": "energy-point-system",
+    "url": "https://docs.frappe.io/erpnext/energy-point-system",
+    "priority": false
+  },
+  {
+    "slug": "erpnext-chat-with-raven",
+    "url": "https://docs.frappe.io/erpnext/erpnext-chat-with-raven",
+    "priority": false
+  },
+  {
+    "slug": "erpnext-dashboards",
+    "url": "https://docs.frappe.io/erpnext/erpnext-dashboards",
+    "priority": false
+  },
+  {
+    "slug": "erpnext-for-services-organization",
+    "url": "https://docs.frappe.io/erpnext/erpnext-for-services-organization",
+    "priority": false
+  },
+  {
+    "slug": "erpnext_integration",
+    "url": "https://docs.frappe.io/erpnext/erpnext_integration",
+    "priority": false
+  },
+  {
+    "slug": "erpnext_shipping",
+    "url": "https://docs.frappe.io/erpnext/erpnext_shipping",
+    "priority": false
+  },
+  {
+    "slug": "exchange-rate-field-frozen",
+    "url": "https://docs.frappe.io/erpnext/exchange-rate-field-frozen",
+    "priority": false
+  },
+  {
+    "slug": "exchange-rate-revaluation",
+    "url": "https://docs.frappe.io/erpnext/exchange-rate-revaluation",
+    "priority": true
+  },
+  {
+    "slug": "exotel_integration",
+    "url": "https://docs.frappe.io/erpnext/exotel_integration",
+    "priority": false
+  },
+  {
+    "slug": "expense_report",
+    "url": "https://docs.frappe.io/erpnext/expense_report",
+    "priority": false
+  },
+  {
+    "slug": "export-data-for-specific-year-or-filter",
+    "url": "https://docs.frappe.io/erpnext/export-data-for-specific-year-or-filter",
+    "priority": false
+  },
+  {
+    "slug": "fairlogin-integration",
+    "url": "https://docs.frappe.io/erpnext/fairlogin-integration",
+    "priority": false
+  },
+  {
+    "slug": "faqs",
+    "url": "https://docs.frappe.io/erpnext/faqs",
+    "priority": false
+  },
+  {
+    "slug": "feedback-request-using-web-form",
+    "url": "https://docs.frappe.io/erpnext/feedback-request-using-web-form",
+    "priority": false
+  },
+  {
+    "slug": "fetch-child-table-values-using-jinja-tags",
+    "url": "https://docs.frappe.io/erpnext/fetch-child-table-values-using-jinja-tags",
+    "priority": false
+  },
+  {
+    "slug": "fetch-the-entire-address-text-on-a-custom-field",
+    "url": "https://docs.frappe.io/erpnext/fetch-the-entire-address-text-on-a-custom-field",
+    "priority": false
+  },
+  {
+    "slug": "fetch-values-from-master",
+    "url": "https://docs.frappe.io/erpnext/fetch-values-from-master",
+    "priority": false
+  },
+  {
+    "slug": "fetching-data-from-a-document",
+    "url": "https://docs.frappe.io/erpnext/fetching-data-from-a-document",
+    "priority": false
+  },
+  {
+    "slug": "fichier_des_ecritures_comptables",
+    "url": "https://docs.frappe.io/erpnext/fichier_des_ecritures_comptables",
+    "priority": false
+  },
+  {
+    "slug": "field-types",
+    "url": "https://docs.frappe.io/erpnext/field-types",
+    "priority": false
+  },
+  {
+    "slug": "fifo-and-moving-average",
+    "url": "https://docs.frappe.io/erpnext/fifo-and-moving-average",
+    "priority": true
+  },
+  {
+    "slug": "filter-options-in-select-field",
+    "url": "https://docs.frappe.io/erpnext/filter-options-in-select-field",
+    "priority": false
+  },
+  {
+    "slug": "finance-book",
+    "url": "https://docs.frappe.io/erpnext/finance-book",
+    "priority": false
+  },
+  {
+    "slug": "financial-report-template",
+    "url": "https://docs.frappe.io/erpnext/financial-report-template",
+    "priority": false
+  },
+  {
+    "slug": "financial-statements-show-unexpected-numbers",
+    "url": "https://docs.frappe.io/erpnext/financial-statements-show-unexpected-numbers",
+    "priority": false
+  },
+  {
+    "slug": "fiscal-year",
+    "url": "https://docs.frappe.io/erpnext/fiscal-year",
+    "priority": false
+  },
+  {
+    "slug": "fiscal-year-and-opening-balance-problems",
+    "url": "https://docs.frappe.io/erpnext/fiscal-year-and-opening-balance-problems",
+    "priority": false
+  },
+  {
+    "slug": "fiscal-year-error",
+    "url": "https://docs.frappe.io/erpnext/fiscal-year-error",
+    "priority": false
+  },
+  {
+    "slug": "france",
+    "url": "https://docs.frappe.io/erpnext/france",
+    "priority": false
+  },
+  {
+    "slug": "frappe-healthcare",
+    "url": "https://docs.frappe.io/erpnext/frappe-healthcare",
+    "priority": false
+  },
+  {
+    "slug": "freeze-account",
+    "url": "https://docs.frappe.io/erpnext/freeze-account",
+    "priority": false
+  },
+  {
+    "slug": "freeze-accounting-entries",
+    "url": "https://docs.frappe.io/erpnext/freeze-accounting-entries",
+    "priority": true
+  },
+  {
+    "slug": "general-ledger",
+    "url": "https://docs.frappe.io/erpnext/general-ledger",
+    "priority": true
+  },
+  {
+    "slug": "generate-item-code-based-on-custom-logic",
+    "url": "https://docs.frappe.io/erpnext/generate-item-code-based-on-custom-logic",
+    "priority": true
+  },
+  {
+    "slug": "geolocation-field",
+    "url": "https://docs.frappe.io/erpnext/geolocation-field",
+    "priority": false
+  },
+  {
+    "slug": "getting-started-with-erpnext",
+    "url": "https://docs.frappe.io/erpnext/getting-started-with-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "global-defaults",
+    "url": "https://docs.frappe.io/erpnext/global-defaults",
+    "priority": false
+  },
+  {
+    "slug": "gocardless-integration",
+    "url": "https://docs.frappe.io/erpnext/gocardless-integration",
+    "priority": false
+  },
+  {
+    "slug": "google_calendar",
+    "url": "https://docs.frappe.io/erpnext/google_calendar",
+    "priority": false
+  },
+  {
+    "slug": "google_contacts",
+    "url": "https://docs.frappe.io/erpnext/google_contacts",
+    "priority": false
+  },
+  {
+    "slug": "google_drive",
+    "url": "https://docs.frappe.io/erpnext/google_drive",
+    "priority": false
+  },
+  {
+    "slug": "google_maps",
+    "url": "https://docs.frappe.io/erpnext/google_maps",
+    "priority": false
+  },
+  {
+    "slug": "google_settings",
+    "url": "https://docs.frappe.io/erpnext/google_settings",
+    "priority": false
+  },
+  {
+    "slug": "gross-profit-report-differences",
+    "url": "https://docs.frappe.io/erpnext/gross-profit-report-differences",
+    "priority": false
+  },
+  {
+    "slug": "gst-api-credentials-and-credits",
+    "url": "https://docs.frappe.io/erpnext/gst-api-credentials-and-credits",
+    "priority": true
+  },
+  {
+    "slug": "gst-exports-sez-and-imports",
+    "url": "https://docs.frappe.io/erpnext/gst-exports-sez-and-imports",
+    "priority": true
+  },
+  {
+    "slug": "gst-for-multiple-branches",
+    "url": "https://docs.frappe.io/erpnext/gst-for-multiple-branches",
+    "priority": true
+  },
+  {
+    "slug": "gst-wrong-on-invoice",
+    "url": "https://docs.frappe.io/erpnext/gst-wrong-on-invoice",
+    "priority": true
+  },
+  {
+    "slug": "gstr-1-missing-or-mismatch",
+    "url": "https://docs.frappe.io/erpnext/gstr-1-missing-or-mismatch",
+    "priority": true
+  },
+  {
+    "slug": "handing-deductions-in-payment-entry",
+    "url": "https://docs.frappe.io/erpnext/handing-deductions-in-payment-entry",
+    "priority": false
+  },
+  {
+    "slug": "handling-excess-customer-payments",
+    "url": "https://docs.frappe.io/erpnext/handling-excess-customer-payments",
+    "priority": true
+  },
+  {
+    "slug": "help-articles",
+    "url": "https://docs.frappe.io/erpnext/help-articles",
+    "priority": false
+  },
+  {
+    "slug": "homepage",
+    "url": "https://docs.frappe.io/erpnext/homepage",
+    "priority": false
+  },
+  {
+    "slug": "how-is-valuation-rate-of-serialised-item-calculated-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/how-is-valuation-rate-of-serialised-item-calculated-in-erpnext",
+    "priority": true
+  },
+  {
+    "slug": "how-to-add-columns-in-the-standard-report-and-export",
+    "url": "https://docs.frappe.io/erpnext/how-to-add-columns-in-the-standard-report-and-export",
+    "priority": false
+  },
+  {
+    "slug": "how-to-add-master-link-and-fetch-data-from-the-same",
+    "url": "https://docs.frappe.io/erpnext/how-to-add-master-link-and-fetch-data-from-the-same",
+    "priority": false
+  },
+  {
+    "slug": "how-to-apply-tax-on-tax",
+    "url": "https://docs.frappe.io/erpnext/how-to-apply-tax-on-tax",
+    "priority": true
+  },
+  {
+    "slug": "how-to-create-a-supplier-quotation-through-the-supplier-portal",
+    "url": "https://docs.frappe.io/erpnext/how-to-create-a-supplier-quotation-through-the-supplier-portal",
+    "priority": true
+  },
+  {
+    "slug": "how-to-create-and-print-proforma-invoice-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/how-to-create-and-print-proforma-invoice-in-erpnext",
+    "priority": true
+  },
+  {
+    "slug": "how-to-disable-users-in-the-erpnext-system",
+    "url": "https://docs.frappe.io/erpnext/how-to-disable-users-in-the-erpnext-system",
+    "priority": false
+  },
+  {
+    "slug": "how-to-fix-the-reached-maximum-user-limit-for-your-subscription-issue",
+    "url": "https://docs.frappe.io/erpnext/how-to-fix-the-reached-maximum-user-limit-for-your-subscription-issue",
+    "priority": false
+  },
+  {
+    "slug": "how-to-give-commission-to-sales-partner",
+    "url": "https://docs.frappe.io/erpnext/how-to-give-commission-to-sales-partner",
+    "priority": true
+  },
+  {
+    "slug": "how-to-grant-permissions-for-reports",
+    "url": "https://docs.frappe.io/erpnext/how-to-grant-permissions-for-reports",
+    "priority": false
+  },
+  {
+    "slug": "how-to-handle-a-scenario-of-1-raw-material-multiple-finish-goods",
+    "url": "https://docs.frappe.io/erpnext/how-to-handle-a-scenario-of-1-raw-material-multiple-finish-goods",
+    "priority": false
+  },
+  {
+    "slug": "how-to-manage-material-transfers-and-goods-in-transit",
+    "url": "https://docs.frappe.io/erpnext/how-to-manage-material-transfers-and-goods-in-transit",
+    "priority": false
+  },
+  {
+    "slug": "how-to-restore-deleted-documents-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/how-to-restore-deleted-documents-in-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "how-to-setup-seo-for-your-website-on-erpnext",
+    "url": "https://docs.frappe.io/erpnext/how-to-setup-seo-for-your-website-on-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "how-to-short-close-multiple-orders-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/how-to-short-close-multiple-orders-in-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "how-to-sync-doc-types-with-calendar",
+    "url": "https://docs.frappe.io/erpnext/how-to-sync-doc-types-with-calendar",
+    "priority": false
+  },
+  {
+    "slug": "how-transactions-affect-the-ledger",
+    "url": "https://docs.frappe.io/erpnext/how-transactions-affect-the-ledger",
+    "priority": true
+  },
+  {
+    "slug": "immutable-ledger-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/immutable-ledger-in-erpnext",
+    "priority": true
+  },
+  {
+    "slug": "import-accounting-masters",
+    "url": "https://docs.frappe.io/erpnext/import-accounting-masters",
+    "priority": true
+  },
+  {
+    "slug": "import-advances-unallocated-payments-bank-stock-and-asset-balances",
+    "url": "https://docs.frappe.io/erpnext/import-advances-unallocated-payments-bank-stock-and-asset-balances",
+    "priority": true
+  },
+  {
+    "slug": "import-e-invoice",
+    "url": "https://docs.frappe.io/erpnext/import-e-invoice",
+    "priority": true
+  },
+  {
+    "slug": "include-document-link-in-notification-email",
+    "url": "https://docs.frappe.io/erpnext/include-document-link-in-notification-email",
+    "priority": false
+  },
+  {
+    "slug": "incoterm-and-named-place",
+    "url": "https://docs.frappe.io/erpnext/incoterm-and-named-place",
+    "priority": false
+  },
+  {
+    "slug": "india-compliance-app",
+    "url": "https://docs.frappe.io/erpnext/india-compliance-app",
+    "priority": false
+  },
+  {
+    "slug": "india-gst-help",
+    "url": "https://docs.frappe.io/erpnext/india-gst-help",
+    "priority": true
+  },
+  {
+    "slug": "input-tax-credit-and-gstr-3b",
+    "url": "https://docs.frappe.io/erpnext/input-tax-credit-and-gstr-3b",
+    "priority": true
+  },
+  {
+    "slug": "installation-note",
+    "url": "https://docs.frappe.io/erpnext/installation-note",
+    "priority": false
+  },
+  {
+    "slug": "installing_redisearch_to_enable_super_fast_e_commerce_search",
+    "url": "https://docs.frappe.io/erpnext/installing_redisearch_to_enable_super_fast_e_commerce_search",
+    "priority": false
+  },
+  {
+    "slug": "integrating-erpnext-with-other-applications",
+    "url": "https://docs.frappe.io/erpnext/integrating-erpnext-with-other-applications",
+    "priority": false
+  },
+  {
+    "slug": "inter-company-invoices",
+    "url": "https://docs.frappe.io/erpnext/inter-company-invoices",
+    "priority": true
+  },
+  {
+    "slug": "inter-company-journal-entry",
+    "url": "https://docs.frappe.io/erpnext/inter-company-journal-entry",
+    "priority": true
+  },
+  {
+    "slug": "introduction",
+    "url": "https://docs.frappe.io/erpnext/introduction",
+    "priority": false
+  },
+  {
+    "slug": "inventory-account",
+    "url": "https://docs.frappe.io/erpnext/inventory-account",
+    "priority": false
+  },
+  {
+    "slug": "inventory_dimension",
+    "url": "https://docs.frappe.io/erpnext/inventory_dimension",
+    "priority": false
+  },
+  {
+    "slug": "invoice-from-sales-order-or-delivery-note",
+    "url": "https://docs.frappe.io/erpnext/invoice-from-sales-order-or-delivery-note",
+    "priority": true
+  },
+  {
+    "slug": "invoice-rounding-issue",
+    "url": "https://docs.frappe.io/erpnext/invoice-rounding-issue",
+    "priority": true
+  },
+  {
+    "slug": "invoice_discounting",
+    "url": "https://docs.frappe.io/erpnext/invoice_discounting",
+    "priority": true
+  },
+  {
+    "slug": "issue",
+    "url": "https://docs.frappe.io/erpnext/issue",
+    "priority": false
+  },
+  {
+    "slug": "issue-type-and-priority",
+    "url": "https://docs.frappe.io/erpnext/issue-type-and-priority",
+    "priority": false
+  },
+  {
+    "slug": "italy",
+    "url": "https://docs.frappe.io/erpnext/italy",
+    "priority": false
+  },
+  {
+    "slug": "item",
+    "url": "https://docs.frappe.io/erpnext/item",
+    "priority": true
+  },
+  {
+    "slug": "item-alternative",
+    "url": "https://docs.frappe.io/erpnext/item-alternative",
+    "priority": true
+  },
+  {
+    "slug": "item-attribute",
+    "url": "https://docs.frappe.io/erpnext/item-attribute",
+    "priority": true
+  },
+  {
+    "slug": "item-codification",
+    "url": "https://docs.frappe.io/erpnext/item-codification",
+    "priority": true
+  },
+  {
+    "slug": "item-creation-not-required-in-purchase-invoice",
+    "url": "https://docs.frappe.io/erpnext/item-creation-not-required-in-purchase-invoice",
+    "priority": true
+  },
+  {
+    "slug": "item-dashboard-stock-does-not-match-the-stock-ledger-or-stock-balance-report",
+    "url": "https://docs.frappe.io/erpnext/item-dashboard-stock-does-not-match-the-stock-ledger-or-stock-balance-report",
+    "priority": true
+  },
+  {
+    "slug": "item-group",
+    "url": "https://docs.frappe.io/erpnext/item-group",
+    "priority": true
+  },
+  {
+    "slug": "item-price",
+    "url": "https://docs.frappe.io/erpnext/item-price",
+    "priority": true
+  },
+  {
+    "slug": "item-tax-template",
+    "url": "https://docs.frappe.io/erpnext/item-tax-template",
+    "priority": true
+  },
+  {
+    "slug": "item-valuation-transactions",
+    "url": "https://docs.frappe.io/erpnext/item-valuation-transactions",
+    "priority": true
+  },
+  {
+    "slug": "item-variants",
+    "url": "https://docs.frappe.io/erpnext/item-variants",
+    "priority": true
+  },
+  {
+    "slug": "item-where-used-report",
+    "url": "https://docs.frappe.io/erpnext/item-where-used-report",
+    "priority": true
+  },
+  {
+    "slug": "item_group_wise_product_listing",
+    "url": "https://docs.frappe.io/erpnext/item_group_wise_product_listing",
+    "priority": true
+  },
+  {
+    "slug": "job-card",
+    "url": "https://docs.frappe.io/erpnext/job-card",
+    "priority": true
+  },
+  {
+    "slug": "job-card-summary",
+    "url": "https://docs.frappe.io/erpnext/job-card-summary",
+    "priority": true
+  },
+  {
+    "slug": "journal-entry",
+    "url": "https://docs.frappe.io/erpnext/journal-entry",
+    "priority": true
+  },
+  {
+    "slug": "journal-entry-party-rows-and-large-entries",
+    "url": "https://docs.frappe.io/erpnext/journal-entry-party-rows-and-large-entries",
+    "priority": true
+  },
+  {
+    "slug": "journal-entry-template",
+    "url": "https://docs.frappe.io/erpnext/journal-entry-template",
+    "priority": true
+  },
+  {
+    "slug": "landed-cost-voucher",
+    "url": "https://docs.frappe.io/erpnext/landed-cost-voucher",
+    "priority": false
+  },
+  {
+    "slug": "ldap-integration",
+    "url": "https://docs.frappe.io/erpnext/ldap-integration",
+    "priority": false
+  },
+  {
+    "slug": "lead",
+    "url": "https://docs.frappe.io/erpnext/lead",
+    "priority": false
+  },
+  {
+    "slug": "lead_source",
+    "url": "https://docs.frappe.io/erpnext/lead_source",
+    "priority": false
+  },
+  {
+    "slug": "legacy-controller-for-period-closing-voucher",
+    "url": "https://docs.frappe.io/erpnext/legacy-controller-for-period-closing-voucher",
+    "priority": false
+  },
+  {
+    "slug": "letter-head",
+    "url": "https://docs.frappe.io/erpnext/letter-head",
+    "priority": false
+  },
+  {
+    "slug": "letter-head-in-the-report",
+    "url": "https://docs.frappe.io/erpnext/letter-head-in-the-report",
+    "priority": false
+  },
+  {
+    "slug": "linkedin-settings",
+    "url": "https://docs.frappe.io/erpnext/linkedin-settings",
+    "priority": false
+  },
+  {
+    "slug": "linking-emails-to-document",
+    "url": "https://docs.frappe.io/erpnext/linking-emails-to-document",
+    "priority": false
+  },
+  {
+    "slug": "local_overrides",
+    "url": "https://docs.frappe.io/erpnext/local_overrides",
+    "priority": false
+  },
+  {
+    "slug": "lower-deduction-certificate",
+    "url": "https://docs.frappe.io/erpnext/lower-deduction-certificate",
+    "priority": false
+  },
+  {
+    "slug": "loyalty-points-redemption-in-pos",
+    "url": "https://docs.frappe.io/erpnext/loyalty-points-redemption-in-pos",
+    "priority": false
+  },
+  {
+    "slug": "loyalty-program",
+    "url": "https://docs.frappe.io/erpnext/loyalty-program",
+    "priority": false
+  },
+  {
+    "slug": "maintain-stock-field-frozen-in-item-master",
+    "url": "https://docs.frappe.io/erpnext/maintain-stock-field-frozen-in-item-master",
+    "priority": true
+  },
+  {
+    "slug": "maintaining-suppliers-part-no-in-item",
+    "url": "https://docs.frappe.io/erpnext/maintaining-suppliers-part-no-in-item",
+    "priority": true
+  },
+  {
+    "slug": "maintenance",
+    "url": "https://docs.frappe.io/erpnext/maintenance",
+    "priority": false
+  },
+  {
+    "slug": "maintenance-sales-orders",
+    "url": "https://docs.frappe.io/erpnext/maintenance-sales-orders",
+    "priority": true
+  },
+  {
+    "slug": "maintenance-schedule",
+    "url": "https://docs.frappe.io/erpnext/maintenance-schedule",
+    "priority": false
+  },
+  {
+    "slug": "maintenance-visit",
+    "url": "https://docs.frappe.io/erpnext/maintenance-visit",
+    "priority": false
+  },
+  {
+    "slug": "make-a-colorful-gantt-chart",
+    "url": "https://docs.frappe.io/erpnext/make-a-colorful-gantt-chart",
+    "priority": false
+  },
+  {
+    "slug": "making-custom-reports",
+    "url": "https://docs.frappe.io/erpnext/making-custom-reports",
+    "priority": false
+  },
+  {
+    "slug": "making-fields-visible-in-print-format",
+    "url": "https://docs.frappe.io/erpnext/making-fields-visible-in-print-format",
+    "priority": false
+  },
+  {
+    "slug": "manage-foreign-exchange-difference",
+    "url": "https://docs.frappe.io/erpnext/manage-foreign-exchange-difference",
+    "priority": false
+  },
+  {
+    "slug": "managing-batch-wise-inventory",
+    "url": "https://docs.frappe.io/erpnext/managing-batch-wise-inventory",
+    "priority": true
+  },
+  {
+    "slug": "managing-fractions-in-uom",
+    "url": "https://docs.frappe.io/erpnext/managing-fractions-in-uom",
+    "priority": false
+  },
+  {
+    "slug": "managing-invoice-discount-in-the-payment-entry",
+    "url": "https://docs.frappe.io/erpnext/managing-invoice-discount-in-the-payment-entry",
+    "priority": true
+  },
+  {
+    "slug": "managing-multi-level-bom",
+    "url": "https://docs.frappe.io/erpnext/managing-multi-level-bom",
+    "priority": true
+  },
+  {
+    "slug": "managing-transactions-in-multiple-currencies",
+    "url": "https://docs.frappe.io/erpnext/managing-transactions-in-multiple-currencies",
+    "priority": false
+  },
+  {
+    "slug": "managing-tree-structure-masters",
+    "url": "https://docs.frappe.io/erpnext/managing-tree-structure-masters",
+    "priority": false
+  },
+  {
+    "slug": "manufacturer",
+    "url": "https://docs.frappe.io/erpnext/manufacturer",
+    "priority": false
+  },
+  {
+    "slug": "manufacturing",
+    "url": "https://docs.frappe.io/erpnext/manufacturing",
+    "priority": true
+  },
+  {
+    "slug": "manufacturing-dashboard",
+    "url": "https://docs.frappe.io/erpnext/manufacturing-dashboard",
+    "priority": true
+  },
+  {
+    "slug": "manufacturing-reports",
+    "url": "https://docs.frappe.io/erpnext/manufacturing-reports",
+    "priority": true
+  },
+  {
+    "slug": "manufacturing-settings",
+    "url": "https://docs.frappe.io/erpnext/manufacturing-settings",
+    "priority": true
+  },
+  {
+    "slug": "manufacturing-without-creating-bom",
+    "url": "https://docs.frappe.io/erpnext/manufacturing-without-creating-bom",
+    "priority": true
+  },
+  {
+    "slug": "material-request",
+    "url": "https://docs.frappe.io/erpnext/material-request",
+    "priority": false
+  },
+  {
+    "slug": "material-requirements-planning-mrp",
+    "url": "https://docs.frappe.io/erpnext/material-requirements-planning-mrp",
+    "priority": false
+  },
+  {
+    "slug": "material-transfer-from-delivery-note",
+    "url": "https://docs.frappe.io/erpnext/material-transfer-from-delivery-note",
+    "priority": true
+  },
+  {
+    "slug": "material_consumption",
+    "url": "https://docs.frappe.io/erpnext/material_consumption",
+    "priority": false
+  },
+  {
+    "slug": "maximum-number-of-fields-in-a-form",
+    "url": "https://docs.frappe.io/erpnext/maximum-number-of-fields-in-a-form",
+    "priority": false
+  },
+  {
+    "slug": "merging-accounts",
+    "url": "https://docs.frappe.io/erpnext/merging-accounts",
+    "priority": true
+  },
+  {
+    "slug": "migrate-to-perpetual-inventory",
+    "url": "https://docs.frappe.io/erpnext/migrate-to-perpetual-inventory",
+    "priority": false
+  },
+  {
+    "slug": "milestone-tracker",
+    "url": "https://docs.frappe.io/erpnext/milestone-tracker",
+    "priority": false
+  },
+  {
+    "slug": "mode-of-payment",
+    "url": "https://docs.frappe.io/erpnext/mode-of-payment",
+    "priority": false
+  },
+  {
+    "slug": "module-settings",
+    "url": "https://docs.frappe.io/erpnext/module-settings",
+    "priority": false
+  },
+  {
+    "slug": "moving-asset-from-stock-item-to-fixed-asset-item",
+    "url": "https://docs.frappe.io/erpnext/moving-asset-from-stock-item-to-fixed-asset-item",
+    "priority": true
+  },
+  {
+    "slug": "mpesa-integration",
+    "url": "https://docs.frappe.io/erpnext/mpesa-integration",
+    "priority": false
+  },
+  {
+    "slug": "multi-currency-accounting",
+    "url": "https://docs.frappe.io/erpnext/multi-currency-accounting",
+    "priority": true
+  },
+  {
+    "slug": "multi-currency-problems",
+    "url": "https://docs.frappe.io/erpnext/multi-currency-problems",
+    "priority": false
+  },
+  {
+    "slug": "multi-currency-setup",
+    "url": "https://docs.frappe.io/erpnext/multi-currency-setup",
+    "priority": false
+  },
+  {
+    "slug": "naming-series",
+    "url": "https://docs.frappe.io/erpnext/naming-series",
+    "priority": false
+  },
+  {
+    "slug": "naming-series-as-per-gst-rules",
+    "url": "https://docs.frappe.io/erpnext/naming-series-as-per-gst-rules",
+    "priority": true
+  },
+  {
+    "slug": "naming-series-current-value",
+    "url": "https://docs.frappe.io/erpnext/naming-series-current-value",
+    "priority": false
+  },
+  {
+    "slug": "newsletter",
+    "url": "https://docs.frappe.io/erpnext/newsletter",
+    "priority": false
+  },
+  {
+    "slug": "non-conformance",
+    "url": "https://docs.frappe.io/erpnext/non-conformance",
+    "priority": false
+  },
+  {
+    "slug": "non-profit",
+    "url": "https://docs.frappe.io/erpnext/non-profit",
+    "priority": false
+  },
+  {
+    "slug": "not-able-to-select-has-serial-no-batch-option-in-item-list",
+    "url": "https://docs.frappe.io/erpnext/not-able-to-select-has-serial-no-batch-option-in-item-list",
+    "priority": true
+  },
+  {
+    "slug": "notifications",
+    "url": "https://docs.frappe.io/erpnext/notifications",
+    "priority": false
+  },
+  {
+    "slug": "open-source",
+    "url": "https://docs.frappe.io/erpnext/open-source",
+    "priority": false
+  },
+  {
+    "slug": "open-work-orders",
+    "url": "https://docs.frappe.io/erpnext/open-work-orders",
+    "priority": true
+  },
+  {
+    "slug": "opening-and-closing",
+    "url": "https://docs.frappe.io/erpnext/opening-and-closing",
+    "priority": false
+  },
+  {
+    "slug": "opening-balance",
+    "url": "https://docs.frappe.io/erpnext/opening-balance",
+    "priority": false
+  },
+  {
+    "slug": "opening-invoice-creation-tool",
+    "url": "https://docs.frappe.io/erpnext/opening-invoice-creation-tool",
+    "priority": true
+  },
+  {
+    "slug": "opening-stock",
+    "url": "https://docs.frappe.io/erpnext/opening-stock",
+    "priority": true
+  },
+  {
+    "slug": "opening-stock-balance-entry-for-serialized-and-batch-item",
+    "url": "https://docs.frappe.io/erpnext/opening-stock-balance-entry-for-serialized-and-batch-item",
+    "priority": true
+  },
+  {
+    "slug": "operation",
+    "url": "https://docs.frappe.io/erpnext/operation",
+    "priority": true
+  },
+  {
+    "slug": "opportunity",
+    "url": "https://docs.frappe.io/erpnext/opportunity",
+    "priority": false
+  },
+  {
+    "slug": "opportunity_type",
+    "url": "https://docs.frappe.io/erpnext/opportunity_type",
+    "priority": false
+  },
+  {
+    "slug": "packing-list",
+    "url": "https://docs.frappe.io/erpnext/packing-list",
+    "priority": false
+  },
+  {
+    "slug": "packing-slip",
+    "url": "https://docs.frappe.io/erpnext/packing-slip",
+    "priority": false
+  },
+  {
+    "slug": "partial-fulfilment-of-sales-order",
+    "url": "https://docs.frappe.io/erpnext/partial-fulfilment-of-sales-order",
+    "priority": true
+  },
+  {
+    "slug": "party-specific-item",
+    "url": "https://docs.frappe.io/erpnext/party-specific-item",
+    "priority": true
+  },
+  {
+    "slug": "payment-entry",
+    "url": "https://docs.frappe.io/erpnext/payment-entry",
+    "priority": false
+  },
+  {
+    "slug": "payment-entry-for-capital-account",
+    "url": "https://docs.frappe.io/erpnext/payment-entry-for-capital-account",
+    "priority": false
+  },
+  {
+    "slug": "payment-entry-outstanding-and-currency-problems",
+    "url": "https://docs.frappe.io/erpnext/payment-entry-outstanding-and-currency-problems",
+    "priority": false
+  },
+  {
+    "slug": "payment-order",
+    "url": "https://docs.frappe.io/erpnext/payment-order",
+    "priority": false
+  },
+  {
+    "slug": "payment-reconciliation",
+    "url": "https://docs.frappe.io/erpnext/payment-reconciliation",
+    "priority": false
+  },
+  {
+    "slug": "payment-reconciliation-problems",
+    "url": "https://docs.frappe.io/erpnext/payment-reconciliation-problems",
+    "priority": false
+  },
+  {
+    "slug": "payment-request",
+    "url": "https://docs.frappe.io/erpnext/payment-request",
+    "priority": false
+  },
+  {
+    "slug": "payment-terms",
+    "url": "https://docs.frappe.io/erpnext/payment-terms",
+    "priority": false
+  },
+  {
+    "slug": "payment-terms-template",
+    "url": "https://docs.frappe.io/erpnext/payment-terms-template",
+    "priority": false
+  },
+  {
+    "slug": "payment_ledger",
+    "url": "https://docs.frappe.io/erpnext/payment_ledger",
+    "priority": true
+  },
+  {
+    "slug": "payment_terms_status_report",
+    "url": "https://docs.frappe.io/erpnext/payment_terms_status_report",
+    "priority": false
+  },
+  {
+    "slug": "paypal-integration",
+    "url": "https://docs.frappe.io/erpnext/paypal-integration",
+    "priority": false
+  },
+  {
+    "slug": "paytm-integration",
+    "url": "https://docs.frappe.io/erpnext/paytm-integration",
+    "priority": false
+  },
+  {
+    "slug": "period-closing-voucher",
+    "url": "https://docs.frappe.io/erpnext/period-closing-voucher",
+    "priority": false
+  },
+  {
+    "slug": "periodic-inventory",
+    "url": "https://docs.frappe.io/erpnext/periodic-inventory",
+    "priority": false
+  },
+  {
+    "slug": "perm-level-error-in-permission-manager",
+    "url": "https://docs.frappe.io/erpnext/perm-level-error-in-permission-manager",
+    "priority": false
+  },
+  {
+    "slug": "perm-levels",
+    "url": "https://docs.frappe.io/erpnext/perm-levels",
+    "priority": false
+  },
+  {
+    "slug": "permissions",
+    "url": "https://docs.frappe.io/erpnext/permissions",
+    "priority": false
+  },
+  {
+    "slug": "perpetual-inventory",
+    "url": "https://docs.frappe.io/erpnext/perpetual-inventory",
+    "priority": false
+  },
+  {
+    "slug": "perpetual-inventory-for-non-stock-item",
+    "url": "https://docs.frappe.io/erpnext/perpetual-inventory-for-non-stock-item",
+    "priority": true
+  },
+  {
+    "slug": "personal-data-deletion",
+    "url": "https://docs.frappe.io/erpnext/personal-data-deletion",
+    "priority": false
+  },
+  {
+    "slug": "personal-data-download",
+    "url": "https://docs.frappe.io/erpnext/personal-data-download",
+    "priority": false
+  },
+  {
+    "slug": "petty-cash-entry-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/petty-cash-entry-in-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "pick-list",
+    "url": "https://docs.frappe.io/erpnext/pick-list",
+    "priority": false
+  },
+  {
+    "slug": "plaid_integration",
+    "url": "https://docs.frappe.io/erpnext/plaid_integration",
+    "priority": false
+  },
+  {
+    "slug": "plant-floor",
+    "url": "https://docs.frappe.io/erpnext/plant-floor",
+    "priority": false
+  },
+  {
+    "slug": "point-of-sale",
+    "url": "https://docs.frappe.io/erpnext/point-of-sale",
+    "priority": false
+  },
+  {
+    "slug": "point-of-sales",
+    "url": "https://docs.frappe.io/erpnext/point-of-sales",
+    "priority": true
+  },
+  {
+    "slug": "portal-login",
+    "url": "https://docs.frappe.io/erpnext/portal-login",
+    "priority": false
+  },
+  {
+    "slug": "pos-invoice-consolidation",
+    "url": "https://docs.frappe.io/erpnext/pos-invoice-consolidation",
+    "priority": true
+  },
+  {
+    "slug": "pos-profile",
+    "url": "https://docs.frappe.io/erpnext/pos-profile",
+    "priority": false
+  },
+  {
+    "slug": "pos-workflows",
+    "url": "https://docs.frappe.io/erpnext/pos-workflows",
+    "priority": false
+  },
+  {
+    "slug": "post-dated-cheque-entry",
+    "url": "https://docs.frappe.io/erpnext/post-dated-cheque-entry",
+    "priority": false
+  },
+  {
+    "slug": "prepare-and-map-legacy-data",
+    "url": "https://docs.frappe.io/erpnext/prepare-and-map-legacy-data",
+    "priority": false
+  },
+  {
+    "slug": "prepared-report",
+    "url": "https://docs.frappe.io/erpnext/prepared-report",
+    "priority": false
+  },
+  {
+    "slug": "price-lists",
+    "url": "https://docs.frappe.io/erpnext/price-lists",
+    "priority": false
+  },
+  {
+    "slug": "pricing",
+    "url": "https://docs.frappe.io/erpnext/pricing",
+    "priority": false
+  },
+  {
+    "slug": "pricing-rule",
+    "url": "https://docs.frappe.io/erpnext/pricing-rule",
+    "priority": false
+  },
+  {
+    "slug": "print",
+    "url": "https://docs.frappe.io/erpnext/print",
+    "priority": false
+  },
+  {
+    "slug": "print-format",
+    "url": "https://docs.frappe.io/erpnext/print-format",
+    "priority": false
+  },
+  {
+    "slug": "print-format-builder",
+    "url": "https://docs.frappe.io/erpnext/print-format-builder",
+    "priority": false
+  },
+  {
+    "slug": "print-headings",
+    "url": "https://docs.frappe.io/erpnext/print-headings",
+    "priority": false
+  },
+  {
+    "slug": "print-settings",
+    "url": "https://docs.frappe.io/erpnext/print-settings",
+    "priority": false
+  },
+  {
+    "slug": "print-style",
+    "url": "https://docs.frappe.io/erpnext/print-style",
+    "priority": false
+  },
+  {
+    "slug": "printing",
+    "url": "https://docs.frappe.io/erpnext/printing",
+    "priority": false
+  },
+  {
+    "slug": "process-deferred-accounting",
+    "url": "https://docs.frappe.io/erpnext/process-deferred-accounting",
+    "priority": true
+  },
+  {
+    "slug": "process-payment-reconciliation-tool",
+    "url": "https://docs.frappe.io/erpnext/process-payment-reconciliation-tool",
+    "priority": false
+  },
+  {
+    "slug": "process-statement-of-accounts",
+    "url": "https://docs.frappe.io/erpnext/process-statement-of-accounts",
+    "priority": true
+  },
+  {
+    "slug": "procurement-cycle-overview",
+    "url": "https://docs.frappe.io/erpnext/procurement-cycle-overview",
+    "priority": false
+  },
+  {
+    "slug": "procurement-tracker-report",
+    "url": "https://docs.frappe.io/erpnext/procurement-tracker-report",
+    "priority": false
+  },
+  {
+    "slug": "product-bundle",
+    "url": "https://docs.frappe.io/erpnext/product-bundle",
+    "priority": false
+  },
+  {
+    "slug": "product-listing",
+    "url": "https://docs.frappe.io/erpnext/product-listing",
+    "priority": false
+  },
+  {
+    "slug": "production-analytics",
+    "url": "https://docs.frappe.io/erpnext/production-analytics",
+    "priority": false
+  },
+  {
+    "slug": "production-and-material-planning",
+    "url": "https://docs.frappe.io/erpnext/production-and-material-planning",
+    "priority": false
+  },
+  {
+    "slug": "production-and-material-planning-capacity-planning",
+    "url": "https://docs.frappe.io/erpnext/production-and-material-planning-capacity-planning",
+    "priority": false
+  },
+  {
+    "slug": "production-plan",
+    "url": "https://docs.frappe.io/erpnext/production-plan",
+    "priority": false
+  },
+  {
+    "slug": "production-plan-schedule",
+    "url": "https://docs.frappe.io/erpnext/production-plan-schedule",
+    "priority": false
+  },
+  {
+    "slug": "production-plan-visualizer",
+    "url": "https://docs.frappe.io/erpnext/production-plan-visualizer",
+    "priority": false
+  },
+  {
+    "slug": "production-planning-report",
+    "url": "https://docs.frappe.io/erpnext/production-planning-report",
+    "priority": false
+  },
+  {
+    "slug": "profit-and-loss-report",
+    "url": "https://docs.frappe.io/erpnext/profit-and-loss-report",
+    "priority": false
+  },
+  {
+    "slug": "proforma-invoice",
+    "url": "https://docs.frappe.io/erpnext/proforma-invoice",
+    "priority": true
+  },
+  {
+    "slug": "project",
+    "url": "https://docs.frappe.io/erpnext/project",
+    "priority": false
+  },
+  {
+    "slug": "project-costing",
+    "url": "https://docs.frappe.io/erpnext/project-costing",
+    "priority": false
+  },
+  {
+    "slug": "project-customer-portal",
+    "url": "https://docs.frappe.io/erpnext/project-customer-portal",
+    "priority": true
+  },
+  {
+    "slug": "project-expense-claims",
+    "url": "https://docs.frappe.io/erpnext/project-expense-claims",
+    "priority": false
+  },
+  {
+    "slug": "project-profitability",
+    "url": "https://docs.frappe.io/erpnext/project-profitability",
+    "priority": false
+  },
+  {
+    "slug": "project-reports",
+    "url": "https://docs.frappe.io/erpnext/project-reports",
+    "priority": false
+  },
+  {
+    "slug": "project-template",
+    "url": "https://docs.frappe.io/erpnext/project-template",
+    "priority": false
+  },
+  {
+    "slug": "project-type",
+    "url": "https://docs.frappe.io/erpnext/project-type",
+    "priority": false
+  },
+  {
+    "slug": "project-update",
+    "url": "https://docs.frappe.io/erpnext/project-update",
+    "priority": false
+  },
+  {
+    "slug": "project-views",
+    "url": "https://docs.frappe.io/erpnext/project-views",
+    "priority": false
+  },
+  {
+    "slug": "projected-quantity",
+    "url": "https://docs.frappe.io/erpnext/projected-quantity",
+    "priority": false
+  },
+  {
+    "slug": "projects-introduction",
+    "url": "https://docs.frappe.io/erpnext/projects-introduction",
+    "priority": false
+  },
+  {
+    "slug": "promotional-scheme",
+    "url": "https://docs.frappe.io/erpnext/promotional-scheme",
+    "priority": false
+  },
+  {
+    "slug": "purchase-cycle-ledger-impact",
+    "url": "https://docs.frappe.io/erpnext/purchase-cycle-ledger-impact",
+    "priority": true
+  },
+  {
+    "slug": "purchase-invoice",
+    "url": "https://docs.frappe.io/erpnext/purchase-invoice",
+    "priority": true
+  },
+  {
+    "slug": "purchase-invoice-account-type-error",
+    "url": "https://docs.frappe.io/erpnext/purchase-invoice-account-type-error",
+    "priority": true
+  },
+  {
+    "slug": "purchase-order",
+    "url": "https://docs.frappe.io/erpnext/purchase-order",
+    "priority": true
+  },
+  {
+    "slug": "purchase-receipt",
+    "url": "https://docs.frappe.io/erpnext/purchase-receipt",
+    "priority": true
+  },
+  {
+    "slug": "purchase-reconciliation-gstr-2b-mismatch",
+    "url": "https://docs.frappe.io/erpnext/purchase-reconciliation-gstr-2b-mismatch",
+    "priority": true
+  },
+  {
+    "slug": "purchase-return",
+    "url": "https://docs.frappe.io/erpnext/purchase-return",
+    "priority": true
+  },
+  {
+    "slug": "purchase-taxes-and-charges-template",
+    "url": "https://docs.frappe.io/erpnext/purchase-taxes-and-charges-template",
+    "priority": true
+  },
+  {
+    "slug": "purchasing-an-asset",
+    "url": "https://docs.frappe.io/erpnext/purchasing-an-asset",
+    "priority": false
+  },
+  {
+    "slug": "purchasing-in-different-unit",
+    "url": "https://docs.frappe.io/erpnext/purchasing-in-different-unit",
+    "priority": false
+  },
+  {
+    "slug": "purpose-of-stock-delivered-but-not-billed",
+    "url": "https://docs.frappe.io/erpnext/purpose-of-stock-delivered-but-not-billed",
+    "priority": true
+  },
+  {
+    "slug": "putaway-rule",
+    "url": "https://docs.frappe.io/erpnext/putaway-rule",
+    "priority": false
+  },
+  {
+    "slug": "quality-feedback-template",
+    "url": "https://docs.frappe.io/erpnext/quality-feedback-template",
+    "priority": false
+  },
+  {
+    "slug": "quality-inspction-summary",
+    "url": "https://docs.frappe.io/erpnext/quality-inspction-summary",
+    "priority": false
+  },
+  {
+    "slug": "quality-inspection",
+    "url": "https://docs.frappe.io/erpnext/quality-inspection",
+    "priority": false
+  },
+  {
+    "slug": "quality-management",
+    "url": "https://docs.frappe.io/erpnext/quality-management",
+    "priority": false
+  },
+  {
+    "slug": "quality_action",
+    "url": "https://docs.frappe.io/erpnext/quality_action",
+    "priority": false
+  },
+  {
+    "slug": "quality_feedback",
+    "url": "https://docs.frappe.io/erpnext/quality_feedback",
+    "priority": false
+  },
+  {
+    "slug": "quality_goal",
+    "url": "https://docs.frappe.io/erpnext/quality_goal",
+    "priority": false
+  },
+  {
+    "slug": "quality_meeting",
+    "url": "https://docs.frappe.io/erpnext/quality_meeting",
+    "priority": false
+  },
+  {
+    "slug": "quality_procedure",
+    "url": "https://docs.frappe.io/erpnext/quality_procedure",
+    "priority": false
+  },
+  {
+    "slug": "quality_review",
+    "url": "https://docs.frappe.io/erpnext/quality_review",
+    "priority": false
+  },
+  {
+    "slug": "quick-stock-balance",
+    "url": "https://docs.frappe.io/erpnext/quick-stock-balance",
+    "priority": true
+  },
+  {
+    "slug": "quickbooks-migrator",
+    "url": "https://docs.frappe.io/erpnext/quickbooks-migrator",
+    "priority": false
+  },
+  {
+    "slug": "quotation",
+    "url": "https://docs.frappe.io/erpnext/quotation",
+    "priority": false
+  },
+  {
+    "slug": "raw-printing",
+    "url": "https://docs.frappe.io/erpnext/raw-printing",
+    "priority": false
+  },
+  {
+    "slug": "razorpay-integration",
+    "url": "https://docs.frappe.io/erpnext/razorpay-integration",
+    "priority": false
+  },
+  {
+    "slug": "rebuild-tree",
+    "url": "https://docs.frappe.io/erpnext/rebuild-tree",
+    "priority": false
+  },
+  {
+    "slug": "receiving-bulk-payments-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/receiving-bulk-payments-in-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "reconcile-advance-payment-made-to-the-supplier",
+    "url": "https://docs.frappe.io/erpnext/reconcile-advance-payment-made-to-the-supplier",
+    "priority": true
+  },
+  {
+    "slug": "records-print-format",
+    "url": "https://docs.frappe.io/erpnext/records-print-format",
+    "priority": false
+  },
+  {
+    "slug": "regional",
+    "url": "https://docs.frappe.io/erpnext/regional",
+    "priority": false
+  },
+  {
+    "slug": "regional-chart-of-accounts",
+    "url": "https://docs.frappe.io/erpnext/regional-chart-of-accounts",
+    "priority": true
+  },
+  {
+    "slug": "remove-link-at-the-bottom-of-the-print-page",
+    "url": "https://docs.frappe.io/erpnext/remove-link-at-the-bottom-of-the-print-page",
+    "priority": false
+  },
+  {
+    "slug": "removing-description-removed-item-code-and-name",
+    "url": "https://docs.frappe.io/erpnext/removing-description-removed-item-code-and-name",
+    "priority": true
+  },
+  {
+    "slug": "renaming-documents",
+    "url": "https://docs.frappe.io/erpnext/renaming-documents",
+    "priority": false
+  },
+  {
+    "slug": "repack-entry",
+    "url": "https://docs.frappe.io/erpnext/repack-entry",
+    "priority": false
+  },
+  {
+    "slug": "report-permission-error",
+    "url": "https://docs.frappe.io/erpnext/report-permission-error",
+    "priority": false
+  },
+  {
+    "slug": "report-showing-multiple-rows-for-one-document",
+    "url": "https://docs.frappe.io/erpnext/report-showing-multiple-rows-for-one-document",
+    "priority": false
+  },
+  {
+    "slug": "repost-accounting-ledger",
+    "url": "https://docs.frappe.io/erpnext/repost-accounting-ledger",
+    "priority": true
+  },
+  {
+    "slug": "repost-item-valuation",
+    "url": "https://docs.frappe.io/erpnext/repost-item-valuation",
+    "priority": true
+  },
+  {
+    "slug": "request-for-quotation",
+    "url": "https://docs.frappe.io/erpnext/request-for-quotation",
+    "priority": false
+  },
+  {
+    "slug": "request-for-raw-materials-from-sales-order",
+    "url": "https://docs.frappe.io/erpnext/request-for-raw-materials-from-sales-order",
+    "priority": true
+  },
+  {
+    "slug": "restore-deleted-erpnext",
+    "url": "https://docs.frappe.io/erpnext/restore-deleted-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "retain-sample-stock",
+    "url": "https://docs.frappe.io/erpnext/retain-sample-stock",
+    "priority": true
+  },
+  {
+    "slug": "return-rejected-item",
+    "url": "https://docs.frappe.io/erpnext/return-rejected-item",
+    "priority": true
+  },
+  {
+    "slug": "returned_materials_against_work_order",
+    "url": "https://docs.frappe.io/erpnext/returned_materials_against_work_order",
+    "priority": false
+  },
+  {
+    "slug": "reverse-charge-mechanism-rcm",
+    "url": "https://docs.frappe.io/erpnext/reverse-charge-mechanism-rcm",
+    "priority": false
+  },
+  {
+    "slug": "reviews_and_rating",
+    "url": "https://docs.frappe.io/erpnext/reviews_and_rating",
+    "priority": false
+  },
+  {
+    "slug": "role-and-role-profile",
+    "url": "https://docs.frappe.io/erpnext/role-and-role-profile",
+    "priority": false
+  },
+  {
+    "slug": "role-based-permissions",
+    "url": "https://docs.frappe.io/erpnext/role-based-permissions",
+    "priority": false
+  },
+  {
+    "slug": "role-permission-for-page-and-report",
+    "url": "https://docs.frappe.io/erpnext/role-permission-for-page-and-report",
+    "priority": false
+  },
+  {
+    "slug": "round-off-account-validation",
+    "url": "https://docs.frappe.io/erpnext/round-off-account-validation",
+    "priority": false
+  },
+  {
+    "slug": "routing",
+    "url": "https://docs.frappe.io/erpnext/routing",
+    "priority": false
+  },
+  {
+    "slug": "rules",
+    "url": "https://docs.frappe.io/erpnext/rules",
+    "priority": false
+  },
+  {
+    "slug": "salary-slip-from-timesheet",
+    "url": "https://docs.frappe.io/erpnext/salary-slip-from-timesheet",
+    "priority": false
+  },
+  {
+    "slug": "sales-analytics",
+    "url": "https://docs.frappe.io/erpnext/sales-analytics",
+    "priority": true
+  },
+  {
+    "slug": "sales-invoice",
+    "url": "https://docs.frappe.io/erpnext/sales-invoice",
+    "priority": true
+  },
+  {
+    "slug": "sales-invoice-from-timesheet",
+    "url": "https://docs.frappe.io/erpnext/sales-invoice-from-timesheet",
+    "priority": true
+  },
+  {
+    "slug": "sales-invoice-without-an-item",
+    "url": "https://docs.frappe.io/erpnext/sales-invoice-without-an-item",
+    "priority": true
+  },
+  {
+    "slug": "sales-order",
+    "url": "https://docs.frappe.io/erpnext/sales-order",
+    "priority": true
+  },
+  {
+    "slug": "sales-order-type",
+    "url": "https://docs.frappe.io/erpnext/sales-order-type",
+    "priority": true
+  },
+  {
+    "slug": "sales-partner",
+    "url": "https://docs.frappe.io/erpnext/sales-partner",
+    "priority": true
+  },
+  {
+    "slug": "sales-person",
+    "url": "https://docs.frappe.io/erpnext/sales-person",
+    "priority": true
+  },
+  {
+    "slug": "sales-person-target-allocation",
+    "url": "https://docs.frappe.io/erpnext/sales-person-target-allocation",
+    "priority": true
+  },
+  {
+    "slug": "sales-persons-in-the-sales-transactions",
+    "url": "https://docs.frappe.io/erpnext/sales-persons-in-the-sales-transactions",
+    "priority": true
+  },
+  {
+    "slug": "sales-pipeline",
+    "url": "https://docs.frappe.io/erpnext/sales-pipeline",
+    "priority": true
+  },
+  {
+    "slug": "sales-return",
+    "url": "https://docs.frappe.io/erpnext/sales-return",
+    "priority": true
+  },
+  {
+    "slug": "sales-returns-and-credit-notes-problems",
+    "url": "https://docs.frappe.io/erpnext/sales-returns-and-credit-notes-problems",
+    "priority": true
+  },
+  {
+    "slug": "sales-taxes-and-charges-template",
+    "url": "https://docs.frappe.io/erpnext/sales-taxes-and-charges-template",
+    "priority": true
+  },
+  {
+    "slug": "sales_funnel",
+    "url": "https://docs.frappe.io/erpnext/sales_funnel",
+    "priority": true
+  },
+  {
+    "slug": "sales_stage",
+    "url": "https://docs.frappe.io/erpnext/sales_stage",
+    "priority": true
+  },
+  {
+    "slug": "salesperson-permissions",
+    "url": "https://docs.frappe.io/erpnext/salesperson-permissions",
+    "priority": true
+  },
+  {
+    "slug": "scrap-management",
+    "url": "https://docs.frappe.io/erpnext/scrap-management",
+    "priority": false
+  },
+  {
+    "slug": "scrapping-an-asset",
+    "url": "https://docs.frappe.io/erpnext/scrapping-an-asset",
+    "priority": false
+  },
+  {
+    "slug": "search-record-by-specific-field",
+    "url": "https://docs.frappe.io/erpnext/search-record-by-specific-field",
+    "priority": false
+  },
+  {
+    "slug": "secondary-items",
+    "url": "https://docs.frappe.io/erpnext/secondary-items",
+    "priority": true
+  },
+  {
+    "slug": "selling",
+    "url": "https://docs.frappe.io/erpnext/selling",
+    "priority": true
+  },
+  {
+    "slug": "selling-an-asset",
+    "url": "https://docs.frappe.io/erpnext/selling-an-asset",
+    "priority": true
+  },
+  {
+    "slug": "selling-cycle-ledger-impact",
+    "url": "https://docs.frappe.io/erpnext/selling-cycle-ledger-impact",
+    "priority": true
+  },
+  {
+    "slug": "selling-settings",
+    "url": "https://docs.frappe.io/erpnext/selling-settings",
+    "priority": true
+  },
+  {
+    "slug": "semi-auto-payment-reconciliation",
+    "url": "https://docs.frappe.io/erpnext/semi-auto-payment-reconciliation",
+    "priority": false
+  },
+  {
+    "slug": "sending-email",
+    "url": "https://docs.frappe.io/erpnext/sending-email",
+    "priority": false
+  },
+  {
+    "slug": "serial-and-batch",
+    "url": "https://docs.frappe.io/erpnext/serial-and-batch",
+    "priority": true
+  },
+  {
+    "slug": "serial-and-batch-bundle",
+    "url": "https://docs.frappe.io/erpnext/serial-and-batch-bundle",
+    "priority": true
+  },
+  {
+    "slug": "serial-and-batch-traceability-report",
+    "url": "https://docs.frappe.io/erpnext/serial-and-batch-traceability-report",
+    "priority": true
+  },
+  {
+    "slug": "serial-no",
+    "url": "https://docs.frappe.io/erpnext/serial-no",
+    "priority": true
+  },
+  {
+    "slug": "serial-no-naming",
+    "url": "https://docs.frappe.io/erpnext/serial-no-naming",
+    "priority": true
+  },
+  {
+    "slug": "service-level-agreement",
+    "url": "https://docs.frappe.io/erpnext/service-level-agreement",
+    "priority": false
+  },
+  {
+    "slug": "session-defaults",
+    "url": "https://docs.frappe.io/erpnext/session-defaults",
+    "priority": false
+  },
+  {
+    "slug": "set-language",
+    "url": "https://docs.frappe.io/erpnext/set-language",
+    "priority": false
+  },
+  {
+    "slug": "set-precision",
+    "url": "https://docs.frappe.io/erpnext/set-precision",
+    "priority": false
+  },
+  {
+    "slug": "set_up_e_commerce",
+    "url": "https://docs.frappe.io/erpnext/set_up_e_commerce",
+    "priority": false
+  },
+  {
+    "slug": "setting-company-sales-goal",
+    "url": "https://docs.frappe.io/erpnext/setting-company-sales-goal",
+    "priority": true
+  },
+  {
+    "slug": "setting-default-values-for-any-field-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/setting-default-values-for-any-field-in-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "setting-up",
+    "url": "https://docs.frappe.io/erpnext/setting-up",
+    "priority": false
+  },
+  {
+    "slug": "setting-up-buy-1-get-1-free-pricing-rule",
+    "url": "https://docs.frappe.io/erpnext/setting-up-buy-1-get-1-free-pricing-rule",
+    "priority": false
+  },
+  {
+    "slug": "setting-up-email-signature-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/setting-up-email-signature-in-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "setting-up-sendgrid-smtp-email-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/setting-up-sendgrid-smtp-email-in-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "setting-up-taxes",
+    "url": "https://docs.frappe.io/erpnext/setting-up-taxes",
+    "priority": true
+  },
+  {
+    "slug": "setting-workflows-on-masters",
+    "url": "https://docs.frappe.io/erpnext/setting-workflows-on-masters",
+    "priority": false
+  },
+  {
+    "slug": "setup-new-2fa",
+    "url": "https://docs.frappe.io/erpnext/setup-new-2fa",
+    "priority": false
+  },
+  {
+    "slug": "setup-two-factor-authentication",
+    "url": "https://docs.frappe.io/erpnext/setup-two-factor-authentication",
+    "priority": false
+  },
+  {
+    "slug": "share-reports",
+    "url": "https://docs.frappe.io/erpnext/share-reports",
+    "priority": false
+  },
+  {
+    "slug": "share-transfer",
+    "url": "https://docs.frappe.io/erpnext/share-transfer",
+    "priority": false
+  },
+  {
+    "slug": "shareholder",
+    "url": "https://docs.frappe.io/erpnext/shareholder",
+    "priority": false
+  },
+  {
+    "slug": "shareholder-management",
+    "url": "https://docs.frappe.io/erpnext/shareholder-management",
+    "priority": false
+  },
+  {
+    "slug": "sharing",
+    "url": "https://docs.frappe.io/erpnext/sharing",
+    "priority": false
+  },
+  {
+    "slug": "shipment",
+    "url": "https://docs.frappe.io/erpnext/shipment",
+    "priority": false
+  },
+  {
+    "slug": "shipping-rule",
+    "url": "https://docs.frappe.io/erpnext/shipping-rule",
+    "priority": false
+  },
+  {
+    "slug": "shop_by_category",
+    "url": "https://docs.frappe.io/erpnext/shop_by_category",
+    "priority": false
+  },
+  {
+    "slug": "shopify_integration",
+    "url": "https://docs.frappe.io/erpnext/shopify_integration",
+    "priority": false
+  },
+  {
+    "slug": "shopping-cart",
+    "url": "https://docs.frappe.io/erpnext/shopping-cart",
+    "priority": false
+  },
+  {
+    "slug": "show-hide-modules",
+    "url": "https://docs.frappe.io/erpnext/show-hide-modules",
+    "priority": false
+  },
+  {
+    "slug": "simplified_ksa_vat_management_and_reporting",
+    "url": "https://docs.frappe.io/erpnext/simplified_ksa_vat_management_and_reporting",
+    "priority": false
+  },
+  {
+    "slug": "single-payment-multiple-invoices",
+    "url": "https://docs.frappe.io/erpnext/single-payment-multiple-invoices",
+    "priority": true
+  },
+  {
+    "slug": "sms-setting",
+    "url": "https://docs.frappe.io/erpnext/sms-setting",
+    "priority": false
+  },
+  {
+    "slug": "social-media-settings",
+    "url": "https://docs.frappe.io/erpnext/social-media-settings",
+    "priority": false
+  },
+  {
+    "slug": "south_africa",
+    "url": "https://docs.frappe.io/erpnext/south_africa",
+    "priority": false
+  },
+  {
+    "slug": "stale-cheque-accounting",
+    "url": "https://docs.frappe.io/erpnext/stale-cheque-accounting",
+    "priority": true
+  },
+  {
+    "slug": "standard-valuation-rate",
+    "url": "https://docs.frappe.io/erpnext/standard-valuation-rate",
+    "priority": true
+  },
+  {
+    "slug": "statement-of-accounts-problems",
+    "url": "https://docs.frappe.io/erpnext/statement-of-accounts-problems",
+    "priority": true
+  },
+  {
+    "slug": "stock",
+    "url": "https://docs.frappe.io/erpnext/stock",
+    "priority": true
+  },
+  {
+    "slug": "stock-adjustment-cogs-with-negative-stock",
+    "url": "https://docs.frappe.io/erpnext/stock-adjustment-cogs-with-negative-stock",
+    "priority": true
+  },
+  {
+    "slug": "stock-balance-and-stock-account-balance-syncing",
+    "url": "https://docs.frappe.io/erpnext/stock-balance-and-stock-account-balance-syncing",
+    "priority": true
+  },
+  {
+    "slug": "stock-closing-entry",
+    "url": "https://docs.frappe.io/erpnext/stock-closing-entry",
+    "priority": true
+  },
+  {
+    "slug": "stock-entry",
+    "url": "https://docs.frappe.io/erpnext/stock-entry",
+    "priority": true
+  },
+  {
+    "slug": "stock-entry-or-stock-reconciliation-timed-out-with-many-items",
+    "url": "https://docs.frappe.io/erpnext/stock-entry-or-stock-reconciliation-timed-out-with-many-items",
+    "priority": true
+  },
+  {
+    "slug": "stock-entry-purpose",
+    "url": "https://docs.frappe.io/erpnext/stock-entry-purpose",
+    "priority": true
+  },
+  {
+    "slug": "stock-inspection",
+    "url": "https://docs.frappe.io/erpnext/stock-inspection",
+    "priority": true
+  },
+  {
+    "slug": "stock-ledger",
+    "url": "https://docs.frappe.io/erpnext/stock-ledger",
+    "priority": true
+  },
+  {
+    "slug": "stock-ledger-entries-of-cancelled-vouchers",
+    "url": "https://docs.frappe.io/erpnext/stock-ledger-entries-of-cancelled-vouchers",
+    "priority": true
+  },
+  {
+    "slug": "stock-level-report",
+    "url": "https://docs.frappe.io/erpnext/stock-level-report",
+    "priority": true
+  },
+  {
+    "slug": "stock-masters",
+    "url": "https://docs.frappe.io/erpnext/stock-masters",
+    "priority": true
+  },
+  {
+    "slug": "stock-received-but-not-billed",
+    "url": "https://docs.frappe.io/erpnext/stock-received-but-not-billed",
+    "priority": true
+  },
+  {
+    "slug": "stock-reconciliation",
+    "url": "https://docs.frappe.io/erpnext/stock-reconciliation",
+    "priority": true
+  },
+  {
+    "slug": "stock-reposting",
+    "url": "https://docs.frappe.io/erpnext/stock-reposting",
+    "priority": true
+  },
+  {
+    "slug": "stock-reposting-settings",
+    "url": "https://docs.frappe.io/erpnext/stock-reposting-settings",
+    "priority": true
+  },
+  {
+    "slug": "stock-reservation",
+    "url": "https://docs.frappe.io/erpnext/stock-reservation",
+    "priority": true
+  },
+  {
+    "slug": "stock-reservation-for-production-plan",
+    "url": "https://docs.frappe.io/erpnext/stock-reservation-for-production-plan",
+    "priority": true
+  },
+  {
+    "slug": "stock-reservation-for-work-order",
+    "url": "https://docs.frappe.io/erpnext/stock-reservation-for-work-order",
+    "priority": true
+  },
+  {
+    "slug": "stock-settings",
+    "url": "https://docs.frappe.io/erpnext/stock-settings",
+    "priority": true
+  },
+  {
+    "slug": "stock-transactions",
+    "url": "https://docs.frappe.io/erpnext/stock-transactions",
+    "priority": true
+  },
+  {
+    "slug": "stock-transactions-landed-cost-voucher",
+    "url": "https://docs.frappe.io/erpnext/stock-transactions-landed-cost-voucher",
+    "priority": true
+  },
+  {
+    "slug": "stock-transfer-with-gst",
+    "url": "https://docs.frappe.io/erpnext/stock-transfer-with-gst",
+    "priority": true
+  },
+  {
+    "slug": "stock-value-account-value-comparison",
+    "url": "https://docs.frappe.io/erpnext/stock-value-account-value-comparison",
+    "priority": true
+  },
+  {
+    "slug": "stock-value-comparison",
+    "url": "https://docs.frappe.io/erpnext/stock-value-comparison",
+    "priority": true
+  },
+  {
+    "slug": "store-landing-page",
+    "url": "https://docs.frappe.io/erpnext/store-landing-page",
+    "priority": false
+  },
+  {
+    "slug": "stripe-integration",
+    "url": "https://docs.frappe.io/erpnext/stripe-integration",
+    "priority": false
+  },
+  {
+    "slug": "subcontracting",
+    "url": "https://docs.frappe.io/erpnext/subcontracting",
+    "priority": false
+  },
+  {
+    "slug": "subcontracting-in-erpnext",
+    "url": "https://docs.frappe.io/erpnext/subcontracting-in-erpnext",
+    "priority": false
+  },
+  {
+    "slug": "subcontracting-inward",
+    "url": "https://docs.frappe.io/erpnext/subcontracting-inward",
+    "priority": false
+  },
+  {
+    "slug": "subscription",
+    "url": "https://docs.frappe.io/erpnext/subscription",
+    "priority": false
+  },
+  {
+    "slug": "subscription-plan",
+    "url": "https://docs.frappe.io/erpnext/subscription-plan",
+    "priority": false
+  },
+  {
+    "slug": "subscription-settings",
+    "url": "https://docs.frappe.io/erpnext/subscription-settings",
+    "priority": false
+  },
+  {
+    "slug": "supplier",
+    "url": "https://docs.frappe.io/erpnext/supplier",
+    "priority": true
+  },
+  {
+    "slug": "supplier-essentials",
+    "url": "https://docs.frappe.io/erpnext/supplier-essentials",
+    "priority": true
+  },
+  {
+    "slug": "supplier-group",
+    "url": "https://docs.frappe.io/erpnext/supplier-group",
+    "priority": true
+  },
+  {
+    "slug": "supplier-quotation",
+    "url": "https://docs.frappe.io/erpnext/supplier-quotation",
+    "priority": true
+  },
+  {
+    "slug": "supplier-scorecard",
+    "url": "https://docs.frappe.io/erpnext/supplier-scorecard",
+    "priority": true
+  },
+  {
+    "slug": "support-issues",
+    "url": "https://docs.frappe.io/erpnext/support-issues",
+    "priority": false
+  },
+  {
+    "slug": "support-settings",
+    "url": "https://docs.frappe.io/erpnext/support-settings",
+    "priority": false
+  },
+  {
+    "slug": "support_reports",
+    "url": "https://docs.frappe.io/erpnext/support_reports",
+    "priority": false
+  },
+  {
+    "slug": "system-settings",
+    "url": "https://docs.frappe.io/erpnext/system-settings",
+    "priority": false
+  },
+  {
+    "slug": "table-multiselect-field",
+    "url": "https://docs.frappe.io/erpnext/table-multiselect-field",
+    "priority": false
+  },
+  {
+    "slug": "tasks",
+    "url": "https://docs.frappe.io/erpnext/tasks",
+    "priority": false
+  },
+  {
+    "slug": "tax-category",
+    "url": "https://docs.frappe.io/erpnext/tax-category",
+    "priority": true
+  },
+  {
+    "slug": "tax-inclusive-accounting",
+    "url": "https://docs.frappe.io/erpnext/tax-inclusive-accounting",
+    "priority": true
+  },
+  {
+    "slug": "tax-on-another-tax-amount",
+    "url": "https://docs.frappe.io/erpnext/tax-on-another-tax-amount",
+    "priority": true
+  },
+  {
+    "slug": "tax-rule",
+    "url": "https://docs.frappe.io/erpnext/tax-rule",
+    "priority": true
+  },
+  {
+    "slug": "tax-withholding-category",
+    "url": "https://docs.frappe.io/erpnext/tax-withholding-category",
+    "priority": true
+  },
+  {
+    "slug": "taxes",
+    "url": "https://docs.frappe.io/erpnext/taxes",
+    "priority": true
+  },
+  {
+    "slug": "tds-setup-india",
+    "url": "https://docs.frappe.io/erpnext/tds-setup-india",
+    "priority": false
+  },
+  {
+    "slug": "terms-and-conditions",
+    "url": "https://docs.frappe.io/erpnext/terms-and-conditions",
+    "priority": false
+  },
+  {
+    "slug": "territory",
+    "url": "https://docs.frappe.io/erpnext/territory",
+    "priority": false
+  },
+  {
+    "slug": "the-champion",
+    "url": "https://docs.frappe.io/erpnext/the-champion",
+    "priority": false
+  },
+  {
+    "slug": "time-based-payout",
+    "url": "https://docs.frappe.io/erpnext/time-based-payout",
+    "priority": false
+  },
+  {
+    "slug": "time-tracking",
+    "url": "https://docs.frappe.io/erpnext/time-tracking",
+    "priority": false
+  },
+  {
+    "slug": "timer-in-timesheets",
+    "url": "https://docs.frappe.io/erpnext/timer-in-timesheets",
+    "priority": false
+  },
+  {
+    "slug": "timesheet-against-work-order",
+    "url": "https://docs.frappe.io/erpnext/timesheet-against-work-order",
+    "priority": true
+  },
+  {
+    "slug": "timesheets",
+    "url": "https://docs.frappe.io/erpnext/timesheets",
+    "priority": false
+  },
+  {
+    "slug": "track-items-using-barcode",
+    "url": "https://docs.frappe.io/erpnext/track-items-using-barcode",
+    "priority": true
+  },
+  {
+    "slug": "track-purchases-in-accounts",
+    "url": "https://docs.frappe.io/erpnext/track-purchases-in-accounts",
+    "priority": true
+  },
+  {
+    "slug": "track-semi-finished-goods",
+    "url": "https://docs.frappe.io/erpnext/track-semi-finished-goods",
+    "priority": false
+  },
+  {
+    "slug": "translations",
+    "url": "https://docs.frappe.io/erpnext/translations",
+    "priority": false
+  },
+  {
+    "slug": "tree-master-renaming",
+    "url": "https://docs.frappe.io/erpnext/tree-master-renaming",
+    "priority": false
+  },
+  {
+    "slug": "twitter-settings",
+    "url": "https://docs.frappe.io/erpnext/twitter-settings",
+    "priority": false
+  },
+  {
+    "slug": "types-in-tax-template",
+    "url": "https://docs.frappe.io/erpnext/types-in-tax-template",
+    "priority": true
+  },
+  {
+    "slug": "uae-vat-201-and-saudi-zatca-questions",
+    "url": "https://docs.frappe.io/erpnext/uae-vat-201-and-saudi-zatca-questions",
+    "priority": false
+  },
+  {
+    "slug": "uae-vat-201-report",
+    "url": "https://docs.frappe.io/erpnext/uae-vat-201-report",
+    "priority": false
+  },
+  {
+    "slug": "uae-vat-setup",
+    "url": "https://docs.frappe.io/erpnext/uae-vat-setup",
+    "priority": false
+  },
+  {
+    "slug": "understand-debit-and-credit",
+    "url": "https://docs.frappe.io/erpnext/understand-debit-and-credit",
+    "priority": false
+  },
+  {
+    "slug": "unicommerce_integration",
+    "url": "https://docs.frappe.io/erpnext/unicommerce_integration",
+    "priority": false
+  },
+  {
+    "slug": "united_arab_emirates",
+    "url": "https://docs.frappe.io/erpnext/united_arab_emirates",
+    "priority": false
+  },
+  {
+    "slug": "unreconciliation",
+    "url": "https://docs.frappe.io/erpnext/unreconciliation",
+    "priority": false
+  },
+  {
+    "slug": "uom",
+    "url": "https://docs.frappe.io/erpnext/uom",
+    "priority": false
+  },
+  {
+    "slug": "update-gstr-1-data-in-gst-offline-tool",
+    "url": "https://docs.frappe.io/erpnext/update-gstr-1-data-in-gst-offline-tool",
+    "priority": true
+  },
+  {
+    "slug": "update-stock-option-in-sales-invoice",
+    "url": "https://docs.frappe.io/erpnext/update-stock-option-in-sales-invoice",
+    "priority": true
+  },
+  {
+    "slug": "use-inline-serial-batch-editor",
+    "url": "https://docs.frappe.io/erpnext/use-inline-serial-batch-editor",
+    "priority": true
+  },
+  {
+    "slug": "use-serial-no-wise-valuation",
+    "url": "https://docs.frappe.io/erpnext/use-serial-no-wise-valuation",
+    "priority": true
+  },
+  {
+    "slug": "user-permission-based-on-hierarchy",
+    "url": "https://docs.frappe.io/erpnext/user-permission-based-on-hierarchy",
+    "priority": false
+  },
+  {
+    "slug": "user-permissions",
+    "url": "https://docs.frappe.io/erpnext/user-permissions",
+    "priority": false
+  },
+  {
+    "slug": "using-custom-api-rows-in-financial-report-template",
+    "url": "https://docs.frappe.io/erpnext/using-custom-api-rows-in-financial-report-template",
+    "priority": false
+  },
+  {
+    "slug": "using-finance-book-for-asset-depreciation",
+    "url": "https://docs.frappe.io/erpnext/using-finance-book-for-asset-depreciation",
+    "priority": false
+  },
+  {
+    "slug": "validate-the-migration",
+    "url": "https://docs.frappe.io/erpnext/validate-the-migration",
+    "priority": false
+  },
+  {
+    "slug": "valuation-based-on-field-in-bom",
+    "url": "https://docs.frappe.io/erpnext/valuation-based-on-field-in-bom",
+    "priority": true
+  },
+  {
+    "slug": "vat_audit_report",
+    "url": "https://docs.frappe.io/erpnext/vat_audit_report",
+    "priority": false
+  },
+  {
+    "slug": "warehouse",
+    "url": "https://docs.frappe.io/erpnext/warehouse",
+    "priority": true
+  },
+  {
+    "slug": "warehouse-ledger-link",
+    "url": "https://docs.frappe.io/erpnext/warehouse-ledger-link",
+    "priority": true
+  },
+  {
+    "slug": "warranty",
+    "url": "https://docs.frappe.io/erpnext/warranty",
+    "priority": false
+  },
+  {
+    "slug": "warranty-claim",
+    "url": "https://docs.frappe.io/erpnext/warranty-claim",
+    "priority": false
+  },
+  {
+    "slug": "web-form",
+    "url": "https://docs.frappe.io/erpnext/web-form",
+    "priority": false
+  },
+  {
+    "slug": "web-page",
+    "url": "https://docs.frappe.io/erpnext/web-page",
+    "priority": false
+  },
+  {
+    "slug": "web-page-builder",
+    "url": "https://docs.frappe.io/erpnext/web-page-builder",
+    "priority": false
+  },
+  {
+    "slug": "website",
+    "url": "https://docs.frappe.io/erpnext/website",
+    "priority": false
+  },
+  {
+    "slug": "website-banner",
+    "url": "https://docs.frappe.io/erpnext/website-banner",
+    "priority": false
+  },
+  {
+    "slug": "website-components",
+    "url": "https://docs.frappe.io/erpnext/website-components",
+    "priority": false
+  },
+  {
+    "slug": "website-home-page",
+    "url": "https://docs.frappe.io/erpnext/website-home-page",
+    "priority": false
+  },
+  {
+    "slug": "website-route-meta",
+    "url": "https://docs.frappe.io/erpnext/website-route-meta",
+    "priority": false
+  },
+  {
+    "slug": "website-settings",
+    "url": "https://docs.frappe.io/erpnext/website-settings",
+    "priority": false
+  },
+  {
+    "slug": "website-theme",
+    "url": "https://docs.frappe.io/erpnext/website-theme",
+    "priority": false
+  },
+  {
+    "slug": "website_item",
+    "url": "https://docs.frappe.io/erpnext/website_item",
+    "priority": true
+  },
+  {
+    "slug": "weekly-auto-repost",
+    "url": "https://docs.frappe.io/erpnext/weekly-auto-repost",
+    "priority": false
+  },
+  {
+    "slug": "what-if-emails-are-not-being-received-by-the-recipients",
+    "url": "https://docs.frappe.io/erpnext/what-if-emails-are-not-being-received-by-the-recipients",
+    "priority": false
+  },
+  {
+    "slug": "why-ERP",
+    "url": "https://docs.frappe.io/erpnext/why-ERP",
+    "priority": false
+  },
+  {
+    "slug": "why-are-uom-and-item-details-not-filled-in-when-i-add-an-item-to-a-material-request",
+    "url": "https://docs.frappe.io/erpnext/why-are-uom-and-item-details-not-filled-in-when-i-add-an-item-to-a-material-request",
+    "priority": true
+  },
+  {
+    "slug": "why-cant-i-select-an-expense-account-in-the-landed-cost-voucher",
+    "url": "https://docs.frappe.io/erpnext/why-cant-i-select-an-expense-account-in-the-landed-cost-voucher",
+    "priority": false
+  },
+  {
+    "slug": "why-does-my-stock-reconciliation-show-a-wrong-difference-amount-or-not-match-the-general-ledger",
+    "url": "https://docs.frappe.io/erpnext/why-does-my-stock-reconciliation-show-a-wrong-difference-amount-or-not-match-the-general-ledger",
+    "priority": true
+  },
+  {
+    "slug": "why-is-my-valuation-rate-or-stock-value-negative-or-abnormally-high",
+    "url": "https://docs.frappe.io/erpnext/why-is-my-valuation-rate-or-stock-value-negative-or-abnormally-high",
+    "priority": true
+  },
+  {
+    "slug": "wishlist",
+    "url": "https://docs.frappe.io/erpnext/wishlist",
+    "priority": false
+  },
+  {
+    "slug": "withdrawing-salary-from-owners-equity-account",
+    "url": "https://docs.frappe.io/erpnext/withdrawing-salary-from-owners-equity-account",
+    "priority": false
+  },
+  {
+    "slug": "woocommerce_integration",
+    "url": "https://docs.frappe.io/erpnext/woocommerce_integration",
+    "priority": false
+  },
+  {
+    "slug": "work-order",
+    "url": "https://docs.frappe.io/erpnext/work-order",
+    "priority": true
+  },
+  {
+    "slug": "work-order-consumed-materials",
+    "url": "https://docs.frappe.io/erpnext/work-order-consumed-materials",
+    "priority": true
+  },
+  {
+    "slug": "work-order-summary",
+    "url": "https://docs.frappe.io/erpnext/work-order-summary",
+    "priority": true
+  },
+  {
+    "slug": "workflow",
+    "url": "https://docs.frappe.io/erpnext/workflow",
+    "priority": false
+  },
+  {
+    "slug": "workflow-actions",
+    "url": "https://docs.frappe.io/erpnext/workflow-actions",
+    "priority": false
+  },
+  {
+    "slug": "workflow-state",
+    "url": "https://docs.frappe.io/erpnext/workflow-state",
+    "priority": false
+  },
+  {
+    "slug": "workflow-transition-tasks",
+    "url": "https://docs.frappe.io/erpnext/workflow-transition-tasks",
+    "priority": false
+  },
+  {
+    "slug": "workflows",
+    "url": "https://docs.frappe.io/erpnext/workflows",
+    "priority": false
+  },
+  {
+    "slug": "workspace",
+    "url": "https://docs.frappe.io/erpnext/workspace",
+    "priority": false
+  },
+  {
+    "slug": "workstation",
+    "url": "https://docs.frappe.io/erpnext/workstation",
+    "priority": true
+  },
+  {
+    "slug": "workstation_type",
+    "url": "https://docs.frappe.io/erpnext/workstation_type",
+    "priority": true
+  },
+  {
+    "slug": "zenoti_integration",
+    "url": "https://docs.frappe.io/erpnext/zenoti_integration",
+    "priority": false
+  }
+]
