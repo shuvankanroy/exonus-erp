@@ -11,7 +11,7 @@ import { createPurchaseOrder, createGoodsReceiptNote, getPurchaseOrders, getGood
 import { getBillSundries, saveBillSundry, seedDefaultBillSundries } from './services/billSundryService.js';
 import { getBankAccounts, getBankReconciliationStatement, updateBankClearance, ensureDefaultBankAccount } from './services/brsService.js';
 import { executeStockTransfer, getGodownStockReport, getGodownsSummary } from './services/stockTransferService.js';
-import { executeProductionRun } from './services/manufacturingService.js';
+import { executeProductionRun, createBillOfMaterials, getBillOfMaterialsList, getProductionHistory } from './services/manufacturingService.js';
 import { processMonthlyPayroll } from './services/payrollService.js';
 import { generateEWayBill, generateEInvoice } from './services/gstComplianceService.js';
 import { getTrialBalance, getStockStatus } from './services/reportService.js';
@@ -485,15 +485,33 @@ app.post('/api/vouchers/payment-receipt', (req, res) => {
 
 // 7. Manufacturing & Production BOM
 app.get('/api/boms', (req, res) => {
-  const boms = db.prepare(`
-    SELECT b.*, i.name as finished_item_name, u.symbol as output_unit_symbol, mc.name as target_godown_name
-    FROM bill_of_materials b
-    JOIN items i ON b.finished_item_id = i.id
-    JOIN units u ON b.output_unit_id = u.id
-    JOIN material_centres mc ON b.target_godown_id = mc.id
-    WHERE b.company_id = ?
-  `).all(activeCompanyId);
-  res.json(boms);
+  try {
+    const boms = getBillOfMaterialsList(db, activeCompanyId);
+    res.json(boms);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/boms', (req, res) => {
+  try {
+    const result = createBillOfMaterials(db, {
+      ...req.body,
+      company_id: activeCompanyId,
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/production/history', (req, res) => {
+  try {
+    const history = getProductionHistory(db, activeCompanyId);
+    res.json(history);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 app.post('/api/vouchers/production', (req, res) => {

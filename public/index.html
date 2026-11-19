@@ -1843,6 +1843,7 @@
             loadStock();
             loadVouchers();
             loadOrders();
+            loadBOMs();
             loadSync();
           } catch (e) {
             console.error('Initialization error:', e);
@@ -2129,7 +2130,38 @@
         };
 
         const submitProductionRun = async () => {
-          alert('Select or configure a BOM Recipe in Administration to execute production run.');
+          if (!productionForm.value.bom_id) return alert('Please select a BOM Recipe');
+          try {
+            const res = await fetch('/api/vouchers/production', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(productionForm.value)
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert(`🎉 Production Run ${data.voucherNumber} Executed! Assembled ${data.finishedUnits} finished units (Cost: ₹${data.totalCost.toFixed(2)}).`);
+              currentView.value = 'stock_status';
+              loadStock();
+              loadVouchers();
+              loadSync();
+            } else {
+              alert('Error: ' + data.error);
+            }
+          } catch (e) {
+            alert('Failed to execute production run: ' + e.message);
+          }
+        };
+
+        const loadBOMs = async () => {
+          try {
+            const res = await fetch('/api/boms');
+            boms.value = await res.json();
+            if (boms.value.length > 0 && !productionForm.value.bom_id) {
+              productionForm.value.bom_id = boms.value[0].id;
+            }
+          } catch (e) {
+            console.error('Failed to load BOMs:', e);
+          }
         };
 
         const loadOrders = async () => {
@@ -2410,6 +2442,7 @@
           submitPurchaseVoucher,
           submitPaymentReceipt,
           submitProductionRun,
+          loadBOMs,
           loadTrialBalance,
           loadStock,
           loadVouchers,
