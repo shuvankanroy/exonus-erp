@@ -61,6 +61,19 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
       const itemRow = db.prepare('SELECT * FROM items WHERE id = ?').get(it.item_id) as any;
       if (!itemRow) throw new Error(`Item ${it.item_id} not found`);
 
+      // Negative stock guard for physical items
+      if (!input.delivery_challan_id) {
+        const stockRow = db.prepare(`
+          SELECT COALESCE(SUM(inward_qty) - SUM(outward_qty), 0) as balance 
+          FROM stock_entries 
+          WHERE item_id = ? AND material_centre_id = ?
+        `).get(it.item_id, input.material_centre_id) as any;
+        const availableStock = stockRow ? stockRow.balance : 0;
+        if (availableStock < it.qty) {
+          throw new Error(`Insufficient stock for '${itemRow.name}' in selected Godown! Available: ${availableStock}, Requested: ${it.qty}`);
+        }
+      }
+
       const discountRate = it.discount_pct || 0;
       const baseAmount = it.qty * it.rate;
       const discountAmount = Math.round(((baseAmount * discountRate) / 100) * 100) / 100;

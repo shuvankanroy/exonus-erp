@@ -176,7 +176,7 @@
       <main class="flex-1 overflow-y-auto p-6">
 
         <!-- SALES ORDERS & QUOTATIONS (Order-to-Cash Lifecycle) -->
-        <div v-if="currentView === 'orders_list'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div v-if="currentView === 'orders_list'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -185,13 +185,16 @@
               <p class="text-xs text-slate-400">Order-to-Cash pipeline: track pending delivery backlogs and convert to invoice</p>
             </div>
             <div class="flex gap-2">
+              <button @click="showNewOrderModal = true" class="px-3 py-1.5 text-xs font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm flex items-center gap-1.5">
+                <i class="fa-solid fa-plus-circle"></i> + New Sales Order
+              </button>
               <button @click="loadOrders" class="px-3 py-1.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1.5">
                 <i class="fa-solid fa-arrows-rotate"></i> Refresh
               </button>
             </div>
           </div>
 
-          <div class="border border-slate-200 rounded-xl overflow-hidden mb-8">
+          <div class="border border-slate-200 rounded-xl overflow-x-auto mb-8">
             <table class="w-full magic-grid text-left">
               <thead>
                 <tr>
@@ -237,7 +240,7 @@
         </div>
 
         <!-- PURCHASE ORDERS & GRN (Procure-to-Pay Lifecycle) -->
-        <div v-if="currentView === 'procurement_list'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div v-if="currentView === 'procurement_list'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -246,6 +249,9 @@
               <p class="text-xs text-slate-400">Track vendor purchase orders, material inward challans (GRN), and unbilled receipts</p>
             </div>
             <div class="flex gap-2">
+              <button @click="showNewPOModal = true" class="px-3 py-1.5 text-xs font-bold text-white bg-teal-600 rounded-lg hover:bg-teal-700 shadow-sm flex items-center gap-1.5">
+                <i class="fa-solid fa-plus-circle"></i> + New Purchase Order
+              </button>
               <button @click="loadProcurement" class="px-3 py-1.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1.5">
                 <i class="fa-solid fa-arrows-rotate"></i> Refresh
               </button>
@@ -257,7 +263,7 @@
             <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
               <i class="fa-solid fa-file-contract text-teal-600"></i> Active Purchase Orders
             </h3>
-            <div class="border border-slate-200 rounded-xl overflow-hidden">
+            <div class="border border-slate-200 rounded-xl overflow-x-auto">
               <table class="w-full magic-grid text-left">
                 <thead>
                   <tr>
@@ -307,7 +313,7 @@
             <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
               <i class="fa-solid fa-boxes-packing text-emerald-600"></i> Goods Receipt Notes (Material Inward Challans)
             </h3>
-            <div class="border border-slate-200 rounded-xl overflow-hidden">
+            <div class="border border-slate-200 rounded-xl overflow-x-auto">
               <table class="w-full magic-grid text-left">
                 <thead>
                   <tr>
@@ -353,7 +359,7 @@
         </div>
 
         <!-- ITEMS & INVENTORY MASTER MANAGER -->
-        <div v-if="currentView === 'items_list'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div v-if="currentView === 'items_list'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -367,7 +373,7 @@
           </div>
 
           <!-- Items Table -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden">
+          <div class="border border-slate-200 rounded-xl overflow-x-auto">
             <table class="w-full magic-grid text-left">
               <thead>
                 <tr>
@@ -462,95 +468,10 @@
               </div>
             </div>
           </div>
-
-          <!-- MODAL: STOCK TRANSFER -->
-          <div v-if="showStockTransferModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-100 overflow-hidden">
-              <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                  <i class="fa-solid fa-right-left text-indigo-600"></i> Godown-to-Godown Stock Transfer
-                </h3>
-                <button @click="showStockTransferModal = false" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
-              </div>
-
-              <div class="p-6 space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Source Godown (From)</label>
-                    <select v-model="stockTransferForm.source_material_centre_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-800">
-                      <option v-for="g in godowns" :key="g.id" :value="g.id">{{ g.name }}</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Destination Godown (To)</label>
-                    <select v-model="stockTransferForm.destination_material_centre_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold text-indigo-700">
-                      <option v-for="g in godowns" :key="g.id" :value="g.id">{{ g.name }}</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Transfer Date</label>
-                    <input type="date" v-model="stockTransferForm.date" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold">
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Transfer Reason / Narration</label>
-                    <input type="text" v-model="stockTransferForm.narration" placeholder="e.g. Regional warehouse replenishment" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs">
-                  </div>
-                </div>
-
-                <!-- Transfer Items -->
-                <div class="border border-slate-200 rounded-xl overflow-hidden">
-                  <div class="p-2.5 bg-slate-50 border-b border-slate-200 font-bold text-xs text-slate-700">Items to Transfer</div>
-                  <table class="w-full magic-grid text-left text-xs">
-                    <thead>
-                      <tr>
-                        <th>Item</th>
-                        <th class="w-24 text-right">Transfer Qty</th>
-                        <th class="w-28 text-right">Unit Rate (₹)</th>
-                        <th class="w-10 text-center">Del</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(row, idx) in stockTransferForm.items" :key="idx">
-                        <td>
-                          <select v-model="row.item_id" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-bold">
-                            <option v-for="it in items" :key="it.id" :value="it.id">{{ it.name }}</option>
-                          </select>
-                        </td>
-                        <td>
-                          <input type="number" min="1" v-model.number="row.qty" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-mono text-right font-bold">
-                        </td>
-                        <td>
-                          <input type="number" step="0.01" v-model.number="row.rate" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-mono text-right">
-                        </td>
-                        <td class="text-center">
-                          <button @click="stockTransferForm.items.splice(idx, 1)" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash-can"></i></button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div class="p-2 bg-slate-50 border-t border-slate-200">
-                    <button @click="stockTransferForm.items.push({ item_id: items[0]?.id || '', qty: 5, rate: 100 })" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
-                      <i class="fa-solid fa-plus-circle"></i> Add Item Line
-                    </button>
-                  </div>
-                </div>
-
-                <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
-                  <button @click="showStockTransferModal = false" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
-                  <button @click="submitStockTransfer" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2 rounded-lg shadow-sm flex items-center gap-1.5">
-                    <i class="fa-solid fa-check"></i> Execute Stock Transfer
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- PARTIES MASTER (Customer & Vendor Management) -->
-        <div v-if="currentView === 'parties_list'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div v-if="currentView === 'parties_list'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -564,7 +485,7 @@
           </div>
 
           <!-- Parties Table -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden">
+          <div class="border border-slate-200 rounded-xl overflow-x-auto">
             <table class="w-full magic-grid text-left">
               <thead>
                 <tr>
@@ -658,7 +579,7 @@
         </div>
 
         <!-- A. DASHBOARD -->
-        <div v-if="currentView === 'dashboard'" class="max-w-6xl mx-auto space-y-6">
+        <div v-if="currentView === 'dashboard'" class="w-full mx-auto space-y-6">
           <div class="flex justify-between items-center">
             <div>
               <h2 class="text-xl font-black text-slate-900 tracking-tight">Commercial ERP Overview</h2>
@@ -774,7 +695,7 @@
         </div>
 
         <!-- B. SALES INVOICE (Tax Invoice / POS) -->
-        <div v-if="currentView === 'sales_create'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div v-if="currentView === 'sales_create'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -817,7 +738,7 @@
           </div>
 
           <!-- Items Grid -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden mb-6">
+          <div class="border border-slate-200 rounded-xl overflow-x-auto mb-6">
             <table class="w-full magic-grid text-left">
               <thead>
                 <tr>
@@ -860,7 +781,7 @@
           </div>
 
           <!-- Bill Sundries Table (BUSY Style Discount, Freight, Insurance) -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden mb-6 bg-slate-50/50">
+          <div class="border border-slate-200 rounded-xl overflow-x-auto mb-6 bg-slate-50/50">
             <div class="px-4 py-2.5 bg-slate-100/70 border-b border-slate-200 flex justify-between items-center">
               <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
                 <i class="fa-solid fa-calculator text-blue-600"></i> Bill Sundries (Pre/Post GST Adjustments)
@@ -962,7 +883,7 @@
         </div>
 
         <!-- C. PURCHASE INWARD BILL (Vendor Invoice / Procure-to-Pay) -->
-        <div v-if="currentView === 'purchase_create'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div v-if="currentView === 'purchase_create'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -1005,7 +926,7 @@
           </div>
 
           <!-- Purchase Item Grid -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden mb-6">
+          <div class="border border-slate-200 rounded-xl overflow-x-auto mb-6">
             <table class="w-full magic-grid text-left">
               <thead>
                 <tr>
@@ -1046,7 +967,7 @@
           </div>
 
           <!-- Bill Sundries Table (Purchase Inward Adjustments) -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden mb-6 bg-slate-50/50">
+          <div class="border border-slate-200 rounded-xl overflow-x-auto mb-6 bg-slate-50/50">
             <div class="px-4 py-2.5 bg-slate-100/70 border-b border-slate-200 flex justify-between items-center">
               <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
                 <i class="fa-solid fa-calculator text-emerald-600"></i> Bill Sundries (Freight, Insurance & Discounts)
@@ -1148,7 +1069,7 @@
         </div>
 
         <!-- D. PAYMENT & RECEIPT VOUCHER (FIFO Bill Settlement) -->
-        <div v-if="currentView === 'payment_create'" class="max-w-4xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div v-if="currentView === 'payment_create'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -1180,9 +1101,11 @@
 
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Party Account</label>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">
+                  {{ paymentForm.voucher_type === 'RECEIPT' ? 'Customer (Sundry Debtor)' : 'Vendor (Sundry Creditor)' }}
+                </label>
                 <select v-model="paymentForm.party_account_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold">
-                  <option v-for="a in accounts" :key="a.id" :value="a.id">{{ a.name }} ({{ a.group_name }})</option>
+                  <option v-for="a in (paymentForm.voucher_type === 'RECEIPT' ? debtorAccounts : creditorAccounts)" :key="a.id" :value="a.id">{{ a.name }} ({{ a.group_name }})</option>
                 </select>
               </div>
               <div>
@@ -1218,7 +1141,7 @@
         </div>
 
         <!-- E. MANUFACTURING & PRODUCTION (BOM) -->
-        <div v-if="currentView === 'production_create'" class="max-w-4xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div v-if="currentView === 'production_create'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -1263,7 +1186,7 @@
         </div>
 
         <!-- F. PAYROLL & HRMS PROCESSING -->
-        <div v-if="currentView === 'payroll_view'" class="max-w-5xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div v-if="currentView === 'payroll_view'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -1275,13 +1198,18 @@
           </div>
 
           <div class="flex justify-between items-center mb-4">
-            <span class="text-xs font-bold text-slate-700">Active Employees ({{ employees.length }})</span>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-700">Active Employees ({{ employees.length }})</span>
+              <button @click="showAddEmployeeModal = true" class="text-xs font-bold text-rose-600 hover:text-rose-700 border border-rose-200 bg-rose-50 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                <i class="fa-solid fa-user-plus"></i> + Add Employee
+              </button>
+            </div>
             <button @click="processPayroll" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm flex items-center gap-1.5">
               <i class="fa-solid fa-calculator"></i> Run Monthly Payroll (Auto Journal)
             </button>
           </div>
 
-          <div class="border border-slate-200 rounded-xl overflow-hidden mb-6">
+          <div class="border border-slate-200 rounded-xl overflow-x-auto mb-6">
             <table class="w-full magic-grid text-left">
               <thead>
                 <tr>
@@ -1317,7 +1245,7 @@
         </div>
 
         <!-- G. DAY BOOK / VOUCHERS LIST -->
-        <div v-if="currentView === 'vouchers_list'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div v-if="currentView === 'vouchers_list'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -1330,7 +1258,7 @@
             </button>
           </div>
 
-          <div class="border border-slate-200 rounded-xl overflow-hidden">
+          <div class="border border-slate-200 rounded-xl overflow-x-auto">
             <table class="w-full magic-grid text-left">
               <thead>
                 <tr>
@@ -1391,7 +1319,7 @@
         </div>
 
         <!-- H. TRIAL BALANCE -->
-        <div v-if="currentView === 'trial_balance'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div v-if="currentView === 'trial_balance'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -1404,7 +1332,7 @@
             </button>
           </div>
 
-          <div class="border border-slate-200 rounded-xl overflow-hidden mb-4">
+          <div class="border border-slate-200 rounded-xl overflow-x-auto mb-4">
             <table class="w-full magic-grid text-left">
               <thead>
                 <tr>
@@ -1454,7 +1382,7 @@
         </div>
 
         <!-- I. STOCK STATUS & MULTI-GODOWN TRANSFERS -->
-        <div v-if="currentView === 'stock_status'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div v-if="currentView === 'stock_status'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -1498,7 +1426,7 @@
           </div>
 
           <!-- Stock Items Register -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden">
+          <div class="border border-slate-200 rounded-xl overflow-x-auto">
             <table class="w-full magic-grid text-left">
               <thead>
                 <tr>
@@ -1529,7 +1457,7 @@
         </div>
 
         <!-- I. BANK RECONCILIATION STATEMENT (BRS) -->
-        <div v-if="currentView === 'brs_view'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div v-if="currentView === 'brs_view'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -1575,7 +1503,7 @@
           </div>
 
           <!-- Cheque & Instrument Reconciliation Register -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden">
+          <div class="border border-slate-200 rounded-xl overflow-x-auto">
             <table class="w-full magic-grid text-left">
               <thead>
                 <tr>
@@ -1637,7 +1565,7 @@
         </div>
 
         <!-- J. CLOUD SYNC -->
-        <div v-if="currentView === 'cloud_sync'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div v-if="currentView === 'cloud_sync'" class="w-full mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
             <div>
               <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
@@ -1650,7 +1578,7 @@
             </button>
           </div>
 
-          <div class="border border-slate-200 rounded-xl overflow-hidden">
+          <div class="border border-slate-200 rounded-xl overflow-x-auto">
             <table class="w-full magic-grid text-left">
               <thead>
                 <tr>
@@ -1678,6 +1606,298 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+        </div>
+
+        
+        <!-- MODAL: NEW SALES ORDER -->
+        <div v-if="showNewOrderModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-100 overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-clipboard-list text-indigo-600"></i> Create New Sales Order
+              </h3>
+              <button @click="showNewOrderModal = false" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Customer</label>
+                  <select v-model="newOrderForm.party_account_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold">
+                    <option v-for="a in debtorAccounts" :key="a.id" :value="a.id">{{ a.name }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Warehouse</label>
+                  <select v-model="newOrderForm.material_centre_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold">
+                    <option v-for="g in godowns" :key="g.id" :value="g.id">{{ g.name }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Order Date</label>
+                  <input type="date" v-model="newOrderForm.date" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Expected Delivery</label>
+                  <input type="date" v-model="newOrderForm.delivery_due_date" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono">
+                </div>
+              </div>
+              <div class="border border-slate-200 rounded-xl overflow-hidden">
+                <div class="p-2.5 bg-slate-50 border-b border-slate-200 font-bold text-xs text-slate-700">Order Line Items</div>
+                <table class="w-full magic-grid text-left text-xs">
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th class="w-24 text-right">Qty</th>
+                      <th class="w-28 text-right">Rate (₹)</th>
+                      <th class="w-10 text-center">Del</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(it, idx) in newOrderForm.items" :key="idx">
+                      <td>
+                        <select v-model="it.item_id" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-bold">
+                          <option v-for="item in items" :key="item.id" :value="item.id">{{ item.name }}</option>
+                        </select>
+                      </td>
+                      <td><input type="number" min="1" v-model.number="it.qty" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-mono text-right font-bold"></td>
+                      <td><input type="number" step="0.01" v-model.number="it.rate" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-mono text-right"></td>
+                      <td class="text-center"><button @click="newOrderForm.items.splice(idx, 1)" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="p-2 bg-slate-50 border-t border-slate-200">
+                  <button @click="newOrderForm.items.push({ item_id: items[0]?.id || '', qty: 5, rate: 1200 })" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                    <i class="fa-solid fa-plus-circle"></i> Add Line Item
+                  </button>
+                </div>
+              </div>
+              <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+                <button @click="showNewOrderModal = false" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+                <button @click="submitNewOrder" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2 rounded-lg shadow-sm">Create Order</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODAL: NEW PURCHASE ORDER -->
+        <div v-if="showNewPOModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-100 overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-cart-flatbed text-teal-600"></i> Create Purchase Order (PO)
+              </h3>
+              <button @click="showNewPOModal = false" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Vendor</label>
+                  <select v-model="newPOForm.vendor_account_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold">
+                    <option v-for="a in creditorAccounts" :key="a.id" :value="a.id">{{ a.name }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Delivery Warehouse</label>
+                  <select v-model="newPOForm.material_centre_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold">
+                    <option v-for="g in godowns" :key="g.id" :value="g.id">{{ g.name }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">PO Date</label>
+                  <input type="date" v-model="newPOForm.date" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Expected Delivery</label>
+                  <input type="date" v-model="newPOForm.expected_delivery_date" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono">
+                </div>
+              </div>
+              <div class="border border-slate-200 rounded-xl overflow-hidden">
+                <div class="p-2.5 bg-slate-50 border-b border-slate-200 font-bold text-xs text-slate-700">PO Items</div>
+                <table class="w-full magic-grid text-left text-xs">
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th class="w-24 text-right">Qty</th>
+                      <th class="w-28 text-right">Rate (₹)</th>
+                      <th class="w-10 text-center">Del</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(it, idx) in newPOForm.items" :key="idx">
+                      <td>
+                        <select v-model="it.item_id" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-bold">
+                          <option v-for="item in items" :key="item.id" :value="item.id">{{ item.name }}</option>
+                        </select>
+                      </td>
+                      <td><input type="number" min="1" v-model.number="it.qty" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-mono text-right font-bold"></td>
+                      <td><input type="number" step="0.01" v-model.number="it.rate" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-mono text-right"></td>
+                      <td class="text-center"><button @click="newPOForm.items.splice(idx, 1)" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="p-2 bg-slate-50 border-t border-slate-200">
+                  <button @click="newPOForm.items.push({ item_id: items[0]?.id || '', qty: 10, rate: 800 })" class="text-xs font-bold text-teal-600 hover:text-teal-800 flex items-center gap-1">
+                    <i class="fa-solid fa-plus-circle"></i> Add Line Item
+                  </button>
+                </div>
+              </div>
+              <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+                <button @click="showNewPOModal = false" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+                <button @click="submitNewPO" class="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-5 py-2 rounded-lg shadow-sm">Create Purchase Order</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODAL: ADD EMPLOYEE -->
+        <div v-if="showAddEmployeeModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-user-plus text-rose-600"></i> Add Employee Master
+              </h3>
+              <button @click="showAddEmployeeModal = false" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-xs">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Emp Code *</label>
+                  <input type="text" v-model="newEmployeeForm.emp_code" placeholder="EMP-004" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono font-bold">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Full Name *</label>
+                  <input type="text" v-model="newEmployeeForm.name" placeholder="John Doe" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-bold">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Designation</label>
+                  <input type="text" v-model="newEmployeeForm.designation" placeholder="Operations Lead" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Department</label>
+                  <input type="text" v-model="newEmployeeForm.department" placeholder="Logistics" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg">
+                </div>
+              </div>
+              <div class="grid grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Basic Salary (₹) *</label>
+                  <input type="number" v-model.number="newEmployeeForm.basic_salary" class="magic-input w-full px-2.5 py-2 border border-slate-200 rounded-lg font-mono font-bold text-right">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">HRA (₹)</label>
+                  <input type="number" v-model.number="newEmployeeForm.hra" class="magic-input w-full px-2.5 py-2 border border-slate-200 rounded-lg font-mono text-right">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Allowances (₹)</label>
+                  <input type="number" v-model.number="newEmployeeForm.special_allowance" class="magic-input w-full px-2.5 py-2 border border-slate-200 rounded-lg font-mono text-right">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Joining Date</label>
+                  <input type="date" v-model="newEmployeeForm.joining_date" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">PAN Number</label>
+                  <input type="text" v-model="newEmployeeForm.pan_number" placeholder="ABCDE1234F" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg font-mono uppercase">
+                </div>
+              </div>
+              <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+                <button @click="showAddEmployeeModal = false" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+                <button @click="submitNewEmployee" class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-5 py-2 rounded-lg shadow-sm">Save Employee</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GLOBAL MODAL: STOCK TRANSFER -->
+        <div v-if="showStockTransferModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-100 overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-right-left text-indigo-600"></i> Godown-to-Godown Stock Transfer
+              </h3>
+              <button @click="showStockTransferModal = false" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="p-6 space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Source Godown (From)</label>
+                  <select v-model="stockTransferForm.source_material_centre_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-800">
+                    <option v-for="g in godowns" :key="g.id" :value="g.id">{{ g.name }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Destination Godown (To)</label>
+                  <select v-model="stockTransferForm.destination_material_centre_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold text-indigo-700">
+                    <option v-for="g in godowns" :key="g.id" :value="g.id">{{ g.name }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Transfer Date</label>
+                  <input type="date" v-model="stockTransferForm.date" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Transfer Reason / Narration</label>
+                  <input type="text" v-model="stockTransferForm.narration" placeholder="e.g. Regional warehouse replenishment" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs">
+                </div>
+              </div>
+
+              <!-- Transfer Items -->
+              <div class="border border-slate-200 rounded-xl overflow-x-auto">
+                <div class="p-2.5 bg-slate-50 border-b border-slate-200 font-bold text-xs text-slate-700">Items to Transfer</div>
+                <table class="w-full magic-grid text-left text-xs">
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th class="w-24 text-right">Transfer Qty</th>
+                      <th class="w-28 text-right">Unit Rate (₹)</th>
+                      <th class="w-10 text-center">Del</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(row, idx) in stockTransferForm.items" :key="idx">
+                      <td>
+                        <select v-model="row.item_id" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-bold">
+                          <option v-for="it in items" :key="it.id" :value="it.id">{{ it.name }}</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input type="number" min="1" v-model.number="row.qty" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-mono text-right font-bold">
+                      </td>
+                      <td>
+                        <input type="number" step="0.01" v-model.number="row.rate" class="magic-input w-full px-2 py-1 border border-slate-200 rounded-md text-xs font-mono text-right">
+                      </td>
+                      <td class="text-center">
+                        <button @click="stockTransferForm.items.splice(idx, 1)" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="p-2 bg-slate-50 border-t border-slate-200">
+                  <button @click="stockTransferForm.items.push({ item_id: items[0]?.id || '', qty: 5, rate: 100 })" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                    <i class="fa-solid fa-plus-circle"></i> Add Item Line
+                  </button>
+                </div>
+              </div>
+
+              <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+                <button @click="showStockTransferModal = false" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+                <button @click="submitStockTransfer" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2 rounded-lg shadow-sm flex items-center gap-1.5">
+                  <i class="fa-solid fa-check"></i> Execute Stock Transfer
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1713,6 +1933,37 @@
         const showAddPartyModal = ref(false);
         const showAddItemModal = ref(false);
         const showStockTransferModal = ref(false);
+        const showNewOrderModal = ref(false);
+        const showNewPOModal = ref(false);
+        const showAddEmployeeModal = ref(false);
+
+        const newOrderForm = ref({
+          party_account_id: '',
+          material_centre_id: '',
+          date: new Date().toISOString().split('T')[0],
+          delivery_due_date: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
+          items: [{ item_id: '', qty: 5, rate: 1200 }]
+        });
+
+        const newPOForm = ref({
+          vendor_account_id: '',
+          material_centre_id: '',
+          date: new Date().toISOString().split('T')[0],
+          expected_delivery_date: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
+          items: [{ item_id: '', qty: 10, rate: 800 }]
+        });
+
+        const newEmployeeForm = ref({
+          emp_code: '',
+          name: '',
+          designation: '',
+          department: '',
+          basic_salary: 25000,
+          hra: 10000,
+          special_allowance: 3000,
+          joining_date: new Date().toISOString().split('T')[0],
+          pan_number: ''
+        });
         const company = ref(null);
         const accounts = ref([]);
         const groups = ref([]);
@@ -1807,8 +2058,9 @@
           date: new Date().toISOString().split('T')[0]
         });
 
-        const debtorAccounts = computed(() => accounts.value.filter(a => a.group_name === 'Sundry Debtors' || a.nature === 'ASSET'));
-        const creditorAccounts = computed(() => accounts.value.filter(a => a.group_name === 'Sundry Creditors' || a.nature === 'LIABILITY'));
+        const debtorAccounts = computed(() => accounts.value.filter(a => a.group_name === 'Sundry Debtors'));
+        const selectedBOM = computed(() => boms.value.find(b => b.id === productionForm.value.bom_id));
+        const creditorAccounts = computed(() => accounts.value.filter(a => a.group_name === 'Sundry Creditors'));
         const bankCashAccounts = computed(() => accounts.value.filter(a => a.group_name === 'Bank Accounts' || a.group_name === 'Cash-in-hand' || a.code === 'CASH'));
         const partyAccountsList = computed(() => accounts.value.filter(a => a.group_name === 'Sundry Debtors' || a.group_name === 'Sundry Creditors'));
         const partyGroups = computed(() => groups.value.filter(g => g.name === 'Sundry Debtors' || g.name === 'Sundry Creditors'));
@@ -1845,7 +2097,21 @@
             if (units.value.length > 0) newItemForm.value.primary_unit_id = units.value[0].id;
 
             if (debtorAccounts.value.length > 0) salesForm.value.party_account_id = debtorAccounts.value[0].id;
-            if (creditorAccounts.value.length > 0) purchaseForm.value.vendor_account_id = creditorAccounts.value[0].id;
+            if (creditorAccounts.value.length > 0) {
+              purchaseForm.value.vendor_account_id = creditorAccounts.value[0].id;
+              newPOForm.value.vendor_account_id = creditorAccounts.value[0].id;
+            }
+            if (debtorAccounts.value.length > 0) {
+              newOrderForm.value.party_account_id = debtorAccounts.value[0].id;
+            }
+            if (godowns.value.length > 0) {
+              newOrderForm.value.material_centre_id = godowns.value[0].id;
+              newPOForm.value.material_centre_id = godowns.value[0].id;
+            }
+            if (items.value.length > 0) {
+              newOrderForm.value.items[0].item_id = items.value[0].id;
+              newPOForm.value.items[0].item_id = items.value[0].id;
+            }
             if (bankCashAccounts.value.length > 0) paymentForm.value.bank_cash_account_id = bankCashAccounts.value[0].id;
             if (accounts.value.length > 0) paymentForm.value.party_account_id = accounts.value[0].id;
 
@@ -2348,6 +2614,71 @@
           }
         };
 
+        const submitNewOrder = async () => {
+          if (!newOrderForm.value.party_account_id) return alert('Select customer');
+          if (!newOrderForm.value.material_centre_id) return alert('Select warehouse');
+          try {
+            const res = await fetch('/api/orders/sales', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newOrderForm.value)
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert('🎉 Sales Order ' + data.orderNumber + ' Created Successfully!');
+              showNewOrderModal.value = false;
+              loadOrders();
+            } else {
+              alert('Error: ' + data.error);
+            }
+          } catch (e) {
+            alert('Failed to create order: ' + e.message);
+          }
+        };
+
+        const submitNewPO = async () => {
+          if (!newPOForm.value.vendor_account_id) return alert('Select vendor');
+          if (!newPOForm.value.material_centre_id) return alert('Select warehouse');
+          try {
+            const res = await fetch('/api/orders/purchase', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newPOForm.value)
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert('🎉 Purchase Order ' + data.poNumber + ' Created Successfully!');
+              showNewPOModal.value = false;
+              loadProcurement();
+            } else {
+              alert('Error: ' + data.error);
+            }
+          } catch (e) {
+            alert('Failed to create PO: ' + e.message);
+          }
+        };
+
+        const submitNewEmployee = async () => {
+          if (!newEmployeeForm.value.emp_code || !newEmployeeForm.value.name) return alert('Emp code and name are required');
+          try {
+            const res = await fetch('/api/employees', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newEmployeeForm.value)
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert('🎉 Employee Master Created/Updated: ' + data.name);
+              showAddEmployeeModal.value = false;
+              loadEmployees();
+            } else {
+              alert('Error: ' + data.error);
+            }
+          } catch (e) {
+            alert('Failed to create employee: ' + e.message);
+          }
+        };
+
         const submitStockTransfer = async () => {
           if (!stockTransferForm.value.source_material_centre_id || !stockTransferForm.value.destination_material_centre_id) {
             return alert('Please select both Source and Destination Godowns');
@@ -2546,6 +2877,8 @@
           loadSync,
           loadEmployees,
           processPayroll,
+          promptEWayBill,
+          generateEInvoiceIRN,
           bankAccountsList,
           selectedBankAccountId,
           brsStatement,
@@ -2553,6 +2886,16 @@
           markChequeCleared,
           markChequeUncleared,
           showStockTransferModal,
+          showNewOrderModal,
+          showNewPOModal,
+          showAddEmployeeModal,
+          newOrderForm,
+          newPOForm,
+          newEmployeeForm,
+          submitNewOrder,
+          submitNewPO,
+          submitNewEmployee,
+          selectedBOM,
           godownsSummary,
           stockTransferForm,
           submitStockTransfer
