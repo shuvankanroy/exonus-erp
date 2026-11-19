@@ -7,6 +7,7 @@ import { createSalesVoucher } from './services/salesService.js';
 import { createPurchaseVoucher } from './services/purchaseService.js';
 import { createPaymentReceiptVoucher } from './services/paymentService.js';
 import { createSalesOrder, createDeliveryChallan, getSalesOrders, createSalesQuotation, getSalesQuotations, convertQuotationToOrder } from './services/orderService.js';
+import { createPurchaseOrder, createGoodsReceiptNote, getPurchaseOrders, getGoodsReceiptNotes } from './services/procurementService.js';
 import { executeProductionRun } from './services/manufacturingService.js';
 import { processMonthlyPayroll } from './services/payrollService.js';
 import { generateEWayBill, generateEInvoice } from './services/gstComplianceService.js';
@@ -326,6 +327,88 @@ app.post('/api/orders/sales', (req, res) => {
 app.post('/api/challans/delivery', (req, res) => {
   try {
     const result = createDeliveryChallan(db, {
+      ...req.body,
+      company_id: activeCompanyId,
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 3.4 Purchase Orders (Procurement)
+app.get('/api/orders/purchase', (req, res) => {
+  try {
+    const orders = getPurchaseOrders(db, activeCompanyId);
+    res.json(orders);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/orders/purchase/:id/items', (req, res) => {
+  try {
+    const items = db.prepare(`
+      SELECT 
+        poi.*, 
+        i.name as item_name, 
+        i.hsn_code, 
+        u.symbol as unit_symbol
+      FROM purchase_order_items poi
+      JOIN items i ON poi.item_id = i.id
+      JOIN units u ON poi.unit_id = u.id
+      WHERE poi.po_id = ?
+    `).all(req.params.id);
+    res.json(items);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/orders/purchase', (req, res) => {
+  try {
+    const result = createPurchaseOrder(db, {
+      ...req.body,
+      company_id: activeCompanyId,
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 3.5 Goods Receipt Notes (GRN / Material Inward Challan)
+app.get('/api/grn', (req, res) => {
+  try {
+    const grns = getGoodsReceiptNotes(db, activeCompanyId);
+    res.json(grns);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/grn/:id/items', (req, res) => {
+  try {
+    const items = db.prepare(`
+      SELECT 
+        gi.*, 
+        i.name as item_name, 
+        i.hsn_code, 
+        u.symbol as unit_symbol
+      FROM grn_items gi
+      JOIN items i ON gi.item_id = i.id
+      JOIN units u ON gi.unit_id = u.id
+      WHERE gi.grn_id = ?
+    `).all(req.params.id);
+    res.json(items);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/grn', (req, res) => {
+  try {
+    const result = createGoodsReceiptNote(db, {
       ...req.body,
       company_id: activeCompanyId,
     });

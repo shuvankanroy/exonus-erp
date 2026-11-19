@@ -80,9 +80,14 @@
           <span>Sales Orders & Quotes</span>
         </a>
 
+        <a @click="currentView = 'procurement_list'; loadProcurement();" :class="{ active: currentView === 'procurement_list' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
+          <i class="fa-solid fa-cart-flatbed w-4 text-center text-teal-600"></i>
+          <span>Purchase Orders & GRN</span>
+        </a>
+
         <a @click="currentView = 'purchase_create'" :class="{ active: currentView === 'purchase_create' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
           <i class="fa-solid fa-truck-ramp-box w-4 text-center text-emerald-600"></i>
-          <span>Purchase / GRN</span>
+          <span>Purchase / Inward Bill</span>
           <span class="ml-auto text-[9px] font-mono font-bold bg-slate-100 text-slate-500 px-1 py-0.5 rounded">F9</span>
         </a>
 
@@ -223,6 +228,122 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- PURCHASE ORDERS & GRN (Procure-to-Pay Lifecycle) -->
+        <div v-if="currentView === 'procurement_list'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-cart-flatbed text-teal-600"></i> Procure-to-Pay Lifecycle (PO & GRN)
+              </h2>
+              <p class="text-xs text-slate-400">Track vendor purchase orders, material inward challans (GRN), and unbilled receipts</p>
+            </div>
+            <div class="flex gap-2">
+              <button @click="loadProcurement" class="px-3 py-1.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1.5">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 1: Purchase Orders -->
+          <div class="mb-8">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-file-contract text-teal-600"></i> Active Purchase Orders
+            </h3>
+            <div class="border border-slate-200 rounded-xl overflow-hidden">
+              <table class="w-full magic-grid text-left">
+                <thead>
+                  <tr>
+                    <th>PO #</th>
+                    <th>Date</th>
+                    <th>Vendor</th>
+                    <th>Godown</th>
+                    <th class="text-right">Total (₹)</th>
+                    <th>Status</th>
+                    <th class="text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="po in purchaseOrdersList" :key="po.id" class="hover:bg-slate-50/50">
+                    <td class="font-mono text-xs font-bold text-teal-700">{{ po.po_number }}</td>
+                    <td class="font-mono text-xs text-slate-500">{{ po.date }}</td>
+                    <td class="font-bold text-slate-800">{{ po.vendor_name }}</td>
+                    <td class="text-xs text-slate-600">{{ po.godown_name }}</td>
+                    <td class="text-right font-mono font-black text-slate-900">₹{{ po.gross_total?.toFixed(2) }}</td>
+                    <td>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase"
+                        :class="{
+                          'bg-amber-50 text-amber-700 border border-amber-200': po.status === 'OPEN',
+                          'bg-blue-50 text-blue-700 border border-blue-200': po.status === 'PARTIAL',
+                          'bg-emerald-50 text-emerald-700 border border-emerald-200': po.status === 'COMPLETED'
+                        }">
+                        {{ po.status }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <button v-if="po.status !== 'COMPLETED'" @click="loadPOIntoPurchase(po)" class="text-xs font-bold text-teal-700 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 px-2.5 py-1 rounded-md transition">
+                        Convert to Bill ➔
+                      </button>
+                      <span v-else class="text-xs font-bold text-emerald-600">✓ Received</span>
+                    </td>
+                  </tr>
+                  <tr v-if="purchaseOrdersList.length === 0">
+                    <td colspan="7" class="text-center py-6 text-slate-400 text-xs">No purchase orders found.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Section 2: Goods Receipt Notes -->
+          <div>
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-boxes-packing text-emerald-600"></i> Goods Receipt Notes (Material Inward Challans)
+            </h3>
+            <div class="border border-slate-200 rounded-xl overflow-hidden">
+              <table class="w-full magic-grid text-left">
+                <thead>
+                  <tr>
+                    <th>GRN #</th>
+                    <th>Date</th>
+                    <th>Vendor</th>
+                    <th>Destination Godown</th>
+                    <th>Vendor Doc #</th>
+                    <th>Status</th>
+                    <th class="text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="grn in grnList" :key="grn.id" class="hover:bg-slate-50/50">
+                    <td class="font-mono text-xs font-bold text-emerald-700">{{ grn.grn_number }}</td>
+                    <td class="font-mono text-xs text-slate-500">{{ grn.date }}</td>
+                    <td class="font-bold text-slate-800">{{ grn.vendor_name }}</td>
+                    <td class="text-xs text-slate-600">{{ grn.godown_name }}</td>
+                    <td class="font-mono text-xs text-slate-500">{{ grn.vendor_delivery_doc || '-' }}</td>
+                    <td>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase"
+                        :class="{
+                          'bg-amber-50 text-amber-700 border border-amber-200': grn.status === 'PENDING_BILL',
+                          'bg-emerald-50 text-emerald-700 border border-emerald-200': grn.status === 'BILLED'
+                        }">
+                        {{ grn.status }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <button v-if="grn.status === 'PENDING_BILL'" @click="loadGRNIntoPurchase(grn)" class="text-xs font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-md transition">
+                        Bill GRN ➔
+                      </button>
+                      <span v-else class="text-xs font-bold text-emerald-600">✓ Billed</span>
+                    </td>
+                  </tr>
+                  <tr v-if="grnList.length === 0">
+                    <td colspan="7" class="text-center py-6 text-slate-400 text-xs">No goods receipt notes found.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -685,7 +806,15 @@
               </h2>
               <p class="text-xs text-slate-400">Records stock inward, Input Tax Credit (ITC), and vendor accounts payable</p>
             </div>
-            <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+            <div class="flex items-center gap-2">
+              <span v-if="purchaseForm.goods_receipt_note_id" class="text-xs font-bold px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                Linked to GRN
+              </span>
+              <span v-if="purchaseForm.purchase_order_id" class="text-xs font-bold px-2.5 py-1 rounded-md bg-teal-50 text-teal-700 border border-teal-200">
+                Linked to PO
+              </span>
+              <button @click="currentView = 'dashboard'" class="text-xs text-slate-500 hover:text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">Back</button>
+            </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -1162,6 +1291,8 @@
         const stockList = ref([]);
         const vouchersList = ref([]);
         const salesOrdersList = ref([]);
+        const purchaseOrdersList = ref([]);
+        const grnList = ref([]);
         const outboxList = ref([]);
         const boms = ref([]);
         const employees = ref([]);
@@ -1205,6 +1336,8 @@
           vendor_account_id: '',
           material_centre_id: '',
           vendor_invoice_number: '',
+          purchase_order_id: null,
+          goods_receipt_note_id: null,
           items: [{ item_id: '', qty: 10, purchase_rate: 0, gst_rate: 18, unit_symbol: 'Pcs' }]
         });
 
@@ -1454,6 +1587,8 @@
               vendor_account_id: purchaseForm.value.vendor_account_id,
               material_centre_id: purchaseForm.value.material_centre_id,
               vendor_invoice_number: purchaseForm.value.vendor_invoice_number,
+              purchase_order_id: purchaseForm.value.purchase_order_id,
+              goods_receipt_note_id: purchaseForm.value.goods_receipt_note_id,
               items: purchaseForm.value.items.map(i => ({
                 item_id: i.item_id,
                 qty: i.qty,
@@ -1474,6 +1609,7 @@
               loadTrialBalance();
               loadStock();
               loadVouchers();
+              loadProcurement();
               loadSync();
             } else {
               alert('Error: ' + data.error);
@@ -1512,6 +1648,63 @@
         const loadOrders = async () => {
           const res = await fetch('/api/orders/sales');
           salesOrdersList.value = await res.json();
+        };
+
+        const loadProcurement = async () => {
+          try {
+            const [poRes, grnRes] = await Promise.all([
+              fetch('/api/orders/purchase'),
+              fetch('/api/grn')
+            ]);
+            purchaseOrdersList.value = await poRes.json();
+            grnList.value = await grnRes.json();
+          } catch (e) {
+            console.error('Failed to load procurement:', e);
+          }
+        };
+
+        const loadPOIntoPurchase = async (po) => {
+          try {
+            const res = await fetch(`/api/orders/purchase/${po.id}/items`);
+            const poItems = await res.json();
+            purchaseForm.value.vendor_account_id = po.vendor_account_id;
+            purchaseForm.value.material_centre_id = po.material_centre_id;
+            purchaseForm.value.purchase_order_id = po.id;
+            purchaseForm.value.goods_receipt_note_id = null;
+            purchaseForm.value.vendor_invoice_number = `INV-PO-${po.po_number.replace('/', '-')}`;
+            purchaseForm.value.items = poItems.map(pi => ({
+              item_id: pi.item_id,
+              qty: pi.pending_qty || pi.ordered_qty,
+              purchase_rate: pi.rate,
+              gst_rate: pi.gst_rate,
+              unit_symbol: pi.unit_symbol
+            }));
+            currentView.value = 'purchase_create';
+          } catch (e) {
+            alert('Failed to load PO: ' + e.message);
+          }
+        };
+
+        const loadGRNIntoPurchase = async (grn) => {
+          try {
+            const res = await fetch(`/api/grn/${grn.id}/items`);
+            const grnItems = await res.json();
+            purchaseForm.value.vendor_account_id = grn.vendor_account_id;
+            purchaseForm.value.material_centre_id = grn.material_centre_id;
+            purchaseForm.value.goods_receipt_note_id = grn.id;
+            purchaseForm.value.purchase_order_id = grn.purchase_order_id || null;
+            purchaseForm.value.vendor_invoice_number = grn.vendor_delivery_doc || `INV-GRN-${grn.grn_number.replace('/', '-')}`;
+            purchaseForm.value.items = grnItems.map(gi => ({
+              item_id: gi.item_id,
+              qty: gi.received_qty,
+              purchase_rate: gi.rate,
+              gst_rate: 18,
+              unit_symbol: gi.unit_symbol
+            }));
+            currentView.value = 'purchase_create';
+          } catch (e) {
+            alert('Failed to load GRN: ' + e.message);
+          }
         };
 
         const loadOrderIntoInvoice = async (order) => {
@@ -1610,6 +1803,11 @@
           paymentForm,
           productionForm,
           salesOrdersList,
+          purchaseOrdersList,
+          grnList,
+          loadProcurement,
+          loadPOIntoPurchase,
+          loadGRNIntoPurchase,
           salesAccountBalance,
           debtorTotal,
           stockUnitsTotal,

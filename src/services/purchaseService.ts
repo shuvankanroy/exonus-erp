@@ -7,6 +7,8 @@ export interface PurchaseVoucherInput {
   date: string; // YYYY-MM-DD
   vendor_account_id: string; // Supplier (Sundry Creditor)
   material_centre_id: string; // Destination Godown
+  purchase_order_id?: string; // Optional Link to PO
+  goods_receipt_note_id?: string; // Optional Link to GRN
   vendor_invoice_number?: string;
   vendor_invoice_date?: string;
   narration?: string;
@@ -148,11 +150,35 @@ export function createPurchaseVoucher(db: Database.Database, input: PurchaseVouc
         line.gst_rate, line.cgst_amount, line.sgst_amount, line.igst_amount, line.net_amount
       );
 
-      // Stock Inward
-      insertStock.run(
-        randomUUID(), input.company_id, voucherId, line.item_id, line.batch_id,
-        line.material_centre_id, line.qty, line.rate, input.date
-      );
+      // Inward Perpetual Stock - Only inward if NOT already receipted via GRN
+      if (!input.goods_receipt_note_id) {
+        insertStock.run(
+          randomUUID(), input.company_id, voucherId, line.item_id, line.batch_id,
+          line.material_centre_id, line.qty, line.rate, input.date
+        );
+      }
+
+      // If linked to PO, update backlog
+      if (input.purchase_order_id) {
+        db.prepare(`
+          UPDATE purchase_order_items 
+          SET received_qty = received_qty + ?, 
+              pending_qty = MAX(0, pending_qty - ?)
+          WHERE po_id = ? AND item_id = ?
+        `).run(line.qty, line.qty, input.purchase_order_id, line.item_id);
+      }
+    }
+
+    if (input.purchase_order_id) {
+      const remainingPending = db.prepare(`
+        SELECT SUM(pending_qty) as total_pending FROM purchase_order_items WHERE po_id = ?
+      `).get(input.purchase_order_id) as any;
+      const newStatus = (remainingPending.total_pending || 0) === 0 ? 'COMPLETED' : 'PARTIAL';
+      db.prepare('UPDATE purchase_orders SET status = ? WHERE id = ?').run(newStatus, input.purchase_order_id);
+    }
+
+    if (input.goods_receipt_note_id) {
+      db.prepare("UPDATE goods_receipt_notes SET status = 'BILLED' WHERE id = ?").run(input.goods_receipt_note_id);
     }
 
     // 3. Double-Entry General Ledger Postings

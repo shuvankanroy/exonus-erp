@@ -140,6 +140,39 @@ export function extendCommercialSchema(db: Database.Database) {
       FOREIGN KEY (item_id) REFERENCES items(id)
     );
 
+    -- Goods Receipt Notes (GRN / Material Inward Challan)
+    CREATE TABLE IF NOT EXISTS goods_receipt_notes (
+      id TEXT PRIMARY KEY,
+      company_id TEXT NOT NULL,
+      grn_number TEXT NOT NULL,
+      date TEXT NOT NULL,
+      vendor_account_id TEXT NOT NULL,
+      purchase_order_id TEXT,
+      material_centre_id TEXT NOT NULL,
+      vendor_delivery_doc TEXT,
+      status TEXT DEFAULT 'PENDING_BILL' CHECK(status IN ('PENDING_BILL', 'BILLED', 'CANCELLED')),
+      narration TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+      FOREIGN KEY (vendor_account_id) REFERENCES accounts(id),
+      FOREIGN KEY (purchase_order_id) REFERENCES purchase_orders(id),
+      FOREIGN KEY (material_centre_id) REFERENCES material_centres(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS grn_items (
+      id TEXT PRIMARY KEY,
+      grn_id TEXT NOT NULL,
+      item_id TEXT NOT NULL,
+      batch_number TEXT,
+      mfg_date TEXT,
+      exp_date TEXT,
+      received_qty REAL NOT NULL,
+      unit_id TEXT NOT NULL,
+      rate REAL NOT NULL,
+      FOREIGN KEY (grn_id) REFERENCES goods_receipt_notes(id) ON DELETE CASCADE,
+      FOREIGN KEY (item_id) REFERENCES items(id)
+    );
+
     -- =========================================================================
     -- 2. MANUFACTURING & ASSEMBLY (Bill of Materials - BOM)
     -- =========================================================================
@@ -289,6 +322,9 @@ export function extendCommercialSchema(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_sq_items_quotation ON sales_quotation_items(quotation_id);
     CREATE INDEX IF NOT EXISTS idx_so_items_order ON sales_order_items(order_id);
     CREATE INDEX IF NOT EXISTS idx_po_items_po ON purchase_order_items(po_id);
+    CREATE INDEX IF NOT EXISTS idx_grn_items_grn ON grn_items(grn_id);
+    CREATE INDEX IF NOT EXISTS idx_grn_comp ON goods_receipt_notes(company_id, status);
+    CREATE INDEX IF NOT EXISTS idx_po_comp ON purchase_orders(company_id, status);
     CREATE INDEX IF NOT EXISTS idx_challan_items_challan ON delivery_challan_items(challan_id);
     CREATE INDEX IF NOT EXISTS idx_bom_raw_bom ON bom_raw_materials(bom_id);
   `);
