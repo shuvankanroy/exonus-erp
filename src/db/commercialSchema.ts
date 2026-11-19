@@ -6,6 +6,42 @@ export function extendCommercialSchema(db: Database.Database) {
     -- 1. ORDER-TO-CASH & PROCURE-TO-PAY LIFECYCLE (Quotations, Orders, Challans)
     -- =========================================================================
 
+    -- Sales Quotations / Estimates
+    CREATE TABLE IF NOT EXISTS sales_quotations (
+      id TEXT PRIMARY KEY,
+      company_id TEXT NOT NULL,
+      quotation_number TEXT NOT NULL,
+      date TEXT NOT NULL,
+      valid_until TEXT,
+      party_account_id TEXT NOT NULL,
+      status TEXT DEFAULT 'OPEN' CHECK(status IN ('OPEN', 'ACCEPTED', 'REJECTED', 'EXPIRED')),
+      narration TEXT,
+      sub_total REAL DEFAULT 0,
+      tax_total REAL DEFAULT 0,
+      gross_total REAL DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+      FOREIGN KEY (party_account_id) REFERENCES accounts(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS sales_quotation_items (
+      id TEXT PRIMARY KEY,
+      quotation_id TEXT NOT NULL,
+      item_id TEXT NOT NULL,
+      qty REAL NOT NULL,
+      unit_id TEXT NOT NULL,
+      rate REAL NOT NULL,
+      discount_pct REAL DEFAULT 0,
+      taxable_amount REAL NOT NULL,
+      gst_rate REAL NOT NULL,
+      cgst_amount REAL DEFAULT 0,
+      sgst_amount REAL DEFAULT 0,
+      igst_amount REAL DEFAULT 0,
+      net_amount REAL NOT NULL,
+      FOREIGN KEY (quotation_id) REFERENCES sales_quotations(id) ON DELETE CASCADE,
+      FOREIGN KEY (item_id) REFERENCES items(id)
+    );
+
     -- Sales Orders
     CREATE TABLE IF NOT EXISTS sales_orders (
       id TEXT PRIMARY KEY,
@@ -250,6 +286,7 @@ export function extendCommercialSchema(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_payroll_runs_vch ON payroll_runs(gl_voucher_id);
     CREATE INDEX IF NOT EXISTS idx_einvoice_vch ON gst_e_invoices(voucher_id);
     CREATE INDEX IF NOT EXISTS idx_eway_vch ON gst_e_way_bills(voucher_id);
+    CREATE INDEX IF NOT EXISTS idx_sq_items_quotation ON sales_quotation_items(quotation_id);
     CREATE INDEX IF NOT EXISTS idx_so_items_order ON sales_order_items(order_id);
     CREATE INDEX IF NOT EXISTS idx_po_items_po ON purchase_order_items(po_id);
     CREATE INDEX IF NOT EXISTS idx_challan_items_challan ON delivery_challan_items(challan_id);

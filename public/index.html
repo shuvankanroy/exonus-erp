@@ -75,6 +75,11 @@
           <span class="ml-auto text-[9px] font-mono font-bold bg-slate-100 text-slate-500 px-1 py-0.5 rounded">F8</span>
         </a>
 
+        <a @click="currentView = 'orders_list'; loadOrders();" :class="{ active: currentView === 'orders_list' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
+          <i class="fa-solid fa-clipboard-list w-4 text-center text-indigo-600"></i>
+          <span>Sales Orders & Quotes</span>
+        </a>
+
         <a @click="currentView = 'purchase_create'" :class="{ active: currentView === 'purchase_create' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
           <i class="fa-solid fa-truck-ramp-box w-4 text-center text-emerald-600"></i>
           <span>Purchase / GRN</span>
@@ -159,6 +164,67 @@
 
       <!-- VIEW CONTAINER -->
       <main class="flex-1 overflow-y-auto p-6">
+
+        <!-- SALES ORDERS & QUOTATIONS (Order-to-Cash Lifecycle) -->
+        <div v-if="currentView === 'orders_list'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-clipboard-list text-indigo-600"></i> Sales Orders & Backlog Tracking
+              </h2>
+              <p class="text-xs text-slate-400">Order-to-Cash pipeline: track pending delivery backlogs and convert to invoice</p>
+            </div>
+            <div class="flex gap-2">
+              <button @click="loadOrders" class="px-3 py-1.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1.5">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="border border-slate-200 rounded-xl overflow-hidden mb-8">
+            <table class="w-full magic-grid text-left">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Date</th>
+                  <th>Customer</th>
+                  <th>Warehouse</th>
+                  <th class="text-right">Order Total (₹)</th>
+                  <th>Fulfillment Status</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="o in salesOrdersList" :key="o.id" class="hover:bg-slate-50/50">
+                  <td class="font-mono text-xs font-bold text-indigo-600">{{ o.order_number }}</td>
+                  <td class="font-mono text-xs text-slate-500">{{ o.date }}</td>
+                  <td class="font-bold text-slate-800">{{ o.party_name }}</td>
+                  <td class="text-xs text-slate-600">{{ o.godown_name }}</td>
+                  <td class="text-right font-mono font-black text-slate-900">₹{{ o.gross_total?.toFixed(2) }}</td>
+                  <td>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase"
+                      :class="{
+                        'bg-amber-50 text-amber-700 border border-amber-200': o.status === 'OPEN',
+                        'bg-blue-50 text-blue-700 border border-blue-200': o.status === 'PARTIAL',
+                        'bg-emerald-50 text-emerald-700 border border-emerald-200': o.status === 'COMPLETED'
+                      }">
+                      {{ o.status }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <button v-if="o.status !== 'COMPLETED'" @click="loadOrderIntoInvoice(o)" class="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-md transition">
+                      Invoice Order ➔
+                    </button>
+                    <span v-else class="text-xs font-bold text-emerald-600">✓ Invoiced</span>
+                  </td>
+                </tr>
+                <tr v-if="salesOrdersList.length === 0">
+                  <td colspan="7" class="text-center py-6 text-slate-400 text-xs">No sales orders found.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         <!-- ITEMS & INVENTORY MASTER MANAGER -->
         <div v-if="currentView === 'items_list'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
@@ -1095,6 +1161,7 @@
         const trialBalance = ref({ rows: [], totalDebits: 0, totalCredits: 0, isBalanced: true });
         const stockList = ref([]);
         const vouchersList = ref([]);
+        const salesOrdersList = ref([]);
         const outboxList = ref([]);
         const boms = ref([]);
         const employees = ref([]);
@@ -1126,6 +1193,7 @@
           date: new Date().toISOString().split('T')[0],
           party_account_id: '',
           material_centre_id: '',
+          sales_order_id: null,
           pos_settlement_type: 'CREDIT',
           narration: '',
           items: [{ item_id: '', qty: 1, rate: 0, discount_pct: 0, gst_rate: 18, unit_symbol: 'Pcs' }]
@@ -1214,6 +1282,7 @@
             loadTrialBalance();
             loadStock();
             loadVouchers();
+            loadOrders();
             loadSync();
           } catch (e) {
             console.error('Initialization error:', e);
@@ -1345,6 +1414,7 @@
               date: salesForm.value.date,
               party_account_id: salesForm.value.party_account_id,
               material_centre_id: salesForm.value.material_centre_id,
+              sales_order_id: salesForm.value.sales_order_id,
               pos_settlement_type: salesForm.value.pos_settlement_type,
               narration: salesForm.value.narration,
               items: salesForm.value.items.map(i => ({
@@ -1439,6 +1509,33 @@
           alert('Select or configure a BOM Recipe in Administration to execute production run.');
         };
 
+        const loadOrders = async () => {
+          const res = await fetch('/api/orders/sales');
+          salesOrdersList.value = await res.json();
+        };
+
+        const loadOrderIntoInvoice = async (order) => {
+          try {
+            const res = await fetch(`/api/orders/sales/${order.id}/items`);
+            const orderItems = await res.json();
+            salesForm.value.party_account_id = order.party_account_id;
+            salesForm.value.material_centre_id = order.material_centre_id;
+            salesForm.value.sales_order_id = order.id;
+            salesForm.value.narration = `Billed against Sales Order ${order.order_number}`;
+            salesForm.value.items = orderItems.map(oi => ({
+              item_id: oi.item_id,
+              qty: oi.pending_qty || oi.ordered_qty,
+              rate: oi.rate,
+              discount_pct: oi.discount_pct,
+              gst_rate: oi.gst_rate,
+              unit_symbol: oi.unit_symbol
+            }));
+            currentView.value = 'sales_create';
+          } catch (e) {
+            alert('Failed to load order: ' + e.message);
+          }
+        };
+
         const loadTrialBalance = async () => {
           const res = await fetch('/api/reports/trial-balance');
           trialBalance.value = await res.json();
@@ -1512,6 +1609,7 @@
           purchaseForm,
           paymentForm,
           productionForm,
+          salesOrdersList,
           salesAccountBalance,
           debtorTotal,
           stockUnitsTotal,
@@ -1532,6 +1630,8 @@
           loadTrialBalance,
           loadStock,
           loadVouchers,
+          loadOrders,
+          loadOrderIntoInvoice,
           loadSync,
           loadEmployees,
           processPayroll

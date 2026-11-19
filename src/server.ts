@@ -6,7 +6,7 @@ import { seedCompanyAndStandardMasters } from './db/seed.js';
 import { createSalesVoucher } from './services/salesService.js';
 import { createPurchaseVoucher } from './services/purchaseService.js';
 import { createPaymentReceiptVoucher } from './services/paymentService.js';
-import { createSalesOrder, createDeliveryChallan, getSalesOrders } from './services/orderService.js';
+import { createSalesOrder, createDeliveryChallan, getSalesOrders, createSalesQuotation, getSalesQuotations, convertQuotationToOrder } from './services/orderService.js';
 import { executeProductionRun } from './services/manufacturingService.js';
 import { processMonthlyPayroll } from './services/payrollService.js';
 import { generateEWayBill, generateEInvoice } from './services/gstComplianceService.js';
@@ -249,13 +249,63 @@ app.get('/api/vouchers', (req, res) => {
 });
 
 // =========================================================================
-// PHASE 2: ORDER-TO-CASH (SALES ORDERS & DELIVERY CHALLANS)
+// PHASE 2: ORDER-TO-CASH (SALES ORDERS, QUOTATIONS & DELIVERY CHALLANS)
 // =========================================================================
+
+app.get('/api/quotations/sales', (req, res) => {
+  try {
+    const quotes = getSalesQuotations(db, activeCompanyId);
+    res.json(quotes);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/quotations/sales', (req, res) => {
+  try {
+    const result = createSalesQuotation(db, {
+      ...req.body,
+      company_id: activeCompanyId,
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/quotations/:id/convert-to-order', (req, res) => {
+  try {
+    const defaultGodown = db.prepare('SELECT id FROM material_centres WHERE company_id = ? LIMIT 1').get(activeCompanyId) as any;
+    const result = convertQuotationToOrder(db, req.params.id, defaultGodown?.id);
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
 
 app.get('/api/orders/sales', (req, res) => {
   try {
     const orders = getSalesOrders(db, activeCompanyId);
     res.json(orders);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/orders/sales/:id/items', (req, res) => {
+  try {
+    const items = db.prepare(`
+      SELECT 
+        soi.*, 
+        i.name as item_name, 
+        i.hsn_code, 
+        u.symbol as unit_symbol
+      FROM sales_order_items soi
+      JOIN items i ON soi.item_id = i.id
+      JOIN units u ON soi.unit_id = u.id
+      WHERE soi.order_id = ?
+    `).all(req.params.id);
+    res.json(items);
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }

@@ -7,6 +7,8 @@ export interface SalesVoucherInput {
   date: string; // YYYY-MM-DD
   party_account_id: string; // Customer / Cash
   material_centre_id: string; // Godown
+  sales_order_id?: string; // Optional Link to Sales Order
+  delivery_challan_id?: string; // Optional Link to Delivery Challan
   narration?: string;
   pos_settlement_type?: 'CASH' | 'UPI' | 'CARD' | 'SPLIT' | 'CREDIT';
   items: Array<{
@@ -138,11 +140,35 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
         line.gst_rate, line.cgst_amount, line.sgst_amount, line.igst_amount, line.net_amount
       );
 
-      // Stock ledger entry (Outward)
-      insertStock.run(
-        randomUUID(), input.company_id, voucherId, line.item_id, line.batch_id,
-        line.material_centre_id, line.qty, line.rate, input.date
-      );
+      // Stock ledger entry (Outward) - Only deduct if NOT already dispatched via Delivery Challan
+      if (!input.delivery_challan_id) {
+        insertStock.run(
+          randomUUID(), input.company_id, voucherId, line.item_id, line.batch_id,
+          line.material_centre_id, line.qty, line.rate, input.date
+        );
+      }
+
+      // If linked to Sales Order, update order backlog
+      if (input.sales_order_id) {
+        db.prepare(`
+          UPDATE sales_order_items 
+          SET delivered_qty = delivered_qty + ?, 
+              pending_qty = MAX(0, pending_qty - ?)
+          WHERE order_id = ? AND item_id = ?
+        `).run(line.qty, line.qty, input.sales_order_id, line.item_id);
+      }
+    }
+
+    if (input.sales_order_id) {
+      const remainingPending = db.prepare(`
+        SELECT SUM(pending_qty) as total_pending FROM sales_order_items WHERE order_id = ?
+      `).get(input.sales_order_id) as any;
+      const newStatus = (remainingPending.total_pending || 0) === 0 ? 'COMPLETED' : 'PARTIAL';
+      db.prepare('UPDATE sales_orders SET status = ? WHERE id = ?').run(newStatus, input.sales_order_id);
+    }
+
+    if (input.delivery_challan_id) {
+      db.prepare("UPDATE delivery_challans SET status = 'INVOICED' WHERE id = ?").run(input.delivery_challan_id);
     }
 
     // 4. Double-Entry General Ledger Postings

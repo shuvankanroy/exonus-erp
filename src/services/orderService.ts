@@ -1,6 +1,120 @@
 import Database from 'better-sqlite3';
 import { randomUUID } from 'crypto';
 
+export interface SalesQuotationInput {
+  company_id: string;
+  party_account_id: string;
+  date: string;
+  valid_until?: string;
+  narration?: string;
+  items: Array<{
+    item_id: string;
+    qty: number;
+    unit_id: string;
+    rate: number;
+    discount_pct?: number;
+  }>;
+}
+
+export function createSalesQuotation(db: Database.Database, input: SalesQuotationInput) {
+  const company = db.prepare('SELECT * FROM companies WHERE id = ?').get(input.company_id) as any;
+  if (!company) throw new Error('Company not found');
+
+  const party = db.prepare('SELECT * FROM accounts WHERE id = ?').get(input.party_account_id) as any;
+  if (!party) throw new Error('Customer account not found');
+
+  return db.transaction(() => {
+    const quoteCount = db.prepare('SELECT COUNT(*) as count FROM sales_quotations WHERE company_id = ?').get(input.company_id) as any;
+    const quotationNumber = `SQ/${String(quoteCount.count + 1).padStart(4, '0')}`;
+    const quotationId = randomUUID();
+
+    let totalTaxable = 0;
+    let totalTax = 0;
+    const isInterState = party.state_code && party.state_code !== company.state_code;
+
+    const processedLines = input.items.map((it) => {
+      const itemRow = db.prepare('SELECT * FROM items WHERE id = ?').get(it.item_id) as any;
+      if (!itemRow) throw new Error(`Item ${it.item_id} not found`);
+
+      const disc = it.discount_pct || 0;
+      const base = it.qty * it.rate;
+      const discountAmount = Math.round(((base * disc) / 100) * 100) / 100;
+      const taxable = Math.round((base - discountAmount) * 100) / 100;
+
+      let cgst = 0;
+      let sgst = 0;
+      let igst = 0;
+
+      if (isInterState) {
+        igst = Math.round(((taxable * itemRow.gst_rate) / 100) * 100) / 100;
+      } else {
+        cgst = Math.round(((taxable * (itemRow.gst_rate / 2)) / 100) * 100) / 100;
+        sgst = Math.round(((taxable * (itemRow.gst_rate / 2)) / 100) * 100) / 100;
+      }
+
+      totalTaxable = Math.round((totalTaxable + taxable) * 100) / 100;
+      totalTax = Math.round((totalTax + cgst + sgst + igst) * 100) / 100;
+
+      return {
+        id: randomUUID(),
+        item_id: it.item_id,
+        qty: it.qty,
+        unit_id: it.unit_id,
+        rate: it.rate,
+        discount_pct: disc,
+        taxable_amount: taxable,
+        gst_rate: itemRow.gst_rate,
+        cgst_amount: cgst,
+        sgst_amount: sgst,
+        igst_amount: igst,
+        net_amount: Math.round((taxable + cgst + sgst + igst) * 100) / 100,
+      };
+    });
+
+    const grossTotal = Math.round((totalTaxable + totalTax) * 100) / 100;
+
+    db.prepare(`
+      INSERT INTO sales_quotations (
+        id, company_id, quotation_number, date, valid_until, party_account_id, status, narration, sub_total, tax_total, gross_total
+      ) VALUES (?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?)
+    `).run(
+      quotationId, input.company_id, quotationNumber, input.date,
+      input.valid_until || null, input.party_account_id, input.narration || '',
+      totalTaxable, totalTax, grossTotal
+    );
+
+    const insertLine = db.prepare(`
+      INSERT INTO sales_quotation_items (
+        id, quotation_id, item_id, qty, unit_id, rate, discount_pct, taxable_amount, gst_rate, cgst_amount, sgst_amount, igst_amount, net_amount
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    for (const l of processedLines) {
+      insertLine.run(
+        l.id, quotationId, l.item_id, l.qty, l.unit_id, l.rate, l.discount_pct,
+        l.taxable_amount, l.gst_rate, l.cgst_amount, l.sgst_amount, l.igst_amount, l.net_amount
+      );
+    }
+
+    return {
+      quotationId,
+      quotationNumber,
+      grossTotal,
+      itemCount: processedLines.length
+    };
+  })();
+}
+
+export function getSalesQuotations(db: Database.Database, companyId: string) {
+  return db.prepare(`
+    SELECT sq.*, a.name as party_name 
+    FROM sales_quotations sq
+    JOIN accounts a ON sq.party_account_id = a.id
+    WHERE sq.company_id = ?
+    ORDER BY sq.date DESC, sq.created_at DESC
+  `).all(companyId);
+}
+
 export interface SalesOrderInput {
   company_id: string;
   party_account_id: string; // Customer
@@ -17,6 +131,34 @@ export interface SalesOrderInput {
     rate: number;
     discount_pct?: number;
   }>;
+}
+
+export function convertQuotationToOrder(db: Database.Database, quotationId: string, materialCentreId: string) {
+  const quote = db.prepare('SELECT * FROM sales_quotations WHERE id = ?').get(quotationId) as any;
+  if (!quote) throw new Error('Quotation not found');
+
+  const quoteItems = db.prepare('SELECT * FROM sales_quotation_items WHERE quotation_id = ?').all(quotationId) as any[];
+
+  return db.transaction(() => {
+    const orderResult = createSalesOrder(db, {
+      company_id: quote.company_id,
+      party_account_id: quote.party_account_id,
+      material_centre_id: materialCentreId,
+      date: new Date().toISOString().split('T')[0],
+      narration: `Converted from Quotation: ${quote.quotation_number}`,
+      items: quoteItems.map(qi => ({
+        item_id: qi.item_id,
+        ordered_qty: qi.qty,
+        unit_id: qi.unit_id,
+        rate: qi.rate,
+        discount_pct: qi.discount_pct
+      }))
+    });
+
+    db.prepare("UPDATE sales_quotations SET status = 'ACCEPTED' WHERE id = ?").run(quotationId);
+
+    return orderResult;
+  })();
 }
 
 export interface DeliveryChallanInput {
