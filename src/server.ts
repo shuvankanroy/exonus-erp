@@ -165,6 +165,43 @@ app.post('/api/items', (req, res) => {
   }
 });
 
+// 2.3 Create Unit Master
+app.post('/api/units', (req, res) => {
+  try {
+    const { name, symbol, uqc_code } = req.body;
+    if (!name || !name.trim()) throw new Error('Unit name is required');
+    if (!symbol || !symbol.trim()) throw new Error('Unit symbol is required');
+
+    const id = randomUUID();
+    db.prepare(`
+      INSERT INTO units (id, company_id, name, symbol, uqc_code)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(id, activeCompanyId, name.trim(), symbol.trim(), uqc_code || symbol.trim().toUpperCase());
+
+    res.json({ success: true, id, name: name.trim(), symbol: symbol.trim() });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// 2.4 Create Material Centre (Godown / Warehouse)
+app.post('/api/godowns', (req, res) => {
+  try {
+    const { name, address } = req.body;
+    if (!name || !name.trim()) throw new Error('Godown name is required');
+
+    const id = randomUUID();
+    db.prepare(`
+      INSERT INTO material_centres (id, company_id, name, address, is_default)
+      VALUES (?, ?, ?, ?, 0)
+    `).run(id, activeCompanyId, name.trim(), address || null);
+
+    res.json({ success: true, id, name: name.trim() });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
 // 3. Transactions / Vouchers
 app.get('/api/vouchers', (req, res) => {
   const vouchers = db.prepare(`

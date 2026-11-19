@@ -64,6 +64,11 @@
           <span>Parties (Debtors / Creditors)</span>
         </a>
 
+        <a @click="currentView = 'items_list'" :class="{ active: currentView === 'items_list' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
+          <i class="fa-solid fa-boxes-packing w-4 text-center text-emerald-600"></i>
+          <span>Items & Products Master</span>
+        </a>
+
         <a @click="currentView = 'sales_create'" :class="{ active: currentView === 'sales_create' }" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 cursor-pointer">
           <i class="fa-solid fa-receipt w-4 text-center text-blue-600"></i>
           <span>Sales & Invoicing</span>
@@ -154,6 +159,118 @@
 
       <!-- VIEW CONTAINER -->
       <main class="flex-1 overflow-y-auto p-6">
+
+        <!-- ITEMS & INVENTORY MASTER MANAGER -->
+        <div v-if="currentView === 'items_list'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-boxes-packing text-emerald-600"></i> Items Master (Products & Services)
+              </h2>
+              <p class="text-xs text-slate-400">Inventory items with SKU, HSN/SAC codes, GST slabs, pricing, and UoM</p>
+            </div>
+            <button @click="showAddItemModal = true" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-plus-circle"></i> + Add New Item
+            </button>
+          </div>
+
+          <!-- Items Table -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden">
+            <table class="w-full magic-grid text-left">
+              <thead>
+                <tr>
+                  <th>Item Name</th>
+                  <th>SKU / Code</th>
+                  <th>HSN Code</th>
+                  <th>Primary Unit</th>
+                  <th class="text-right">GST Rate</th>
+                  <th class="text-right">Sale Price (₹)</th>
+                  <th class="text-right">Purc. Price (₹)</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="it in items" :key="it.id" class="hover:bg-slate-50/50">
+                  <td class="font-bold text-slate-900">{{ it.name }}</td>
+                  <td class="font-mono text-xs text-blue-600 font-bold">{{ it.sku || '-' }}</td>
+                  <td class="font-mono text-xs text-slate-600">{{ it.hsn_code }}</td>
+                  <td><span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-xs font-semibold">{{ it.unit_symbol || 'Pcs' }}</span></td>
+                  <td class="text-right font-mono font-bold text-slate-700">{{ it.gst_rate }}%</td>
+                  <td class="text-right font-mono font-black text-blue-600">₹{{ it.standard_sale_rate?.toFixed(2) }}</td>
+                  <td class="text-right font-mono font-medium text-slate-700">₹{{ it.standard_purchase_rate?.toFixed(2) }}</td>
+                  <td><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Active</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Add Item Modal Dialog -->
+          <div v-if="showAddItemModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-2xl max-w-lg w-full p-6">
+              <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                  <i class="fa-solid fa-plus-circle text-emerald-600"></i> Add New Inventory Item
+                </h3>
+                <button @click="showAddItemModal = false" class="text-slate-400 hover:text-slate-600 font-bold text-lg">×</button>
+              </div>
+
+              <div class="space-y-3.5">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Item / Product Name *</label>
+                  <input type="text" v-model="newItemForm.name" placeholder="e.g. Laser Printer Toner Cartridge" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-800">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">SKU / Item Code</label>
+                    <input type="text" v-model="newItemForm.sku" placeholder="e.g. TNR-85A" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">HSN / SAC Code *</label>
+                    <input type="text" v-model="newItemForm.hsn_code" placeholder="e.g. 844399" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Primary Unit *</label>
+                    <select v-model="newItemForm.primary_unit_id" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold">
+                      <option v-for="u in units" :key="u.id" :value="u.id">{{ u.name }} ({{ u.symbol }})</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">GST Tax Slab *</label>
+                    <select v-model.number="newItemForm.gst_rate" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold text-blue-700">
+                      <option :value="0">0% (Nil / Exempt)</option>
+                      <option :value="5">5% GST</option>
+                      <option :value="12">12% GST</option>
+                      <option :value="18">18% GST (Standard)</option>
+                      <option :value="28">28% GST (Luxury)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Standard Sale Rate (₹)</label>
+                    <input type="number" step="0.01" v-model.number="newItemForm.standard_sale_rate" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Standard Purchase Rate (₹)</label>
+                    <input type="number" step="0.01" v-model.number="newItemForm.standard_purchase_rate" class="magic-input w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-mono font-bold">
+                  </div>
+                </div>
+
+                <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+                  <button @click="showAddItemModal = false" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+                  <button @click="submitNewItem" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2 rounded-lg shadow-sm flex items-center gap-1.5">
+                    <i class="fa-solid fa-check"></i> Save Item Master
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- PARTIES MASTER (Customer & Vendor Management) -->
         <div v-if="currentView === 'parties_list'" class="max-w-6xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6">
@@ -968,6 +1085,7 @@
       setup() {
         const currentView = ref('dashboard');
         const showAddPartyModal = ref(false);
+        const showAddItemModal = ref(false);
         const company = ref(null);
         const accounts = ref([]);
         const groups = ref([]);
@@ -990,6 +1108,17 @@
           address: '',
           credit_limit: 0,
           credit_period_days: 0
+        });
+
+        // New Item Form
+        const newItemForm = ref({
+          name: '',
+          sku: '',
+          hsn_code: '',
+          primary_unit_id: '',
+          gst_rate: 18,
+          standard_sale_rate: 0,
+          standard_purchase_rate: 0
         });
 
         // Sales Form
@@ -1062,6 +1191,7 @@
             units.value = data.units;
 
             if (partyGroups.value.length > 0) newPartyForm.value.group_id = partyGroups.value[0].id;
+            if (units.value.length > 0) newItemForm.value.primary_unit_id = units.value[0].id;
 
             if (debtorAccounts.value.length > 0) salesForm.value.party_account_id = debtorAccounts.value[0].id;
             if (creditorAccounts.value.length > 0) purchaseForm.value.vendor_account_id = creditorAccounts.value[0].id;
@@ -1175,6 +1305,31 @@
               newPartyForm.value.name = '';
               newPartyForm.value.gstin = '';
               newPartyForm.value.address = '';
+              loadInitialData();
+            } else {
+              alert('Error: ' + data.error);
+            }
+          } catch (e) {
+            alert('Failed: ' + e.message);
+          }
+        };
+
+        const submitNewItem = async () => {
+          if (!newItemForm.value.name) return alert('Please enter item name');
+          if (!newItemForm.value.hsn_code) return alert('Please enter HSN code');
+          try {
+            const res = await fetch('/api/items', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newItemForm.value)
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert(`🎉 Item "${data.name}" Created Successfully!`);
+              showAddItemModal.value = false;
+              newItemForm.value.name = '';
+              newItemForm.value.sku = '';
+              newItemForm.value.hsn_code = '';
               loadInitialData();
             } else {
               alert('Error: ' + data.error);
@@ -1333,12 +1488,14 @@
         return {
           currentView,
           showAddPartyModal,
+          showAddItemModal,
           company,
           accounts,
           groups,
           partyAccountsList,
           partyGroups,
           newPartyForm,
+          newItemForm,
           debtorAccounts,
           creditorAccounts,
           bankCashAccounts,
@@ -1367,6 +1524,7 @@
           calculatePurchaseLineTotal,
           computeTotals,
           submitNewParty,
+          submitNewItem,
           submitSalesVoucher,
           submitPurchaseVoucher,
           submitPaymentReceipt,
