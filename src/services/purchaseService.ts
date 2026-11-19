@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import { randomUUID } from 'crypto';
 import { calculateBillSundries, AppliedSundryInput } from './billSundryService.js';
+import { StockLedgerEngine } from './stockLedgerService.js';
 
 export interface PurchaseVoucherInput {
   company_id: string;
@@ -153,6 +154,25 @@ export function createPurchaseVoucher(db: Database.Database, input: PurchaseVouc
           randomUUID(), input.company_id, voucherId, line.item_id, line.batch_id,
           line.material_centre_id, line.qty, line.rate, input.date
         );
+
+        // ERPNext Immutable Stock Ledger Entry (SLE) & Bin Update
+        try {
+          const sleEngine = new StockLedgerEngine(db);
+          sleEngine.postEntry({
+            company_id: input.company_id,
+            voucher_id: voucherId,
+            voucher_type: 'PURCHASE',
+            voucher_number: voucherNumber,
+            posting_date: input.date,
+            item_id: line.item_id,
+            material_centre_id: line.material_centre_id,
+            batch_id: line.batch_id,
+            actual_qty: line.qty,
+            incoming_rate: line.rate
+          });
+        } catch (e) {
+          console.warn('SLE posting notice:', e);
+        }
       }
 
       // If linked to PO, update backlog

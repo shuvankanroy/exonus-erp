@@ -18,6 +18,7 @@ import { getTrialBalance, getStockStatus } from './services/reportService.js';
 import { calculateProfitAndLoss, calculateBalanceSheet, getAccountLedgerStatement, getGSTSummaryReport, getBillOutstandingReport } from './services/finalReportsService.js';
 import { createContraVoucher } from './services/contraService.js';
 import { getCompanyFeatures, updateCompanyFeatures, getVoucherSeriesList, updateVoucherSeries, freezeDataUpToDate, getActiveFreezeDate } from './services/configurationService.js';
+import { StockLedgerEngine } from './services/stockLedgerService.js';
 import { randomUUID } from 'crypto';
 import path from 'path';
 import fs from 'fs';
@@ -898,6 +899,129 @@ app.post('/api/stock/transfer', (req, res) => {
     res.json({ success: true, ...result });
   } catch (err: any) {
     res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// --- ERPNext-Grade Stock & Inventory Endpoints ---
+
+// 1. Stock Ledger Register (Immutable SLE Entries)
+app.get('/api/stock/ledger', (req, res) => {
+  try {
+    const engine = new StockLedgerEngine(db);
+    const entries = engine.getStockLedger(activeCompanyId, {
+      item_id: req.query.item_id as string,
+      material_centre_id: req.query.material_centre_id as string,
+      from_date: req.query.from_date as string,
+      to_date: req.query.to_date as string
+    });
+    res.json(entries);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// 2. Real-time Bin Balances & Projected Quantities
+app.get('/api/stock/bins', (req, res) => {
+  try {
+    const itemId = req.query.item_id as string;
+    let query = `
+      SELECT b.*, i.name as item_name, i.sku, i.hsn_code, mc.name as warehouse_name
+      FROM bins b
+      JOIN items i ON b.item_id = i.id
+      JOIN material_centres mc ON b.material_centre_id = mc.id
+      WHERE b.company_id = ?
+    `;
+    const params: any[] = [activeCompanyId];
+    if (itemId) {
+      query += ` AND b.item_id = ?`;
+      params.push(itemId);
+    }
+    query += ` ORDER BY i.name ASC, mc.name ASC`;
+    const bins = db.prepare(query).all(...params);
+    res.json(bins);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// 3. Stock Settings (FIFO / Moving Average, Negative Stock)
+app.get('/api/stock/settings', (req, res) => {
+  try {
+    let settings = db.prepare('SELECT * FROM stock_settings WHERE company_id = ?').get(activeCompanyId);
+    if (!settings) {
+      db.prepare(`
+        INSERT INTO stock_settings (id, company_id, default_valuation_method, allow_negative_stock)
+        VALUES (?, ?, 'FIFO', 0)
+      `).run(randomUUID(), activeCompanyId);
+      settings = db.prepare('SELECT * FROM stock_settings WHERE company_id = ?').get(activeCompanyId);
+    }
+    res.json(settings);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/stock/settings', (req, res) => {
+  try {
+    const { default_valuation_method, allow_negative_stock, stock_freeze_up_to_date } = req.body;
+    db.prepare(`
+      INSERT INTO stock_settings (id, company_id, default_valuation_method, allow_negative_stock, stock_freeze_up_to_date)
+      VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(company_id) DO UPDATE SET
+        default_valuation_method = excluded.default_valuation_method,
+        allow_negative_stock = excluded.allow_negative_stock,
+        stock_freeze_up_to_date = excluded.stock_freeze_up_to_date
+    `).run(
+      randomUUID(), activeCompanyId,
+      default_valuation_method || 'FIFO',
+      allow_negative_stock ? 1 : 0,
+      stock_freeze_up_to_date || null
+    );
+    res.json({ success: true, message: 'Stock settings updated successfully' });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// 4. Warehouse Hierarchy Master (Add / List)
+app.get('/api/warehouses/tree', (req, res) => {
+  try {
+    const warehouses = db.prepare(`
+      SELECT mc.*, parent.name as parent_name, acc.name as account_name
+      FROM material_centres mc
+      LEFT JOIN material_centres parent ON mc.parent_centre_id = parent.id
+      LEFT JOIN accounts acc ON mc.account_id = acc.id
+      WHERE mc.company_id = ?
+      ORDER BY mc.name ASC
+    `).all(activeCompanyId);
+    res.json(warehouses);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/warehouses', (req, res) => {
+  try {
+    const { name, parent_centre_id, is_group, account_id, address, is_default } = req.body;
+    if (!name) throw new Error('Warehouse name is required');
+    const id = randomUUID();
+    db.prepare(`
+      INSERT INTO material_centres (id, company_id, name, parent_centre_id, is_group, account_id, address, is_default)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(id, activeCompanyId, name, parent_centre_id || null, is_group ? 1 : 0, account_id || null, address || '', is_default ? 1 : 0);
+    res.json({ success: true, id, message: 'Warehouse created successfully' });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// 5. Units of Measure (UOM Dictionary)
+app.get('/api/units', (req, res) => {
+  try {
+    const units = db.prepare('SELECT * FROM units WHERE company_id = ? ORDER BY category ASC, name ASC').all(activeCompanyId);
+    res.json(units);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
   }
 });
 

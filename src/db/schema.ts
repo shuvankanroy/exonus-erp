@@ -100,6 +100,7 @@ export function initDatabase(dbPath?: string): Database.Database {
       name TEXT NOT NULL,
       symbol TEXT NOT NULL,
       uqc_code TEXT, -- e.g., 'BOX', 'PCS', 'KGS'
+      category TEXT, -- e.g. 'Unit', 'Length', 'Area', 'Volume', 'Weight'
       FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
     );
 
@@ -107,9 +108,72 @@ export function initDatabase(dbPath?: string): Database.Database {
       id TEXT PRIMARY KEY,
       company_id TEXT NOT NULL,
       name TEXT NOT NULL, -- e.g., 'Main Godown', 'Shop Floor'
+      parent_centre_id TEXT, -- Hierarchical parent godown (Tree structure)
+      is_group BOOLEAN DEFAULT 0, -- Folder group vs leaf storage node
+      account_id TEXT, -- Linked Stock-in-Hand GL Account
       address TEXT,
       is_default BOOLEAN DEFAULT 0,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+      FOREIGN KEY (parent_centre_id) REFERENCES material_centres(id),
+      FOREIGN KEY (account_id) REFERENCES accounts(id)
+    );
+
+    -- ERPNext-Grade Stock Settings & System Parameters
+    CREATE TABLE IF NOT EXISTS stock_settings (
+      id TEXT PRIMARY KEY,
+      company_id TEXT NOT NULL UNIQUE,
+      default_valuation_method TEXT DEFAULT 'FIFO' CHECK(default_valuation_method IN ('FIFO', 'Moving Average')),
+      allow_negative_stock BOOLEAN DEFAULT 0,
+      stock_freeze_up_to_date TEXT,
+      auto_reorder_enabled BOOLEAN DEFAULT 1,
       FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+    );
+
+    -- ERPNext-Grade Bins (Real-time Material Planning Cache)
+    CREATE TABLE IF NOT EXISTS bins (
+      id TEXT PRIMARY KEY,
+      company_id TEXT NOT NULL,
+      item_id TEXT NOT NULL,
+      material_centre_id TEXT NOT NULL,
+      actual_qty REAL DEFAULT 0,
+      ordered_qty REAL DEFAULT 0,
+      reserved_qty REAL DEFAULT 0,
+      indented_qty REAL DEFAULT 0,
+      planned_qty REAL DEFAULT 0,
+      projected_qty REAL DEFAULT 0,
+      valuation_rate REAL DEFAULT 0,
+      stock_value REAL DEFAULT 0,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+      FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
+      FOREIGN KEY (material_centre_id) REFERENCES material_centres(id) ON DELETE CASCADE,
+      UNIQUE(item_id, material_centre_id)
+    );
+
+    -- ERPNext-Grade Stock Ledger Entries (Immutable Journal)
+    CREATE TABLE IF NOT EXISTS stock_ledger_entries (
+      id TEXT PRIMARY KEY,
+      company_id TEXT NOT NULL,
+      voucher_id TEXT, -- Nullable/unconstrained for opening stock or pre-voucher movements
+      voucher_type TEXT NOT NULL, -- 'SALES', 'PURCHASE', 'STOCK_TRANSFER', 'STOCK_ENTRY', 'STOCK_RECON', 'DELIVERY_NOTE', 'PURCHASE_RECEIPT'
+      voucher_number TEXT NOT NULL,
+      posting_date TEXT NOT NULL,
+      posting_time TEXT NOT NULL,
+      item_id TEXT NOT NULL,
+      material_centre_id TEXT NOT NULL,
+      batch_id TEXT,
+      actual_qty REAL NOT NULL, -- + for inward, - for outward
+      qty_after_transaction REAL NOT NULL,
+      incoming_rate REAL DEFAULT 0,
+      outgoing_rate REAL DEFAULT 0,
+      valuation_rate REAL NOT NULL,
+      stock_value REAL NOT NULL,
+      stock_value_difference REAL NOT NULL,
+      stock_queue TEXT DEFAULT '[]', -- JSON serialized FIFO queue: [[qty, rate], ...]
+      is_cancelled BOOLEAN DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+      FOREIGN KEY (item_id) REFERENCES items(id),
+      FOREIGN KEY (material_centre_id) REFERENCES material_centres(id)
     );
 
     -- 5. Items, Batches & Pricing
@@ -320,7 +384,27 @@ export function initDatabase(dbPath?: string): Database.Database {
     CREATE INDEX IF NOT EXISTS idx_ledger_account_date ON ledger_entries(account_id, entry_date);
     CREATE INDEX IF NOT EXISTS idx_stock_item_mc ON stock_entries(item_id, material_centre_id);
     CREATE INDEX IF NOT EXISTS idx_outbox_pending ON sync_outbox(status);
+
+    -- Stock Ledger & Bin Indexing
+    CREATE INDEX IF NOT EXISTS idx_sle_item_mc ON stock_ledger_entries(item_id, material_centre_id, posting_date, posting_time);
+    CREATE INDEX IF NOT EXISTS idx_bins_lookup ON bins(item_id, material_centre_id);
   `);
+
+  // Auto-migration helper for material_centres
+  const existingMcCols = db.prepare("PRAGMA table_info(material_centres)").all() as Array<{ name: string }>;
+  const mcColNames = new Set(existingMcCols.map(c => c.name));
+  const newMcCols: Array<{ name: string; type: string }> = [
+    { name: 'parent_centre_id', type: 'TEXT' },
+    { name: 'is_group', type: 'BOOLEAN DEFAULT 0' },
+    { name: 'account_id', type: 'TEXT' }
+  ];
+  for (const col of newMcCols) {
+    if (!mcColNames.has(col.name)) {
+      try {
+        db.exec(`ALTER TABLE material_centres ADD COLUMN ${col.name} ${col.type}`);
+      } catch (e) {}
+    }
+  }
 
   // Auto-migration helper for existing databases: ensure new company columns exist
   const existingCols = db.prepare("PRAGMA table_info(companies)").all() as Array<{ name: string }>;

@@ -145,10 +145,43 @@ export function seedCompanyAndStandardMasters(db: Database.Database, config: Com
       insertSeries.run(randomUUID(), config.id, vt, 'Main', `${vt.slice(0, 3)}/`);
     }
 
-    // 5. Default Units & Material Centre
-    insertUnit.run(randomUUID(), config.id, 'Pieces', 'Pcs', 'PCS');
-    insertUnit.run(randomUUID(), config.id, 'Boxes', 'Box', 'BOX');
+    // 5. Default Units, Standard Units Master & Material Centre
+    const standardUnits = [
+      { name: 'Pieces', symbol: 'Pcs', uqc: 'PCS', cat: 'Unit' },
+      { name: 'Boxes', symbol: 'Box', uqc: 'BOX', cat: 'Unit' },
+      { name: 'Kilograms', symbol: 'Kg', uqc: 'KGS', cat: 'Weight' },
+      { name: 'Grams', symbol: 'Gm', uqc: 'GMS', cat: 'Weight' },
+      { name: 'Litres', symbol: 'Ltr', uqc: 'LTR', cat: 'Volume' },
+      { name: 'Metres', symbol: 'Mtr', uqc: 'MTR', cat: 'Length' },
+      { name: 'Numbers', symbol: 'Nos', uqc: 'NOS', cat: 'Unit' },
+      { name: 'Packets', symbol: 'Pkt', uqc: 'PAC', cat: 'Unit' },
+      { name: 'Cartons', symbol: 'Ctn', uqc: 'CTN', cat: 'Unit' },
+      { name: 'Sets', symbol: 'Set', uqc: 'SET', cat: 'Unit' },
+      { name: 'Rolls', symbol: 'Rol', uqc: 'ROL', cat: 'Unit' },
+      { name: 'Dozens', symbol: 'Dzn', uqc: 'DOZ', cat: 'Unit' }
+    ];
+
+    const insertUnitExt = db.prepare(`
+      INSERT INTO units (id, company_id, name, symbol, uqc_code, category)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `);
+
+    for (const u of standardUnits) {
+      insertUnitExt.run(randomUUID(), config.id, u.name, u.symbol, u.uqc, u.cat);
+    }
+
+    // Stock in Hand Asset Account
+    const stockInHandAccId = randomUUID();
+    insertAccount.run(stockInHandAccId, config.id, grpAssets, 'Stock-in-Hand', 'STOCK_ASSET');
+
+    // Material Centre with linked GL account
     insertMC.run(randomUUID(), config.id, 'Main Godown');
+
+    // Default Stock Settings
+    db.prepare(`
+      INSERT OR IGNORE INTO stock_settings (id, company_id, default_valuation_method, allow_negative_stock)
+      VALUES (?, ?, 'FIFO', 0)
+    `).run(randomUUID(), config.id);
   });
 
   seedTransaction();

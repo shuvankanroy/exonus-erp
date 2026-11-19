@@ -43,6 +43,21 @@ db.prepare(`
   VALUES (?, ?, NULL, ?, ?, 50, 1800, '2026-04-01')
 `).run(randomUUID(), companyId, itemId, godown.id);
 
+// Seed initial ERPNext Stock Ledger Entry (SLE) & Bin
+import { StockLedgerEngine } from './services/stockLedgerService.js';
+const sleEngine = new StockLedgerEngine(db);
+sleEngine.postEntry({
+  company_id: companyId,
+  voucher_id: undefined as any,
+  voucher_type: 'STOCK_ENTRY',
+  voucher_number: 'OPN/0001',
+  posting_date: '2026-04-01',
+  item_id: itemId,
+  material_centre_id: godown.id,
+  actual_qty: 50,
+  incoming_rate: 1800
+});
+
 console.log('✅ Setup & Masters initialized successfully.');
 
 // 4. Record a Sales Voucher (BUSY Double-Entry & Stock Movement Workflow)
