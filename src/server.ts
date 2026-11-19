@@ -84,7 +84,12 @@ app.get('/api/company', (req, res) => {
 // 2. Masters List (Accounts, Items, Godowns, Units)
 app.get('/api/masters', (req, res) => {
   const accounts = db.prepare(`
-    SELECT a.*, ag.name as group_name, ag.nature 
+    SELECT 
+      a.*, 
+      ag.name as group_name, 
+      ag.nature,
+      (COALESCE((SELECT SUM(debit) FROM ledger_entries WHERE account_id = a.id), 0) -
+       COALESCE((SELECT SUM(credit) FROM ledger_entries WHERE account_id = a.id), 0)) as current_balance
     FROM accounts a
     JOIN account_groups ag ON a.group_id = ag.id
     WHERE a.company_id = ?
@@ -202,15 +207,42 @@ app.post('/api/godowns', (req, res) => {
   }
 });
 
-// 3. Transactions / Vouchers
+// 2.5 Get Pending Bills for Party (Bill-by-Bill Settlement)
+app.get('/api/accounts/:id/pending-bills', (req, res) => {
+  try {
+    const bills = db.prepare(`
+      SELECT 
+        b.id,
+        b.ref_number,
+        b.bill_date,
+        b.due_date,
+        b.total_amount,
+        b.pending_amount,
+        v.voucher_type
+      FROM bill_references b
+      JOIN vouchers v ON b.ref_voucher_id = v.id
+      WHERE b.company_id = ? AND b.account_id = ? AND b.pending_amount > 0
+      ORDER BY b.bill_date ASC
+    `).all(activeCompanyId, req.params.id);
+    res.json(bills);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// 3. Transactions / Vouchers (Full Double-Entry Day Book)
 app.get('/api/vouchers', (req, res) => {
   const vouchers = db.prepare(`
-    SELECT v.*, a.name as party_name 
+    SELECT 
+      v.*, 
+      a.name as party_name,
+      v.gross_total as total_debit,
+      v.gross_total as total_credit
     FROM vouchers v
     LEFT JOIN accounts a ON v.party_account_id = a.id
     WHERE v.company_id = ?
     ORDER BY v.date DESC, v.created_at DESC
-    LIMIT 100
+    LIMIT 200
   `).all(activeCompanyId);
   res.json(vouchers);
 });

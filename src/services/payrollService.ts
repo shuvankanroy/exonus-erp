@@ -71,17 +71,59 @@ export function processMonthlyPayroll(db: Database.Database, input: ProcessPayro
       db.prepare("INSERT INTO accounts (id, company_id, group_id, name) VALUES (?, ?, ?, 'Salary Payable')").run(salaryPayable.id, input.company_id, liabGroup.id);
     }
 
-    // Debit Salary Expense (Gross)
+    const dutiesGroup = db.prepare("SELECT id FROM account_groups WHERE company_id = ? AND nature = 'LIABILITY' LIMIT 1").get(input.company_id) as any;
+
+    let pfPayable = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND name = 'PF Payable'").get(input.company_id) as any;
+    if (!pfPayable) {
+      pfPayable = { id: randomUUID() };
+      db.prepare("INSERT INTO accounts (id, company_id, group_id, name) VALUES (?, ?, ?, 'PF Payable')").run(pfPayable.id, input.company_id, dutiesGroup.id);
+    }
+
+    let esiPayable = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND name = 'ESI Payable'").get(input.company_id) as any;
+    if (!esiPayable) {
+      esiPayable = { id: randomUUID() };
+      db.prepare("INSERT INTO accounts (id, company_id, group_id, name) VALUES (?, ?, ?, 'ESI Payable')").run(esiPayable.id, input.company_id, dutiesGroup.id);
+    }
+
+    let ptPayable = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND name = 'Professional Tax Payable'").get(input.company_id) as any;
+    if (!ptPayable) {
+      ptPayable = { id: randomUUID() };
+      db.prepare("INSERT INTO accounts (id, company_id, group_id, name) VALUES (?, ?, ?, 'Professional Tax Payable')").run(ptPayable.id, input.company_id, dutiesGroup.id);
+    }
+
+    // 1. Debit Gross Salary Expense
     db.prepare(`
       INSERT INTO ledger_entries (id, company_id, voucher_id, account_id, debit, credit, entry_date, narration)
       VALUES (?, ?, ?, ?, ?, 0, ?, 'Gross Salary Expense')
     `).run(randomUUID(), input.company_id, journalVchId, salaryExp.id, totalGross, input.payment_date);
 
-    // Credit Salary Payable (Net)
+    // 2. Credit Net Salary Payable to Staff
     db.prepare(`
       INSERT INTO ledger_entries (id, company_id, voucher_id, account_id, debit, credit, entry_date, narration)
       VALUES (?, ?, ?, ?, 0, ?, ?, 'Net Salaries Payable to Staff')
     `).run(randomUUID(), input.company_id, journalVchId, salaryPayable.id, totalNet, input.payment_date);
+
+    // 3. Credit Statutory Liabilities (PF, ESI, PT) -> GUARANTEES EXACT BALANCING
+    if (totalPF > 0) {
+      db.prepare(`
+        INSERT INTO ledger_entries (id, company_id, voucher_id, account_id, debit, credit, entry_date, narration)
+        VALUES (?, ?, ?, ?, 0, ?, ?, 'Employee PF Statutory Deduction')
+      `).run(randomUUID(), input.company_id, journalVchId, pfPayable.id, totalPF, input.payment_date);
+    }
+
+    if (totalESI > 0) {
+      db.prepare(`
+        INSERT INTO ledger_entries (id, company_id, voucher_id, account_id, debit, credit, entry_date, narration)
+        VALUES (?, ?, ?, ?, 0, ?, ?, 'Employee ESI Statutory Deduction')
+      `).run(randomUUID(), input.company_id, journalVchId, esiPayable.id, totalESI, input.payment_date);
+    }
+
+    if (totalPT > 0) {
+      db.prepare(`
+        INSERT INTO ledger_entries (id, company_id, voucher_id, account_id, debit, credit, entry_date, narration)
+        VALUES (?, ?, ?, ?, 0, ?, ?, 'Professional Tax Deduction')
+      `).run(randomUUID(), input.company_id, journalVchId, ptPayable.id, totalPT, input.payment_date);
+    }
 
     // Record Payroll Run Table
     const payrollRunId = randomUUID();

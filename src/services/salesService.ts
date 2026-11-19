@@ -32,11 +32,13 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
   `).get(input.company_id, input.series_name || 'Main') as any;
   if (!series) throw new Error('Voucher series not found');
 
-  // Find system sales & tax accounts
-  const salesAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'SALES'").get(input.company_id) as any;
-  const cgstAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'CGST_OUT'").get(input.company_id) as any;
-  const sgstAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'SGST_OUT'").get(input.company_id) as any;
-  const igstAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'IGST_OUT'").get(input.company_id) as any;
+    // Find system accounts
+    const salesAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'SALES'").get(input.company_id) as any;
+    const cgstAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'CGST_OUT'").get(input.company_id) as any;
+    const sgstAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'SGST_OUT'").get(input.company_id) as any;
+    const igstAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'IGST_OUT'").get(input.company_id) as any;
+    const roundOffAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'ROUND_OFF'").get(input.company_id) as any;
+    const cashAcc = db.prepare("SELECT id FROM accounts WHERE company_id = ? AND code = 'CASH'").get(input.company_id) as any;
 
   // Determine Inter-state vs Intra-state GST
   const isInterState = party.state_code && party.state_code !== company.state_code;
@@ -60,24 +62,24 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
 
       const discountRate = it.discount_pct || 0;
       const baseAmount = it.qty * it.rate;
-      const discountAmount = (baseAmount * discountRate) / 100;
-      const taxable = baseAmount - discountAmount;
+      const discountAmount = Math.round(((baseAmount * discountRate) / 100) * 100) / 100;
+      const taxable = Math.round((baseAmount - discountAmount) * 100) / 100;
 
       let cgst = 0;
       let sgst = 0;
       let igst = 0;
 
       if (isInterState) {
-        igst = (taxable * itemRow.gst_rate) / 100;
+        igst = Math.round(((taxable * itemRow.gst_rate) / 100) * 100) / 100;
       } else {
-        cgst = (taxable * (itemRow.gst_rate / 2)) / 100;
-        sgst = (taxable * (itemRow.gst_rate / 2)) / 100;
+        cgst = Math.round(((taxable * (itemRow.gst_rate / 2)) / 100) * 100) / 100;
+        sgst = Math.round(((taxable * (itemRow.gst_rate / 2)) / 100) * 100) / 100;
       }
 
-      totalTaxable += taxable;
-      totalCgst += cgst;
-      totalSgst += sgst;
-      totalIgst += igst;
+      totalTaxable = Math.round((totalTaxable + taxable) * 100) / 100;
+      totalCgst = Math.round((totalCgst + cgst) * 100) / 100;
+      totalSgst = Math.round((totalSgst + sgst) * 100) / 100;
+      totalIgst = Math.round((totalIgst + igst) * 100) / 100;
 
       return {
         id: randomUUID(),
@@ -93,12 +95,15 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
         cgst_amount: cgst,
         sgst_amount: sgst,
         igst_amount: igst,
-        net_amount: taxable + cgst + sgst + igst,
+        net_amount: Math.round((taxable + cgst + sgst + igst) * 100) / 100,
       };
     });
 
-    const taxTotal = totalCgst + totalSgst + totalIgst;
-    const grossTotal = Math.round((totalTaxable + taxTotal) * 100) / 100;
+    const taxTotal = Math.round((totalCgst + totalSgst + totalIgst) * 100) / 100;
+    const computedGross = Math.round((totalTaxable + taxTotal) * 100) / 100;
+    // Commercial Round-Off to Nearest Rupee
+    const grossTotal = Math.round(computedGross);
+    const roundOffDiff = Math.round((grossTotal - computedGross) * 100) / 100;
 
     // 2. Insert Voucher Header
     db.prepare(`
@@ -147,8 +152,10 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    // Debit Party Account (Gross Total)
-    insertLedger.run(randomUUID(), input.company_id, voucherId, input.party_account_id, grossTotal, 0, input.date, `Sales: ${voucherNumber}`);
+    // Debit Party or Cash Account (Based on POS settlement)
+    const isCashSettlement = input.pos_settlement_type === 'CASH' && cashAcc;
+    const debitAccountId = isCashSettlement ? cashAcc.id : input.party_account_id;
+    insertLedger.run(randomUUID(), input.company_id, voucherId, debitAccountId, grossTotal, 0, input.date, `Sales: ${voucherNumber}`);
 
     // Credit Sales Account (Taxable Value)
     insertLedger.run(randomUUID(), input.company_id, voucherId, salesAcc.id, 0, totalTaxable, input.date, `Sales: ${voucherNumber}`);
@@ -158,15 +165,28 @@ export function createSalesVoucher(db: Database.Database, input: SalesVoucherInp
     if (totalSgst > 0) insertLedger.run(randomUUID(), input.company_id, voucherId, sgstAcc.id, 0, totalSgst, input.date, 'SGST Output');
     if (totalIgst > 0) insertLedger.run(randomUUID(), input.company_id, voucherId, igstAcc.id, 0, totalIgst, input.date, 'IGST Output');
 
-    // 5. Bill-by-Bill Reference Entry
-    db.prepare(`
-      INSERT INTO bill_references (
-        id, company_id, account_id, ref_voucher_id, ref_number, bill_date, total_amount, pending_amount
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      randomUUID(), input.company_id, input.party_account_id, voucherId,
-      voucherNumber, input.date, grossTotal, grossTotal
-    );
+    // Post Round-Off differential to ensure mathematical perfection (Debits === Credits)
+    if (roundOffDiff !== 0 && roundOffAcc) {
+      if (roundOffDiff > 0) {
+        // We added cents to round up: Credit Round-Off
+        insertLedger.run(randomUUID(), input.company_id, voucherId, roundOffAcc.id, 0, roundOffDiff, input.date, 'Round-Off (+)');
+      } else {
+        // We subtracted cents to round down: Debit Round-Off
+        insertLedger.run(randomUUID(), input.company_id, voucherId, roundOffAcc.id, Math.abs(roundOffDiff), 0, input.date, 'Round-Off (-)');
+      }
+    }
+
+    // 5. Bill-by-Bill Reference Entry (Only for Credit sales)
+    if (!isCashSettlement) {
+      db.prepare(`
+        INSERT INTO bill_references (
+          id, company_id, account_id, ref_voucher_id, ref_number, bill_date, total_amount, pending_amount
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        randomUUID(), input.company_id, input.party_account_id, voucherId,
+        voucherNumber, input.date, grossTotal, grossTotal
+      );
+    }
 
     // 6. Outbox Sync Queue (Replicates to Cloud for Silver Cloud & Gold Cloud)
     db.prepare(`
