@@ -176,7 +176,25 @@ export function initDatabase(dbPath?: string): Database.Database {
       FOREIGN KEY (material_centre_id) REFERENCES material_centres(id)
     );
 
-    -- 5. Items, Batches & Pricing
+    -- 5. Items, Batches, Serials & Classifications
+    CREATE TABLE IF NOT EXISTS item_groups (
+      id TEXT PRIMARY KEY,
+      company_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      parent_group_id TEXT,
+      is_group BOOLEAN DEFAULT 0,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+      FOREIGN KEY (parent_group_id) REFERENCES item_groups(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS brands (
+      id TEXT PRIMARY KEY,
+      company_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      description TEXT,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+    );
+
     CREATE TABLE IF NOT EXISTS items (
       id TEXT PRIMARY KEY,
       company_id TEXT NOT NULL,
@@ -184,6 +202,8 @@ export function initDatabase(dbPath?: string): Database.Database {
       sku TEXT,
       barcode TEXT,
       hsn_code TEXT NOT NULL,
+      item_group_id TEXT,
+      brand_id TEXT,
       gst_rate REAL NOT NULL, -- e.g. 5, 12, 18, 28
       primary_unit_id TEXT NOT NULL,
       alt_unit_id TEXT,
@@ -197,11 +217,14 @@ export function initDatabase(dbPath?: string): Database.Database {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
       FOREIGN KEY (primary_unit_id) REFERENCES units(id),
-      FOREIGN KEY (alt_unit_id) REFERENCES units(id)
+      FOREIGN KEY (alt_unit_id) REFERENCES units(id),
+      FOREIGN KEY (item_group_id) REFERENCES item_groups(id),
+      FOREIGN KEY (brand_id) REFERENCES brands(id)
     );
 
     CREATE TABLE IF NOT EXISTS item_batches (
       id TEXT PRIMARY KEY,
+      company_id TEXT NOT NULL,
       item_id TEXT NOT NULL,
       batch_number TEXT NOT NULL,
       mfg_date TEXT,
@@ -209,8 +232,56 @@ export function initDatabase(dbPath?: string): Database.Database {
       mrp REAL,
       sale_rate REAL,
       cost_price REAL,
+      disabled BOOLEAN DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
       FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
       UNIQUE(item_id, batch_number)
+    );
+
+    -- ERPNext-Grade Serial Numbers (Unique Unit Lifecycle)
+    CREATE TABLE IF NOT EXISTS serial_numbers (
+      id TEXT PRIMARY KEY,
+      company_id TEXT NOT NULL,
+      item_id TEXT NOT NULL,
+      batch_id TEXT,
+      serial_no TEXT NOT NULL,
+      material_centre_id TEXT, -- Current Godown location
+      status TEXT DEFAULT 'Active' CHECK(status IN ('Active', 'Delivered', 'Consumed', 'Expired')),
+      purchase_rate REAL DEFAULT 0,
+      purchase_voucher_id TEXT,
+      delivery_voucher_id TEXT,
+      warranty_expiry_date TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+      FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
+      FOREIGN KEY (batch_id) REFERENCES item_batches(id),
+      FOREIGN KEY (material_centre_id) REFERENCES material_centres(id),
+      UNIQUE(company_id, serial_no)
+    );
+
+    -- ERPNext-Grade Inventory Dimensions (Custom multi-dimensional tracking: Rack, Shelf, Bin, Bay)
+    CREATE TABLE IF NOT EXISTS inventory_dimensions (
+      id TEXT PRIMARY KEY,
+      company_id TEXT NOT NULL,
+      dimension_name TEXT NOT NULL, -- e.g. 'Rack', 'Shelf', 'Bay'
+      reference_document TEXT, -- Optional table link
+      apply_to_all BOOLEAN DEFAULT 1,
+      is_mandatory BOOLEAN DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+      UNIQUE(company_id, dimension_name)
+    );
+
+    -- Values assigned to Inventory Dimensions (e.g. Rack: R-01, Shelf: S-04)
+    CREATE TABLE IF NOT EXISTS inventory_dimension_values (
+      id TEXT PRIMARY KEY,
+      company_id TEXT NOT NULL,
+      dimension_id TEXT NOT NULL,
+      dimension_value TEXT NOT NULL, -- e.g. 'Rack-A1', 'Shelf-3'
+      material_centre_id TEXT, -- Optional Godown constraint
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+      FOREIGN KEY (dimension_id) REFERENCES inventory_dimensions(id) ON DELETE CASCADE
     );
 
     -- 6. Bill Sundries (Discount, Freight, Packaging, Round-off)
@@ -388,7 +459,26 @@ export function initDatabase(dbPath?: string): Database.Database {
     -- Stock Ledger & Bin Indexing
     CREATE INDEX IF NOT EXISTS idx_sle_item_mc ON stock_ledger_entries(item_id, material_centre_id, posting_date, posting_time);
     CREATE INDEX IF NOT EXISTS idx_bins_lookup ON bins(item_id, material_centre_id);
+
+    -- Serial & Batch Indexing
+    CREATE INDEX IF NOT EXISTS idx_serial_nos_item ON serial_numbers(item_id, status);
+    CREATE INDEX IF NOT EXISTS idx_batches_item ON item_batches(item_id, batch_number);
   `);
+
+  // Auto-migration helper for item_batches
+  const existingBatchCols = db.prepare("PRAGMA table_info(item_batches)").all() as Array<{ name: string }>;
+  const batchColNames = new Set(existingBatchCols.map(c => c.name));
+  const newBatchCols: Array<{ name: string; type: string }> = [
+    { name: 'company_id', type: 'TEXT' },
+    { name: 'disabled', type: 'BOOLEAN DEFAULT 0' }
+  ];
+  for (const col of newBatchCols) {
+    if (!batchColNames.has(col.name)) {
+      try {
+        db.exec(`ALTER TABLE item_batches ADD COLUMN ${col.name} ${col.type}`);
+      } catch (e) {}
+    }
+  }
 
   // Auto-migration helper for material_centres
   const existingMcCols = db.prepare("PRAGMA table_info(material_centres)").all() as Array<{ name: string }>;

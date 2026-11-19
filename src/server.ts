@@ -19,6 +19,7 @@ import { calculateProfitAndLoss, calculateBalanceSheet, getAccountLedgerStatemen
 import { createContraVoucher } from './services/contraService.js';
 import { getCompanyFeatures, updateCompanyFeatures, getVoucherSeriesList, updateVoucherSeries, freezeDataUpToDate, getActiveFreezeDate } from './services/configurationService.js';
 import { StockLedgerEngine } from './services/stockLedgerService.js';
+import { SerialBatchService } from './services/serialBatchService.js';
 import { randomUUID } from 'crypto';
 import path from 'path';
 import fs from 'fs';
@@ -1020,6 +1021,167 @@ app.get('/api/units', (req, res) => {
   try {
     const units = db.prepare('SELECT * FROM units WHERE company_id = ? ORDER BY category ASC, name ASC').all(activeCompanyId);
     res.json(units);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// --- Phase 2: Serial Numbers, Batches & Inventory Dimensions APIs ---
+
+// Batches API
+app.get('/api/batches', (req, res) => {
+  try {
+    const service = new SerialBatchService(db);
+    const itemId = req.query.item_id as string;
+    if (!itemId) throw new Error('item_id is required');
+    const batches = service.getBatchesForItem(itemId);
+    res.json(batches);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/batches', (req, res) => {
+  try {
+    const service = new SerialBatchService(db);
+    const result = service.createBatch({
+      ...req.body,
+      company_id: activeCompanyId
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Serial Numbers API
+app.get('/api/serials', (req, res) => {
+  try {
+    const service = new SerialBatchService(db);
+    const itemId = req.query.item_id as string;
+    const mcId = req.query.material_centre_id as string;
+    if (!itemId) throw new Error('item_id is required');
+    const serials = service.getAvailableSerials(itemId, mcId);
+    res.json(serials);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/serials', (req, res) => {
+  try {
+    const service = new SerialBatchService(db);
+    const { item_id, serial_nos, batch_id, material_centre_id, purchase_rate, warranty_expiry_date } = req.body;
+    if (!item_id || !serial_nos || !Array.isArray(serial_nos)) {
+      throw new Error('item_id and serial_nos array are required');
+    }
+    const inputs = serial_nos.map((sn: string) => ({
+      company_id: activeCompanyId,
+      item_id,
+      serial_no: sn,
+      batch_id,
+      material_centre_id,
+      purchase_rate,
+      warranty_expiry_date
+    }));
+    const registered = service.registerSerialNumbers(inputs);
+    res.json({ success: true, registered_count: registered.length, serials: registered });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Inventory Dimensions API (Rack, Shelf, Bin, Bay)
+app.get('/api/dimensions', (req, res) => {
+  try {
+    const service = new SerialBatchService(db);
+    const dimensions = service.getDimensions(activeCompanyId);
+    res.json(dimensions);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/dimensions', (req, res) => {
+  try {
+    const service = new SerialBatchService(db);
+    const { dimension_name, is_mandatory } = req.body;
+    if (!dimension_name) throw new Error('dimension_name is required');
+    const result = service.createDimension(activeCompanyId, dimension_name, is_mandatory);
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/dimension-values', (req, res) => {
+  try {
+    const service = new SerialBatchService(db);
+    const dimensionId = req.query.dimension_id as string;
+    const values = service.getDimensionValues(activeCompanyId, dimensionId);
+    res.json(values);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/dimension-values', (req, res) => {
+  try {
+    const service = new SerialBatchService(db);
+    const { dimension_id, dimension_value, material_centre_id } = req.body;
+    if (!dimension_id || !dimension_value) throw new Error('dimension_id and dimension_value are required');
+    const result = service.addDimensionValue(activeCompanyId, dimension_id, dimension_value, material_centre_id);
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Item Groups API
+app.get('/api/item-groups', (req, res) => {
+  try {
+    const groups = db.prepare('SELECT * FROM item_groups WHERE company_id = ? ORDER BY name ASC').all(activeCompanyId);
+    res.json(groups);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/item-groups', (req, res) => {
+  try {
+    const { name, parent_group_id, is_group } = req.body;
+    if (!name) throw new Error('name is required');
+    const id = randomUUID();
+    db.prepare(`
+      INSERT INTO item_groups (id, company_id, name, parent_group_id, is_group)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(id, activeCompanyId, name, parent_group_id || null, is_group ? 1 : 0);
+    res.json({ success: true, id, name });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Brands API
+app.get('/api/brands', (req, res) => {
+  try {
+    const brands = db.prepare('SELECT * FROM brands WHERE company_id = ? ORDER BY name ASC').all(activeCompanyId);
+    res.json(brands);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/brands', (req, res) => {
+  try {
+    const { name, description } = req.body;
+    if (!name) throw new Error('name is required');
+    const id = randomUUID();
+    db.prepare(`
+      INSERT INTO brands (id, company_id, name, description)
+      VALUES (?, ?, ?, ?)
+    `).run(id, activeCompanyId, name, description || '');
+    res.json({ success: true, id, name });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
