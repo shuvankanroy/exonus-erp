@@ -242,6 +242,34 @@ app.get('/api/masters', (req, res) => {
   res.json({ accounts, groups, items, godowns, units, billSundries });
 });
 
+// Direct master endpoints
+app.get('/api/items', (req, res) => {
+  const items = db.prepare(`
+    SELECT i.*, u.symbol as unit_symbol 
+    FROM items i
+    JOIN units u ON i.primary_unit_id = u.id
+    WHERE i.company_id = ?
+    ORDER BY i.name
+  `).all(activeCompanyId);
+  res.json(items);
+});
+
+app.get('/api/accounts', (req, res) => {
+  const accounts = db.prepare(`
+    SELECT 
+      a.*, 
+      ag.name as group_name, 
+      ag.nature,
+      (COALESCE((SELECT SUM(debit) FROM ledger_entries WHERE account_id = a.id), 0) -
+       COALESCE((SELECT SUM(credit) FROM ledger_entries WHERE account_id = a.id), 0)) as current_balance
+    FROM accounts a
+    JOIN account_groups ag ON a.group_id = ag.id
+    WHERE a.company_id = ?
+    ORDER BY a.name
+  `).all(activeCompanyId);
+  res.json(accounts);
+});
+
 // 2.1 Create Party / Account Master (BUSY Style)
 app.post('/api/accounts', (req, res) => {
   try {
